@@ -1,3 +1,46 @@
+;;
+;; RSpec (minor) mode
+;; ==================
+;;
+;; This minor mode provides some minor enhancements to ruby-mode in
+;; the contexts of RSpec specifications.  Namely, it provides the
+;; following capabilities:
+;;
+;;  * toggle back and forth between a spec and it's target (bound to
+;;    `\C-c so`)
+;;
+;;  * verify the spec file associated with the current buffer (bound to `\C-c ,`)
+;;  
+;;  * verify the spec defined in the current buffer if it is a spec
+;;    file (bound to `\C-c ,`)
+;;
+;;  * ability to disable the example at the point (bound to `\C-c sd)
+;;
+;;  * ability to reenable the disabled example at the point (bound to
+;;    `\C-c se
+;;
+;;
+;; Known Issues
+;; ------------
+;;
+;; Disable/reenable example miss parts of the current example some time.
+;;
+;;
+;; (c) 2008 Peter Williams <http://pezra.barelyenough.org>
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; See <http://www.gnu.org/licenses/> for a copy of the GNU General
+;; Public License.
+
 (require 'ruby-mode)
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
@@ -16,6 +59,17 @@
   "Minor mode for rSpec files"
   :lighter " rSpec"
   :keymap  (rspec-keymap))
+
+;; Snippets
+(snippet-with-abbrev-table
+ 'rspec-mode-abbrev-table
+ ("helper" . "require 'pathname'\nrequire Pathname(__FILE__).dirname + '../spec_helper'\n\n$.")
+ ("desc"   . "describe $${ClassName} do\n  $.\nend ")
+ ("descm"  . "describe $${ClassName}, \"$${modifier}\" do\n  $.\nend ")
+ ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
+ ("bef"    . "before do\n  $.\n  end"))
+
+
 
 
 (defun rspec-disable-spec ()
@@ -151,7 +205,6 @@
 (require 'mode-compile)
 (add-to-list 'compilation-error-regexp-alist '("\\(.*?\\)\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 2 3))
 (add-to-list 'mode-compile-modes-alist '(rspec-mode . (respec-compile kill-compilation)))
-
 
 
 (provide 'rspec-mode)
