@@ -29,7 +29,8 @@
 ;; Dependencies
 ;; ------------
 ;;
-;; This minor mode depends on `mode-compile`.
+;; This minor mode depends on `mode-compile`.  The expectations depend
+;; `on el-expectataions.el`.
 ;; 
 ;;
 ;; (c) 2008 Peter Williams <http://pezra.barelyenough.org>
@@ -153,7 +154,7 @@
 (defun rspec-directory-subdirectories (directory)
   "Returns list of subdirectories"
   (remove-if 
-   (lambda (dir) (or (string-match-p "^\\.\\.?$" (file-name-nondirectory dir)) 
+   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir)) 
                      (not (file-directory-p dir))))
    (directory-files directory t)))
 
@@ -177,7 +178,7 @@
 
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
-  (string-match-p "\\(_\\|-\\)spec\\.rb$" a-file-name))
+  (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
 
 (defun rspec-buffer-is-spec-p ()
   "Returns true if the current buffer is a spec"
