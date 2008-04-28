@@ -2,7 +2,7 @@
 ;; RSpec (minor) mode
 ;; ==================
 ;;
-;; This minor mode provides some minor enhancements to ruby-mode in
+;; This minor mode provides some enhancements to ruby-mode in
 ;; the contexts of RSpec specifications.  Namely, it provides the
 ;; following capabilities:
 ;;
@@ -23,8 +23,14 @@
 ;; Known Issues
 ;; ------------
 ;;
-;; Disable/reenable example miss parts of the current example some time.
+;; Disable/reenable example miss parts of the current example sometimes.
 ;;
+;;
+;; Dependencies
+;; ------------
+;;
+;; This minor mode depends on `mode-compile`.
+;; 
 ;;
 ;; (c) 2008 Peter Williams <http://pezra.barelyenough.org>
 ;;
