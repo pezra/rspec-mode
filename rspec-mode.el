@@ -7,17 +7,17 @@
 ;; following capabilities:
 ;;
 ;;  * toggle back and forth between a spec and it's target (bound to
-;;    `\C-c so`)
+;;    `\C-c ,t`)
 ;;
-;;  * verify the spec file associated with the current buffer (bound to `\C-c ,`)
+;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
 ;;  
 ;;  * verify the spec defined in the current buffer if it is a spec
-;;    file (bound to `\C-c ,`)
+;;    file (bound to `\C-c ,v`)
 ;;
-;;  * ability to disable the example at the point (bound to `\C-c sd)
+;;  * ability to disable the example at the point (bound to `\C-c ,d)
 ;;
 ;;  * ability to reenable the disabled example at the point (bound to
-;;    `\C-c se
+;;    `\C-c ,e
 ;;
 ;;
 ;; Known Issues
@@ -56,10 +56,10 @@
   "Creates a keymap for spec files"
   (let ((rspec-mode-map (make-sparse-keymap)))
     (define-keys rspec-mode-map
-      ((kbd "C-c ,")   'rspec-verify)
-      ((kbd "C-c sd")  'rspec-disable-spec)
-      ((kbd "C-c se")  'rspec-enable-spec)
-      ((kbd "C-c so")  'rspec-toggle-spec-and-target))
+      ((kbd "C-c ,v")   'rspec-verify)
+      ((kbd "C-c ,d")  'rspec-disable-spec)
+      ((kbd "C-c ,e")  'rspec-enable-spec)
+      ((kbd "C-c ,t")  'rspec-toggle-spec-and-target))
     rspec-mode-map))
 
 (define-minor-mode rspec-mode
@@ -198,8 +198,8 @@
 ;; Add verify related spec keybinding to ruby ruby modes
 (add-hook 'ruby-mode-hook
           (lambda ()
-            (local-set-key (kbd "C-c ,") 'rspec-verify)
-            (local-set-key (kbd "C-c so") 'rspec-toggle-spec-and-target)))
+            (local-set-key (kbd "C-c ,v") 'rspec-verify)
+            (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target)))
 
 ;; This hook makes any abbreviation that are defined in
 ;; rspec-mode-abbrev-table available in rSpec buffers
