@@ -14,17 +14,14 @@
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
-;;  * disable the example at the point (bound to `\C-c ,d`)
+;;  * toggle the pendingness of the example at the point (bound to
+;;    `\C-c ,d`)
 ;;
-;;  * reenable the disabled example at the point (bound to
-;;    `\C-c ,e`)
+;;  * disable the example at the point by making it pending
+;;
+;;  * reenable the disabled example at the point
 ;;
 ;;  * run "spec" rake task for project (bound to `\C-c ,a`)
-;;
-;; Known Issues
-;; ------------
-;;
-;; Disable/reenable example miss parts of the current example sometimes.
 ;;
 ;;
 ;; Dependencies
@@ -59,8 +56,7 @@
     (define-keys rspec-mode-map
       ((kbd "C-c ,v")  'rspec-verify)
       ((kbd "C-c ,a")  'rspec-verify-all)
-      ((kbd "C-c ,d")  'rspec-disable-spec)
-      ((kbd "C-c ,e")  'rspec-enable-spec)
+      ((kbd "C-c ,d")  'rspec-toggle-example-pendingness)
       ((kbd "C-c ,t")  'rspec-toggle-spec-and-target))
     rspec-mode-map))
 
@@ -80,30 +76,52 @@
 
 
 
+(defun rspec-beginning-of-example ()
+  "Moves point to the beginning of the example in which the point current is."
+  (interactive)
+  (let ((start (point)))
+    (goto-char 
+     (save-excursion
+       (end-of-line)
+       (unless (and (search-backward-regexp "^[[:space:]]*it[[:space:]]*(?[\"']" nil t)
+                    (save-excursion (ruby-end-of-block) (< start (point))))
+         (error "Unable to find an example"))
+       (point)))))
 
-(defun rspec-disable-spec ()
-  "Disable the spec in which the point is located"
+(defun rspec-example-pending-p ()
+  "True if the example under point is pending. Otherwise false"
   (interactive)
   (save-excursion
-    (ruby-beginning-of-block)
-    (search-forward-regexp "do\\|{")
-    (backward-word)
-    (insert "\n")
-    (let ((start (point)))
-      (ruby-end-of-block)
-      (search-forward-regexp "end\\|}")
-      (comment-region start (point)))))
+    (rspec-beginning-of-example)
+    (re-search-forward "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)) t)))
 
-(defun rspec-enable-spec ()
-  "Enable the spec in which the point is located"
+
+(defun rspec-toggle-example-pendingness ()
+  "Disables active examples and enables pending examples."
   (interactive)
-  (save-excursion
-    (search-backward-regexp "^[^#]")
-    (next-line)
-    (join-line)
-    (let ((start (point)))
-      (search-forward-regexp "^[^#]")
-      (uncomment-region start (point)))))
+  (if (rspec-example-pending-p)
+      (rspec-enable-example)
+    (rspec-disable-example)))
+
+(defun rspec-disable-example ()
+  "Disable the example in which the point is located"
+  (interactive)
+  (when (not (rspec-example-pending-p))   
+    (save-excursion
+      (rspec-beginning-of-example)
+      (end-of-line)
+      (insert "\npending")
+      (indent-for-tab-command))))
+
+(defun rspec-enable-example ()
+  "Enable the example in which the point is located"
+  (interactive)
+  (when (rspec-example-pending-p)
+    (save-excursion
+      (rspec-beginning-of-example)
+      (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
+      (beginning-of-line)
+      (kill-line))))
 
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
