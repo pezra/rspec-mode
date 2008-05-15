@@ -14,11 +14,12 @@
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
-;;  * ability to disable the example at the point (bound to `\C-c ,d)
+;;  * disable the example at the point (bound to `\C-c ,d`)
 ;;
-;;  * ability to reenable the disabled example at the point (bound to
-;;    `\C-c ,e
+;;  * reenable the disabled example at the point (bound to
+;;    `\C-c ,e`)
 ;;
+;;  * run "spec" rake task for project (bound to `\C-c ,a`)
 ;;
 ;; Known Issues
 ;; ------------
@@ -56,7 +57,8 @@
   "Creates a keymap for spec files"
   (let ((rspec-mode-map (make-sparse-keymap)))
     (define-keys rspec-mode-map
-      ((kbd "C-c ,v")   'rspec-verify)
+      ((kbd "C-c ,v")  'rspec-verify)
+      ((kbd "C-c ,a")  'rspec-verify-all)
       ((kbd "C-c ,d")  'rspec-disable-spec)
       ((kbd "C-c ,e")  'rspec-enable-spec)
       ((kbd "C-c ,t")  'rspec-toggle-spec-and-target))
@@ -107,6 +109,11 @@
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
   (compile (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse")))
+
+(defun rspec-verify-all ()
+  "Runs the 'spec' rake task for the project of the current file."
+  (interactive)
+  (compile "rake spec SPEC_OPTS='--format=progress'"))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -199,6 +206,14 @@
 (add-hook 'ruby-mode-hook
           (lambda ()
             (local-set-key (kbd "C-c ,v") 'rspec-verify)
+            (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
+            (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target)))
+
+;; Add verify related spec keybinding to ruby ruby modes
+(add-hook 'rails-minor-mode-hook
+          (lambda ()
+            (local-set-key (kbd "C-c ,v") 'rspec-verify)
+            (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
             (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target)))
 
 ;; This hook makes any abbreviation that are defined in
