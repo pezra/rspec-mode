@@ -52,13 +52,12 @@
 
 (defun rspec-keymap ()
   "Creates a keymap for spec files"
-  (let ((rspec-mode-map (make-sparse-keymap)))
-    (define-keys rspec-mode-map
-      ((kbd "C-c ,v")  'rspec-verify)
-      ((kbd "C-c ,a")  'rspec-verify-all)
-      ((kbd "C-c ,d")  'rspec-toggle-example-pendingness)
-      ((kbd "C-c ,t")  'rspec-toggle-spec-and-target))
-    rspec-mode-map))
+  (let ((km (make-sparse-keymap)))
+    (define-key km (kbd "C-c ,v") 'rspec-verify)
+    (define-key km (kbd "C-c ,a") 'rspec-verify-all)
+    (define-key km (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
+    (define-key km (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
+    km))
 
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
@@ -121,8 +120,9 @@
       (rspec-beginning-of-example)
       (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
       (beginning-of-line)
+      (kill-line)
       (kill-line))))
-
+  
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
