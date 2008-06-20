@@ -241,6 +241,25 @@
             (merge-abbrev-tables rspec-mode-abbrev-table
                                  local-abbrev-table)))
 
+;; abbrev
+;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
+(defun merge-abbrev-tables (old new)
+  "Merge an old abbrev table into a new one.
+This function requires internal knowledge of how abbrev tables work,
+presuming that they are obarrays with the abbrev as the symbol, the expansion
+as the value of the symbol, and the hook as the function definition."
+  (when old
+    (mapatoms
+     (lambda(it)
+       (or (intern-soft (symbol-name it) new)
+           (define-abbrev new
+             (symbol-name it)
+             (symbol-value it)
+             (symbol-function it)
+             nil
+             t)))
+     old)))
+
 ;; Setup better rspec output output
 (require 'mode-compile)
 (add-to-list 'compilation-error-regexp-alist '("\\(.*?\\)\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 2 3))
