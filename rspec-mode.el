@@ -120,8 +120,8 @@
       (rspec-beginning-of-example)
       (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
       (beginning-of-line)
-      (kill-line)
-      (kill-line))))
+      (delete-region (save-excursion (beginning-of-line) (point)) 
+                     (save-excursion (forward-line 1) (point))))))
   
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
