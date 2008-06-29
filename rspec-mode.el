@@ -14,6 +14,8 @@
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
+;;  * verify the example defined at the point of the current buffer (bound to `\C-c ,s`)
+;;
 ;;  * toggle the pendingness of the example at the point (bound to
 ;;    `\C-c ,d`)
 ;;
@@ -54,6 +56,7 @@
   "Creates a keymap for spec files"
   (let ((km (make-sparse-keymap)))
     (define-key km (kbd "C-c ,v") 'rspec-verify)
+    (define-key km (kbd "C-c ,s") 'rspec-verify-single)
     (define-key km (kbd "C-c ,a") 'rspec-verify-all)
     (define-key km (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
     (define-key km (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
@@ -127,6 +130,11 @@
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
   (compile (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse")))
+
+(defun rspec-verify-single ()
+  "Runs the specified example at the point of the current buffer."
+  (interactive)
+  (compile (concat "spec " (buffer-file-name) " --format specdoc --reverse" (format " -l %d" (line-number-at-pos)))))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
