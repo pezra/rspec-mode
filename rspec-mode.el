@@ -126,7 +126,8 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (compile (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse")))
+  (compile (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse"))
+  (end-of-buffer-other-window 0))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
