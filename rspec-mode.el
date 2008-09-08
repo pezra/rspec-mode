@@ -129,18 +129,19 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (compile (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse"))
-  (end-of-buffer-other-window 0))
+  (rspec-run-cmd (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse")))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (compile (concat "spec " (buffer-file-name) " --format specdoc --reverse" (format " -l %d" (line-number-at-pos)))))
+  (rspec-run-cmd (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) 
+                         " --format specdoc --reverse --example '" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point)) 
+                         "'")))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
-  (compile "rake spec SPEC_OPTS='--format=progress'"))
+  (rspec-run-cmd "rake spec SPEC_OPTS='--format=progress'"))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -151,8 +152,6 @@
    (if (rspec-buffer-is-spec-p)
        (rspec-target-file-for (buffer-file-name))
      (rspec-spec-file-for (buffer-file-name)))))
-
-
 
 (defun rspec-spec-file-for (a-file-name)
   "Find spec for the specified file"
@@ -219,7 +218,21 @@
   (and (buffer-file-name)
        (rspec-spec-file-p (buffer-file-name))))
 
+(defun rspec-example-name-at-point ()
+  "Returns the name of the example in which the point is currently positioned; or nil if it is outside of and example"
+  (save-excursion 
+    (rspec-beginning-of-example)
+    (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
+    (match-string 1)))
+                         
+                                            
 
+
+(defun rspec-run-cmd (cmd)
+  "Runs a command and puts the output in the compile buffer"
+  (compile cmd)
+  (end-of-buffer-other-window 0))
+  
 
 
 
