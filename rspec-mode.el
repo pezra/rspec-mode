@@ -49,6 +49,7 @@
 ;; Public License.
 
 (require 'ruby-mode)
+(require 'snippet)
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
 
