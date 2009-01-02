@@ -142,7 +142,8 @@
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
-  (rspec-run-cmd "rake spec SPEC_OPTS='--format=progress'"))
+  (let ((default-directory (or (rspec-project-root) default-directory)))
+    (rspec-run-cmd "rake spec SPEC_OPTS='--format=progress'")))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -225,17 +226,18 @@
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
-                         
                                             
-
-
 (defun rspec-run-cmd (cmd)
   "Runs a command and puts the output in the compile buffer"
   (compile cmd)
   (end-of-buffer-other-window 0))
-  
 
-
+(defun rspec-project-root (&optional directory)
+  "Finds the root directory of the project by walking the directory tree until it finds a rake file."
+  (let ((directory (file-name-as-directory (or directory default-directory))))
+    (cond ((rspec-root-directory-p directory) nil)
+          ((file-exists-p (concat directory "Rakefile")) directory)
+          (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 ;; Makes sure that rSpec buffers are given the rspec minor mode by default
 (add-hook 'ruby-mode-hook
