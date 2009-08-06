@@ -130,20 +130,18 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run-cmd (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) " --format specdoc --reverse")))
+  (rspec-run "--format specdoc" "--reverse"))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run-cmd (concat ruby-command " " (rspec-spec-file-for (buffer-file-name)) 
-                         " --format specdoc --reverse --example '" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point)) 
-                         "'")))
+  (rspec-run "--format specdoc" "--reverse" "--example" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point))))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (rspec-run-cmd "rake spec SPEC_OPTS='--format=progress'")))
+    (rspec-run "--format=progress")))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -227,10 +225,11 @@
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
                                             
-(defun rspec-run-cmd (cmd)
-  "Runs a command and puts the output in the compile buffer"
-  (compile cmd)
-  (end-of-buffer-other-window 0))
+(defun rspec-run (&rest opts)
+  "Runs spec with the specified options"
+  (let ((opts (cons "--no-color" opts)))
+    (compile (concat "rake spec SPEC_OPT=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+    (end-of-buffer-other-window 0)))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
