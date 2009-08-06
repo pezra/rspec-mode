@@ -135,7 +135,7 @@
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run "--format specdoc" "--reverse" "--example" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point))))
+  (rspec-run "--format specdoc" "--reverse" (concat "--example \"" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point)) "\"")))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
@@ -227,9 +227,8 @@
                                             
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
-  (let ((opts (cons "--no-color" opts)))
-    (compile (concat "rake spec SPEC_OPT=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
-    (end-of-buffer-other-window 0)))
+  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
