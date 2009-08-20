@@ -130,13 +130,13 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run "--format specdoc" "--reverse"))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse"))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run "--format specdoc" "--reverse" (concat "--example \"" (replace-regexp-in-string "'" "\\'" (rspec-example-name-at-point)) "\"")))
-
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse" (concat "--line " (number-to-string (line-number-at-pos)))))
+ 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
@@ -228,6 +228,11 @@
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
   (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (end-of-buffer-other-window 0))
+
+(defun rspec-run-single-file (spec-file &rest opts)
+  "Runs spec with the specified options"
+  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
