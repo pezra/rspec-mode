@@ -16,6 +16,8 @@
 ;;
 ;;  * verify the example defined at the point of the current buffer (bound to `\C-c ,s`)
 ;;
+;;  * re-run the last verification process (bound to `\C-c ,r`)
+;;
 ;;  * toggle the pendingness of the example at the point (bound to
 ;;    `\C-c ,d`)
 ;;
@@ -53,20 +55,19 @@
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
 
-(defun rspec-keymap ()
-  "Creates a keymap for spec files"
-  (let ((km (make-sparse-keymap)))
-    (define-key km (kbd "C-c ,v") 'rspec-verify)
-    (define-key km (kbd "C-c ,s") 'rspec-verify-single)
-    (define-key km (kbd "C-c ,a") 'rspec-verify-all)
-    (define-key km (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
-    (define-key km (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
-    km))
+(defconst rspec-mode-keymap (make-sparse-keymap) "Keymap used in rspec mode")
+
+(define-key rspec-mode-keymap (kbd "C-c ,v") 'rspec-verify)
+(define-key rspec-mode-keymap (kbd "C-c ,s") 'rspec-verify-single)
+(define-key rspec-mode-keymap (kbd "C-c ,a") 'rspec-verify-all)
+(define-key rspec-mode-keymap (kbd "C-c ,r") 'rspec-reverify-last)
+(define-key rspec-mode-keymap (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
+(define-key rspec-mode-keymap (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
 
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
   :lighter " rSpec"
-  :keymap  (rspec-keymap))
+  :keymap  rspec-mode-keymap)
 
 ;; Snippets
 (snippet-with-abbrev-table
@@ -142,6 +143,14 @@
   (interactive)
   (let ((default-directory (or (rspec-project-root) default-directory)))
     (rspec-run "--format=progress")))
+
+(defun rspec-reverify-last ()
+  "Runs the last verify command again"
+  (interactive)
+  (unless rspec-last-verify-run
+    (error "No recorded verification to re-run"))
+  (print rspec-last-verify-run)
+  (eval rspec-last-verify-run))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -227,11 +236,13 @@
                                             
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
+  (setq rspec-last-verify-run (cons 'rspec-run opts))
   (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec with the specified options"
+  (setq rspec-last-verify-run (cons 'rspec-run-single-file (cons spec-file opts)))
   (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
 
@@ -241,6 +252,9 @@
     (cond ((rspec-root-directory-p directory) nil)
           ((file-exists-p (concat directory "Rakefile")) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
+
+;; Setup global reverify keybinding
+(global-set-key (kbd "C-c ,r") 'rspec-reverify-last)1
 
 ;; Makes sure that rSpec buffers are given the rspec minor mode by default
 (add-hook 'ruby-mode-hook
