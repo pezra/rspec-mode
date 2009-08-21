@@ -144,14 +144,6 @@
   (let ((default-directory (or (rspec-project-root) default-directory)))
     (rspec-run "--format=progress")))
 
-(defun rspec-reverify-last ()
-  "Runs the last verify command again"
-  (interactive)
-  (unless rspec-last-verify-run
-    (error "No recorded verification to re-run"))
-  (print rspec-last-verify-run)
-  (eval rspec-last-verify-run))
-
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
    non-spec file, or switch to the target of the current buffer
@@ -233,16 +225,21 @@
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
-                                            
+                    
+(defun rspec-register-verify-redo (redoer)
+  "Register a bit of code that will repeat a verification process"
+  (let ((redoer-cmd (eval (append '(lambda () (interactive)) (list redoer)))))
+    (global-set-key (kbd "C-c ,r") redoer-cmd)))
+
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
-  (setq rspec-last-verify-run (cons 'rspec-run opts))
+  (rspec-register-verify-redo (cons 'rspec-run opts))
   (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec with the specified options"
-  (setq rspec-last-verify-run (cons 'rspec-run-single-file (cons spec-file opts)))
+  (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
   (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
   (end-of-buffer-other-window 0))
 
@@ -252,9 +249,6 @@
     (cond ((rspec-root-directory-p directory) nil)
           ((file-exists-p (concat directory "Rakefile")) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
-
-;; Setup global reverify keybinding
-(global-set-key (kbd "C-c ,r") 'rspec-reverify-last)1
 
 ;; Makes sure that rSpec buffers are given the rspec minor mode by default
 (add-hook 'ruby-mode-hook
