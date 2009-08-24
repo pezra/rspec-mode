@@ -60,7 +60,6 @@
 (define-key rspec-mode-keymap (kbd "C-c ,v") 'rspec-verify)
 (define-key rspec-mode-keymap (kbd "C-c ,s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "C-c ,a") 'rspec-verify-all)
-(define-key rspec-mode-keymap (kbd "C-c ,r") 'rspec-reverify-last)
 (define-key rspec-mode-keymap (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
 (define-key rspec-mode-keymap (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
 
