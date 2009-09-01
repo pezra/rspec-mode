@@ -51,7 +51,6 @@
 ;; Public License.
 
 (require 'ruby-mode)
-(require 'snippet)
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
 
@@ -69,14 +68,15 @@
   :keymap  rspec-mode-keymap)
 
 ;; Snippets
-(snippet-with-abbrev-table
- 'rspec-mode-abbrev-table
- ("helper" . "require 'pathname'\nrequire Pathname(__FILE__).dirname + '../spec_helper'\n\n$.")
- ("desc"   . "describe $${ClassName} do\n  $.\nend ")
- ("descm"  . "describe $${ClassName}, \"$${modifier}\" do\n  $.\nend ")
- ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
- ("bef"    . "before do\n  $.\n  end"))
-
+(if (require 'snippet nil t)
+    (snippet-with-abbrev-table
+     'rspec-mode-abbrev-table
+     ("helper" . "require 'pathname'\nrequire Pathname(__FILE__).dirname + '../spec_helper'\n\n$.")
+     ("desc"   . "describe $${ClassName} do\n  $.\nend ")
+     ("descm"  . "describe $${ClassName}, \"$${modifier}\" do\n  $.\nend ")
+     ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
+     ("bef"    . "before do\n  $.\n  end"))
+  )
 
 
 (defun rspec-beginning-of-example ()
