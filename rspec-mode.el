@@ -67,6 +67,20 @@
   :lighter " rSpec"
   :keymap  rspec-mode-keymap)
 
+
+(defvar rspec-imenu-generic-expression
+  '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
+  "The imenu regex to parse an outline of the rspec file")
+
+(defun rspec-set-imenu-generic-expression ()
+  (make-local-variable 'imenu-generic-expression)
+  (make-local-variable 'imenu-create-index-function)
+  (setq imenu-create-index-function 'imenu-default-create-index-function)
+  (setq imenu-generic-expression rspec-imenu-generic-expression)
+  (message (format "imenu-generic-expression is %s" imenu-generic-expression)))
+
+(add-hook 'rspec-mode-hook 'rspec-set-imenu-generic-expression)
+
 ;; Snippets
 (if (require 'snippet nil t)
     (snippet-with-abbrev-table
