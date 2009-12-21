@@ -299,7 +299,7 @@
 
 ;; Add verify related spec keybinding to ruby ruby modes
 ;;;###autoload
-(eval-after-load 'ruby-mode
+(eval-after-load 'rails
   '(add-hook 'rails-minor-mode-hook
              (lambda ()
                (local-set-key (kbd "C-c ,v") 'rspec-verify)
@@ -308,12 +308,10 @@
 
 ;; This hook makes any abbreviation that are defined in
 ;; rspec-mode-abbrev-table available in rSpec buffers
-;;;###autoload
-(eval-after-load 'ruby-mode
-  '(add-hook 'rspec-mode-hook
-             (lambda ()
-               (merge-abbrev-tables rspec-mode-abbrev-table
-                                    local-abbrev-table))))
+(add-hook 'rspec-mode-hook
+          (lambda ()
+            (merge-abbrev-tables rspec-mode-abbrev-table
+                                 local-abbrev-table)))
 
 ;; abbrev
 ;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
