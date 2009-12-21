@@ -264,13 +264,13 @@
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run opts))
-  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'"))
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'") t)
+  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'"))
   (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
@@ -334,10 +334,10 @@ as the value of the symbol, and the hook as the function definition."
              t)))
      old)))
 
-;; Setup better rspec output output
-(add-to-list 'compilation-error-regexp-alist '("\\(.*?\\)\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 2 3))
 
-
+(add-to-list 'compilation-error-regexp-alist-alist 
+	     '(rspec "\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
+(add-to-list 'compilation-error-regexp-alist 'rspec)
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
