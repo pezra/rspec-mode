@@ -1,6 +1,31 @@
+;;; rspec-mode.el --- Enhance ruby-mode for RSpec
+
+;; Copyright (C) 2008 Peter Williams <http://pezra.barelyenough.org>
+;; Authors: Peter Williams, Tim Harper
+;; URL: http://github.com/pezra/rspec-mode
+;; Created: 2008
+;; Version: 0.2
+;; Keywords: rspec ruby
+;; Package-Requires: ((ruby-mode "1.1"))
+
+;;; Commentary:
 ;;
-;; RSpec (minor) mode
-;; ==================
+;; This file is NOT part of GNU Emacs.
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; See <http://www.gnu.org/licenses/> for a copy of the GNU General
+;; Public License.
+
+;;; Documentation:
 ;;
 ;; This minor mode provides some enhancements to ruby-mode in
 ;; the contexts of RSpec specifications.  Namely, it provides the
@@ -27,29 +52,19 @@
 ;;
 ;;  * run "spec" rake task for project (bound to `\C-c ,a`)
 ;;
-;;
 ;; Dependencies
 ;; ------------
 ;;
 ;; This minor mode depends on `mode-compile`.  The expectations depend
 ;; `on el-expectataions.el`.
 ;; 
-;;
-;; (c) 2008 Peter Williams <http://pezra.barelyenough.org>
-;;
-;; This program is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-;;
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-;;
-;; See <http://www.gnu.org/licenses/> for a copy of the GNU General
-;; Public License.
 
+;;; Change Log:
+;; 0.2 - Tim Harper implemented support for imenu to generate a basic
+;;       tag outline
+;; 0.1 - Pezra's version in master
+
+;;; Code:
 (require 'ruby-mode)
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
@@ -62,6 +77,7 @@
 (define-key rspec-mode-keymap (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
 (define-key rspec-mode-keymap (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
 
+;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
   :lighter " rSpec"
@@ -227,6 +243,7 @@
   "Returns true if the specified file is a spec"
   (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
 
+;;;###autoload
 (defun rspec-buffer-is-spec-p ()
   "Returns true if the current buffer is a spec"
   (and (buffer-file-name)
@@ -264,31 +281,39 @@
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 ;; Makes sure that rSpec buffers are given the rspec minor mode by default
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (when (rspec-buffer-is-spec-p)
-              (rspec-mode))))
+;;;###autoload
+(eval-after-load 'ruby-mode
+  '(add-hook 'ruby-mode-hook
+             (lambda ()
+               (when (rspec-buffer-is-spec-p)
+                 (rspec-mode)))))
 
 ;; Add verify related spec keybinding to ruby ruby modes
-(add-hook 'ruby-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c ,v") 'rspec-verify)
-            (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
-            (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target)))
+;;;###autoload
+(eval-after-load 'ruby-mode
+  '(add-hook 'ruby-mode-hook
+             (lambda ()
+               (local-set-key (kbd "C-c ,v") 'rspec-verify)
+               (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
+               (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target))))
 
 ;; Add verify related spec keybinding to ruby ruby modes
-(add-hook 'rails-minor-mode-hook
-          (lambda ()
-            (local-set-key (kbd "C-c ,v") 'rspec-verify)
-            (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
-            (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target)))
+;;;###autoload
+(eval-after-load 'ruby-mode
+  '(add-hook 'rails-minor-mode-hook
+             (lambda ()
+               (local-set-key (kbd "C-c ,v") 'rspec-verify)
+               (local-set-key (kbd "C-c ,a") 'rspec-verify-all)
+               (local-set-key (kbd "C-c ,t") 'rspec-toggle-spec-and-target))))
 
 ;; This hook makes any abbreviation that are defined in
 ;; rspec-mode-abbrev-table available in rSpec buffers
-(add-hook 'rspec-mode-hook
-          (lambda ()
-            (merge-abbrev-tables rspec-mode-abbrev-table
-                                 local-abbrev-table)))
+;;;###autoload
+(eval-after-load 'ruby-mode
+  '(add-hook 'rspec-mode-hook
+             (lambda ()
+               (merge-abbrev-tables rspec-mode-abbrev-table
+                                    local-abbrev-table))))
 
 ;; abbrev
 ;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
@@ -316,3 +341,4 @@ as the value of the symbol, and the hook as the function definition."
 
 
 (provide 'rspec-mode)
+;;; rspec-mode.el ends here
