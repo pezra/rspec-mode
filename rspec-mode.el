@@ -296,9 +296,8 @@ as the value of the symbol, and the hook as the function definition."
      old)))
 
 ;; Setup better rspec output output
-(require 'mode-compile)
 (add-to-list 'compilation-error-regexp-alist '("\\(.*?\\)\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 2 3))
-(add-to-list 'mode-compile-modes-alist '(rspec-mode . (respec-compile kill-compilation)))
+
 
 
 (provide 'rspec-mode)
