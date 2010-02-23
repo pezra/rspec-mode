@@ -60,6 +60,10 @@
 ;; 
 
 ;;; Change Log:
+;;
+;; 0.3 - Dave Nolan prefers to run spec using spec command rather than
+;;       rake, and to respect spec.opts configuration
+;;
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
 ;;       tag outline
 ;; 0.1 - Pezra's version in master
@@ -160,18 +164,18 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse"))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ())))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) "--format specdoc" "--reverse" (concat "--line " (number-to-string (line-number-at-pos)))))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos)))))
  
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (rspec-run "--format=progress")))
+    (rspec-run (rspec-core-options "--format=progress"))))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -243,6 +247,19 @@
   "Returns true if the specified file is a spec"
   (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
 
+(defun rspec-core-options (&optional default-options)
+  "Returns string of options that instructs spec to use spec.opts file if it exists, or sensible defaults otherwise"
+  (if (file-readable-p (rspec-spec-opts-file))
+      (concat "--options " (rspec-spec-opts-file))
+    (if default-options
+        default-options
+        (concat "--format specdoc " "--reverse"))))
+    
+
+(defun rspec-spec-opts-file ()
+  "Returns filename of spec opts file (usually spec/spec.opts)"
+  (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts"))
+
 ;;;###autoload
 (defun rspec-buffer-is-spec-p ()
   "Returns true if the current buffer is a spec"
@@ -264,13 +281,13 @@
 (defun rspec-run (&rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run opts))
-  (compile (concat "rake spec SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'"))
+  (compile (concat "spec " (rspec-spec-directory (rspec-project-root)) " " (mapconcat (lambda (x) x) opts " ")))
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (compile (concat "rake spec SPEC=\'" spec-file "\' SPEC_OPTS=\'" (mapconcat (lambda (x) x) opts " ") "\'"))
+  (compile (concat "spec " spec-file " " (mapconcat (lambda (x) x) opts " ")))
   (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
