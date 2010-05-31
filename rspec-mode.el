@@ -50,7 +50,14 @@
 ;;
 ;;  * reenable the disabled example at the point
 ;;
-;;  * run "spec" rake task for project (bound to `\C-c ,a`)
+;;  * run spec for entire project (bound to `\C-c ,a`)
+;;
+;; You can choose whether to run specs using 'rake spec' or the 'spec'
+;; command. Use the customization interface (customize-group
+;; rspec-mode) or override using (setq rspec-use-rake-flag TVAL).
+;;
+;; Options will be loaded from spec.opts if it exists, otherwise it
+;; will fallback to defaults.
 ;;
 ;; Dependencies
 ;; ------------
@@ -61,9 +68,8 @@
 
 ;;; Change Log:
 ;;
-;; 0.3 - Dave Nolan prefers to run spec using spec command rather than
-;;       rake, and to respect spec.opts configuration
-;;
+;; 0.3 - Dave Nolan implements respect for spec.opts config and
+;;       custom option to use 'rake spec' task or 'spec' command
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
 ;;       tag outline
 ;; 0.1 - Pezra's version in master
@@ -80,6 +86,16 @@
 (define-key rspec-mode-keymap (kbd "C-c ,a") 'rspec-verify-all)
 (define-key rspec-mode-keymap (kbd "C-c ,d") 'rspec-toggle-example-pendingness)
 (define-key rspec-mode-keymap (kbd "C-c ,t") 'rspec-toggle-spec-and-target)
+
+(defgroup rspec-mode nil
+  "Rspec minor mode.")
+
+(defcustom rspec-use-rake-flag t
+  "*Whether rspec runner is run using rake spec task or the spec command"
+  :tag "Rspec runner command"
+  :type '(radio (const :tag "Use 'rake spec' task" t)
+                (const :tag "Use 'spec' command" nil))
+  :group 'rspec-mode)
 
 ;;;###autoload
 (define-minor-mode rspec-mode
@@ -254,11 +270,24 @@
     (if default-options
         default-options
         (concat "--format specdoc " "--reverse"))))
-    
 
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file (usually spec/spec.opts)"
   (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts"))
+
+(defun rspec-runner ()
+  "Returns command line to run rspec"
+  (if rspec-use-rake-flag "rake spec" "spec"))
+
+(defun rspec-runner-options (&optional opts)
+  "Returns string of options for command line"
+  (concat (when rspec-use-rake-flag "SPEC_OPTS=\'")
+          (mapconcat 'identity opts " ")
+          (when rspec-use-rake-flag "\'")))
+
+(defun rspec-runner-target (target)
+  "Returns target file/directory wrapped in SPEC if using rake"
+  (concat (when rspec-use-rake-flag "SPEC=\'") target (when rspec-use-rake-flag "\'")))
 
 ;;;###autoload
 (defun rspec-buffer-is-spec-p ()
@@ -278,16 +307,16 @@
   (let ((redoer-cmd (eval (append '(lambda () (interactive)) (list redoer)))))
     (global-set-key (kbd "C-c ,r") redoer-cmd)))
 
-(defun rspec-run (&rest opts)
+(defun rspec-run (&optional opts)
   "Runs spec with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run opts))
-  (compile (concat "spec " (rspec-spec-directory (rspec-project-root)) " " (mapconcat (lambda (x) x) opts " ")))
+  (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target) (rspec-spec-directory rspec-project-root) (rspec-runner-options opts)) " "))
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
-  "Runs spec with the specified options"
+  "Runs spec on a file with the specified options"
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (compile (concat "spec " spec-file " " (mapconcat (lambda (x) x) opts " ")))
+  (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
   (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
@@ -297,7 +326,7 @@
           ((file-exists-p (concat directory "Rakefile")) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
-;; Makes sure that rSpec buffers are given the rspec minor mode by default
+;; Makes sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
 (eval-after-load 'ruby-mode
   '(add-hook 'ruby-mode-hook
