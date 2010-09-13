@@ -63,11 +63,13 @@
 ;; ------------
 ;;
 ;; This minor mode depends on `mode-compile`.  The expectations depend
-;; `on el-expectataions.el`.
+;; `on el-expectataions.el`.  If `ansi-color` is available it will be
+;; loaded so that rspec output is colorized properly.
 ;; 
 
 ;;; Change Log:
 ;;
+;; 0.4 - teaforthecat provided ansi colorization of compliation buffers.
 ;; 0.3 - Dave Nolan implements respect for spec.opts config and
 ;;       custom option to use 'rake spec' task or 'spec' command
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
@@ -385,6 +387,16 @@ as the value of the symbol, and the hook as the function definition."
 (add-to-list 'compilation-error-regexp-alist-alist 
 	     '(rspec "\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
 (add-to-list 'compilation-error-regexp-alist 'rspec)
+
+(condition-case nil
+    (progn
+      (require 'ansi-color)
+      (defun rspec-colorize-compilation-buffer ()
+        (toggle-read-only)
+        (ansi-color-apply-on-region (point-min) (point-max))
+        (toggle-read-only))
+      (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer))
+    (error nil))
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
