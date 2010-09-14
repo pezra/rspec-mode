@@ -101,6 +101,16 @@
                 (const :tag "Use 'spec' command" nil))
   :group 'rspec-mode)
 
+(defcustom rspec-rake-command "rake"
+  "The command for rake"
+  :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-spec-command "spec"
+  "The command for spec"
+  :type 'string
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
@@ -280,7 +290,9 @@
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
-  (if rspec-use-rake-flag "rake spec" "spec"))
+  (if rspec-use-rake-flag
+      (concat rspec-rake-command " spec")
+    rspec-spec-command))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
