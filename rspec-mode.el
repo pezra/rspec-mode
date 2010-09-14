@@ -216,19 +216,35 @@
    (if (rspec-buffer-is-spec-p)
        (rspec-target-file-for (buffer-file-name))
      (rspec-spec-file-for (buffer-file-name)))))
+(defun rspec-spec-directory-has-lib? (a-file-name)
+  (file-directory-p (concat (rspec-spec-directory a-file-name) "/lib")))
+
 
 (defun rspec-spec-file-for (a-file-name)
   "Find spec for the specified file"
   (if (rspec-spec-file-p a-file-name)
       a-file-name
-    (rspec-specize-file-name (expand-file-name (replace-regexp-in-string "^\\.\\./[^/]+/" "" (file-relative-name a-file-name (rspec-spec-directory a-file-name))) 
-                                               (rspec-spec-directory a-file-name)))))
+    (let ((replace-regex (if (and (rspec-target-lib-file-p a-file-name) (rspec-spec-directory-has-lib? a-file-name))
+                             "^\\.\\./"
+                           "^\\.\\./[^/]+/"))
+          (relative-file-name (file-relative-name a-file-name (rspec-spec-directory a-file-name))))
+      (rspec-specize-file-name (expand-file-name (replace-regexp-in-string replace-regex "" relative-file-name)
+                                                 (rspec-spec-directory a-file-name))))))
+
+(defun rspec-spec-lib-file-p (a-spec-file-name)
+  (string-match (concat "^" (expand-file-name (regexp-quote (concat (rspec-spec-directory a-spec-file-name) "/lib")))) a-spec-file-name))
+
+(defun rspec-target-lib-file-p (a-file-name)
+  (string-match (concat "^" (expand-file-name (regexp-quote (concat (rspec-project-root a-file-name) "/lib")))) a-file-name))
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for a-spec-file-name"
-  (first 
-   (file-expand-wildcards 
-    (replace-regexp-in-string "/spec/" "/*/" (rspec-targetize-file-name a-spec-file-name)))))
+  (first
+   (file-expand-wildcards
+        (replace-regexp-in-string
+         "/spec/"
+         (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
+         (rspec-targetize-file-name a-spec-file-name)))))
 
 (defun rspec-specize-file-name (a-file-name)
   "Returns a-file-name but converted in to a spec file name"
