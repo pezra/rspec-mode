@@ -1,10 +1,10 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
 ;; Copyright (C) 2008 Peter Williams <http://pezra.barelyenough.org>
-;; Authors: Peter Williams, Tim Harper
+;; Authors: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2008
-;; Version: 0.5
+;; Version: 0.6
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.1")
 ;;                    (mode-compile "2.29"))
@@ -70,8 +70,9 @@
 
 ;;; Change Log:
 ;;
+;; 0.6 - support for arbitrary spec and rake commands (David Yeu)
 ;; 0.5 - minor changes from Tim Harper
-;; 0.4 - teaforthecat provided ansi colorization of compliation buffers.
+;; 0.4 - ansi colorization of compliation buffers (teaforthecat)
 ;; 0.3 - Dave Nolan implements respect for spec.opts config and
 ;;       custom option to use 'rake spec' task or 'spec' command
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
