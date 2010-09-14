@@ -4,7 +4,7 @@
 ;; Authors: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2008
-;; Version: 0.6
+;; Version: 0.7
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.1")
 ;;                    (mode-compile "2.29"))
@@ -70,6 +70,7 @@
 
 ;;; Change Log:
 ;;
+;; 0.7 - follow RoR conventions for file in lib directory (Tim Harper)
 ;; 0.6 - support for arbitrary spec and rake commands (David Yeu)
 ;; 0.5 - minor changes from Tim Harper
 ;; 0.4 - ansi colorization of compliation buffers (teaforthecat)
