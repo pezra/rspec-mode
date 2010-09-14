@@ -4,9 +4,10 @@
 ;; Authors: Peter Williams, Tim Harper
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2008
-;; Version: 0.2
+;; Version: 0.4
 ;; Keywords: rspec ruby
-;; Package-Requires: ((ruby-mode "1.1"))
+;; Package-Requires: ((ruby-mode "1.1")
+;;                    (mode-compile "2.29"))
 
 ;;; Commentary:
 ;;
