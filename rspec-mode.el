@@ -65,11 +65,13 @@
 ;;
 ;; This minor mode depends on `mode-compile`.  The expectations depend
 ;; `on el-expectataions.el`.  If `ansi-color` is available it will be
-;; loaded so that rspec output is colorized properly.
+;; loaded so that rspec output is colorized properly.  If
+;; `rspec-use-rvm` is set to true `rvm.el` is required.
 ;; 
 
 ;;; Change Log:
 ;;
+;; 0.8 - RVM support (Peter Williams)
 ;; 0.7 - follow RoR conventions for file in lib directory (Tim Harper)
 ;; 0.6 - support for arbitrary spec and rake commands (David Yeu)
 ;; 0.5 - minor changes from Tim Harper
@@ -112,6 +114,12 @@
   "The command for spec"
   :type 'string
   :group 'rspec-mode)
+
+(defcustom rspec-use-rvm nil
+  "t when RVM in is in use. (Requires rvm.el)"
+  :type 'boolean
+  :group 'rspec-mode)
+
 
 ;;;###autoload
 (define-minor-mode rspec-mode
@@ -345,12 +353,16 @@
 
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
+  (if rspec-use-rvm
+      (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run opts))
   (compile (mapconcat 'identity (list (rspec-runner) (rspec-spec-directory (rspec-project-root)) (rspec-runner-options opts)) " "))
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec on a file with the specified options"
+  (if rspec-use-rvm
+      (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
   (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
   (end-of-buffer-other-window 0))
