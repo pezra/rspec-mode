@@ -203,18 +203,18 @@
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ())))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) ))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos)))))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (concat "--line " (number-to-string (line-number-at-pos)))))
  
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (rspec-run (rspec-core-options "--format=progress"))))
+    (rspec-run )))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -301,18 +301,6 @@
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
   (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
-
-(defun rspec-core-options (&optional default-options)
-  "Returns string of options that instructs spec to use spec.opts file if it exists, or sensible defaults otherwise"
-  (if (file-readable-p (rspec-spec-opts-file))
-      (concat "--options " (rspec-spec-opts-file))
-    (if default-options
-        default-options
-        (concat "--format specdoc " "--reverse"))))
-
-(defun rspec-spec-opts-file ()
-  "Returns filename of spec opts file (usually spec/spec.opts)"
-  (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts"))
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
