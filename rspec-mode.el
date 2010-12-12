@@ -132,6 +132,11 @@
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
   "The imenu regex to parse an outline of the rspec file")
 
+(defcustom rspec-compilation-buffer-name "*compilation*"
+  "The compilation buffer name for spec"
+  :type 'string
+  :group 'rspec-mode)
+
 (defun rspec-set-imenu-generic-expression ()
   (make-local-variable 'imenu-generic-expression)
   (make-local-variable 'imenu-create-index-function)
@@ -345,6 +350,17 @@
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
+
+(defun rspec-end-of-buffer-target-window (buf-name)
+  "end of line target window"
+  (let ((cur-window (selected-window))
+        (com-buffer (get-buffer buf-name)))
+    (if com-buffer
+        (let ((com-window (get-buffer-window com-buffer)))
+          (cond (com-window
+                 (select-window com-window)
+                 (end-of-buffer 0)
+                 (select-window cur-window)))))))
                     
 (defun rspec-register-verify-redo (redoer)
   "Register a bit of code that will repeat a verification process"
@@ -357,7 +373,7 @@
       (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run opts))
   (compile (mapconcat 'identity (list (rspec-runner) (rspec-spec-directory (rspec-project-root)) (rspec-runner-options opts)) " "))
-  (end-of-buffer-other-window 0))
+  (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec on a file with the specified options"
@@ -365,7 +381,7 @@
       (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
   (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
-  (end-of-buffer-other-window 0))
+  (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
