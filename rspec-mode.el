@@ -358,10 +358,14 @@
     (if com-buffer
         (let ((com-window (get-buffer-window com-buffer)))
           (cond (com-window
-                 (select-window com-window)
-                 (end-of-buffer 0)
-                 (select-window cur-window)))))))
-                    
+                 (unwind-protect
+                     (progn
+                       (select-window com-window)
+                       (with-no-warnings
+                         (goto-char (point-max))
+                         (recenter '(t))))
+                   (select-window cur-window))))))))
+
 (defun rspec-register-verify-redo (redoer)
   "Register a bit of code that will repeat a verification process"
   (let ((redoer-cmd (eval (append '(lambda () (interactive)) (list redoer)))))
