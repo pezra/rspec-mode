@@ -356,7 +356,10 @@
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run opts))
-  (compile (mapconcat 'identity (list (rspec-runner) (rspec-spec-directory (rspec-project-root)) (rspec-runner-options opts)) " "))
+  (let ((curdir (file-name-as-directory default-directory)))
+    (setq default-directory (rspec-project-root))
+    (compile (mapconcat 'identity (list (rspec-runner) (rspec-spec-directory (rspec-project-root)) (rspec-runner-options opts)) " "))
+    (setq default-directory curdir))
   (end-of-buffer-other-window 0))
 
 (defun rspec-run-single-file (spec-file &rest opts)
@@ -364,7 +367,10 @@
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
   (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
+  (let ((curdir (file-name-as-directory default-directory)))
+    (setq default-directory (rspec-project-root))
+    (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
+    (setq default-directory curdir))
   (end-of-buffer-other-window 0))
 
 (defun rspec-project-root (&optional directory)
