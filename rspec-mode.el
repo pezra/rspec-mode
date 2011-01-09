@@ -71,6 +71,7 @@
 
 ;;; Change Log:
 ;;
+;; 1.0 - Advance to end of compilation buffer even if it not the other window (byplayer)
 ;; 0.8 - RVM support (Peter Williams)
 ;; 0.7 - follow RoR conventions for file in lib directory (Tim Harper)
 ;; 0.6 - support for arbitrary spec and rake commands (David Yeu)
