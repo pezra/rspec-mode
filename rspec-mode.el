@@ -310,15 +310,21 @@
 
 (defun rspec-core-options (&optional default-options)
   "Returns string of options that instructs spec to use spec.opts file if it exists, or sensible defaults otherwise"
-  (if (file-readable-p (rspec-spec-opts-file))
-      (concat "--options " (rspec-spec-opts-file))
-    (if default-options
-        default-options
-        (concat "--format specdoc " "--reverse"))))
+  (if (file-readable-p (rspec-dotrspec-file))
+      nil
+    (if (file-readable-p (rspec-spec-opts-file))
+	(concat "--options " (rspec-spec-opts-file))
+      (if default-options
+	  default-options
+        (concat "--format specdoc " "--reverse")))))
 
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file (usually spec/spec.opts)"
   (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts"))
+
+(defun rspec-dotrspec-file ()
+  "Returns filename of the .rspec file (usually .rspec)"
+  (concat (rspec-project-root) ".rspec"))
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
