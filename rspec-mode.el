@@ -220,8 +220,7 @@
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
-  (let ((default-directory (or (rspec-project-root) default-directory)))
-    (rspec-run (rspec-core-options "--format=progress"))))
+  (rspec-run (rspec-core-options "--format=progress")))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -368,31 +367,25 @@
                          (recenter '(t))))
                    (select-window cur-window))))))))
 
-(defun rspec-register-verify-redo (redoer)
-  "Register a bit of code that will repeat a verification process"
-  (let ((redoer-cmd (eval (append '(lambda () (interactive)) (list redoer)))))
-    (global-set-key (kbd "C-c ,r") redoer-cmd)))
-
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
-  (if rspec-use-rvm
-      (rvm-activate-corresponding-ruby))
-  (rspec-register-verify-redo (cons 'rspec-run opts))
-  (let ((curdir (file-name-as-directory default-directory)))
-    (setq default-directory (rspec-project-root))
-    (compile (mapconcat 'identity (list (rspec-runner) (rspec-spec-directory (rspec-project-root)) (rspec-runner-options opts)) " "))
-    (setq default-directory curdir))
-  (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
+  (rspec-compile (rspec-spec-directory (rspec-project-root)) opts))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec on a file with the specified options"
+  (rspec-compile (rspec-runner-target spec-file) opts))
+
+(defun rspec-compile (a-file-or-dir &optional opts)
+  "Runs a compile for the specified file or diretory with the specified opts"
+  (global-set-key (kbd "C-c ,r") 
+                  (eval `(lambda () (interactive) 
+                           (rspec-from-direcory ,default-directory
+                                                (rspec-compile ,a-file-or-dir ,@opts)))))
+
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
-  (rspec-register-verify-redo (cons 'rspec-run-single-file (cons spec-file opts)))
-  (let ((curdir (file-name-as-directory default-directory)))
-    (setq default-directory (rspec-project-root))
-    (compile (mapconcat 'identity (list (rspec-runner) (rspec-runner-target spec-file) (rspec-runner-options opts)) " "))
-    (setq default-directory curdir))
+  (rspec-from-project-root
+   (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir ,(rspec-runner-options opts)) " ")))
   (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
 
 
@@ -402,6 +395,16 @@
     (cond ((rspec-root-directory-p directory) nil)
           ((file-exists-p (concat directory "Rakefile")) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
+
+(defmacro rspec-from-direcory (directory body-form)
+  "Peform body-form from the specified directory"
+  `(let ((default-directory ,directory))
+     ,body-form))
+
+(defmacro rspec-from-project-root (body-form)
+  "Peform body-form from the project root directory"
+  `(rspec-from-direcory ,(or (rspec-project-root) default-directory)
+                        ,body-form))
 
 ;; Makes sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
