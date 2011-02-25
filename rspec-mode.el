@@ -378,9 +378,9 @@
 (defun rspec-compile (a-file-or-dir &optional opts)
   "Runs a compile for the specified file or diretory with the specified opts"
   (global-set-key (kbd "C-c ,r") 
-                  (eval `(lambda () (interactive) 
-                           (rspec-from-direcory ,default-directory
-                                                (rspec-compile ,a-file-or-dir ,@opts)))))
+                  (eval (print `(lambda () (interactive) 
+                            (rspec-from-direcory ,default-directory
+                                                (rspec-compile ,a-file-or-dir (quote ,opts)))))))
 
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
