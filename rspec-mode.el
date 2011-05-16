@@ -71,6 +71,7 @@
 
 ;;; Change Log:
 ;;
+;; 1.2 - Rspec2 compatibility  (Anantha Kumaran)
 ;; 1.1 - Run verification processes from project root directory (Joe Hirn)
 ;; 1.0 - Advance to end of compilation buffer even if it not the other window (byplayer)
 ;; 0.8 - RVM support (Peter Williams)
