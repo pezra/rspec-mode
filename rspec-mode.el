@@ -307,7 +307,7 @@
 
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
-  (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
+  (numberp (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name)))
 
 (defun rspec-core-options (&optional default-options)
   "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
