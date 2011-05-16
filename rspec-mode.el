@@ -57,7 +57,7 @@
 ;; command. Use the customization interface (customize-group
 ;; rspec-mode) or override using (setq rspec-use-rake-flag TVAL).
 ;;
-;; Options will be loaded from spec.opts if it exists, otherwise it
+;; Options will be loaded from spec.opts or .rspec if it exists, otherwise it
 ;; will fallback to defaults.
 ;;
 ;; Dependencies
@@ -220,7 +220,7 @@
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
-  (rspec-run (rspec-core-options "--format=progress")))
+  (rspec-run (rspec-core-options "--format progress")))
 
 (defun rspec-toggle-spec-and-target ()
   "Switches to the spec for the current buffer if it is a
@@ -309,16 +309,27 @@
   (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
 
 (defun rspec-core-options (&optional default-options)
-  "Returns string of options that instructs spec to use spec.opts file if it exists, or sensible defaults otherwise"
+  "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
   (if (file-readable-p (rspec-spec-opts-file))
       (concat "--options " (rspec-spec-opts-file))
     (if default-options
         default-options
-        (concat "--format specdoc " "--reverse"))))
+      (rspec-default-options))))
+
+(defun rspec2-p ()
+  (or (string-match "rspec" rspec-spec-command)
+      (file-readable-p (concat (rspec-project-root) ".rspec"))))
+
+(defun rspec-default-options ()
+  (if (rspec2-p)
+      "--format documentation"
+    (concat "--format specdoc " "--reverse")))
 
 (defun rspec-spec-opts-file ()
-  "Returns filename of spec opts file (usually spec/spec.opts)"
-  (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts"))
+  "Returns filename of spec opts file"
+  (if (rspec2-p)
+      (concat (rspec-project-root) ".rspec")
+    (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts")))
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
