@@ -1,10 +1,10 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
-;; Copyright (C) 2008 Peter Williams <http://pezra.barelyenough.org>
+;; Copyright (C) 2008-2011 Peter Williams <http://barelyenough.org>
 ;; Authors: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
-;; Created: 2008
-;; Version: 0.7
+;; Created: 2011
+;; Version: 1.3
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.1")
 ;;                    (mode-compile "2.29"))
@@ -71,6 +71,7 @@
 
 ;;; Change Log:
 ;;
+;; 1.3 - Bundler support (JD Huntington)
 ;; 1.2 - Rspec2 compatibility  (Anantha Kumaran)
 ;; 1.1 - Run verification processes from project root directory (Joe Hirn)
 ;; 1.0 - Advance to end of compilation buffer even if it not the other window (byplayer)
