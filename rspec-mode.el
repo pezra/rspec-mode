@@ -308,7 +308,7 @@
 
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
-  (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name))
+  (numberp (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name)))
 
 (defun rspec-core-options (&optional default-options)
   "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
@@ -317,6 +317,9 @@
     (if default-options
         default-options
       (rspec-default-options))))
+
+(defun rspec-bundle-p ()
+  (file-readable-p (concat (rspec-project-root) "Gemfile")))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
@@ -335,9 +338,10 @@
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
-  (if rspec-use-rake-flag
-      (concat rspec-rake-command " spec")
-    rspec-spec-command))
+  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " "")))
+    (concat bundle-command (if rspec-use-rake-flag
+                               (concat rspec-rake-command " spec")
+                             rspec-spec-command))))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
