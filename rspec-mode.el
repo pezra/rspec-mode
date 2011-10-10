@@ -124,6 +124,10 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-bundler-when-possible t
+  "t when rspec should be run with 'bundle exec' whenever possible. (Gemfile present)"
+  :type 'boolean
+  :group 'rspec-mode)
 
 ;;;###autoload
 (define-minor-mode rspec-mode
@@ -319,7 +323,8 @@
       (rspec-default-options))))
 
 (defun rspec-bundle-p ()
-  (file-readable-p (concat (rspec-project-root) "Gemfile")))
+  (and rspec-use-bundler-when-possible
+       (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
