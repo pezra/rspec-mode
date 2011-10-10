@@ -36,7 +36,7 @@
 ;;    `\C-c ,t`)
 ;;
 ;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
-;;  
+;;
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
@@ -67,7 +67,7 @@
 ;; `on el-expectataions.el`.  If `ansi-color` is available it will be
 ;; loaded so that rspec output is colorized properly.  If
 ;; `rspec-use-rvm` is set to true `rvm.el` is required.
-;; 
+;;
 
 ;;; Change Log:
 ;;
@@ -168,7 +168,7 @@
   "Moves point to the beginning of the example in which the point current is."
   (interactive)
   (let ((start (point)))
-    (goto-char 
+    (goto-char
      (save-excursion
        (end-of-line)
        (unless (and (search-backward-regexp "^[[:space:]]*it[[:space:]]*(?[\"']" nil t)
@@ -194,7 +194,7 @@
 (defun rspec-disable-example ()
   "Disable the example in which the point is located"
   (interactive)
-  (when (not (rspec-example-pending-p))   
+  (when (not (rspec-example-pending-p))
     (save-excursion
       (rspec-beginning-of-example)
       (end-of-line)
@@ -209,9 +209,9 @@
       (rspec-beginning-of-example)
       (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
       (beginning-of-line)
-      (delete-region (save-excursion (beginning-of-line) (point)) 
+      (delete-region (save-excursion (beginning-of-line) (point))
                      (save-excursion (forward-line 1) (point))))))
-  
+
 (defun rspec-verify ()
   "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
@@ -221,7 +221,7 @@
   "Runs the specified example at the point of the current buffer."
   (interactive)
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos)))))
- 
+
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
   (interactive)
@@ -275,19 +275,19 @@
 (defun rspec-targetize-file-name (a-file-name)
   "Returns a-file-name but converted into a non-spec file name"
      (concat (file-name-directory a-file-name)
-             (rspec-file-name-with-default-extension 
+             (rspec-file-name-with-default-extension
               (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
-  
+
 (defun rspec-file-name-with-default-extension (a-file-name)
   "Adds .rb file extension to a-file-name if it does not already have an extension"
   (if (file-name-extension a-file-name)
       a-file-name ;; file has a extension already so do nothing
     (concat a-file-name ".rb")))
-        
+
 (defun rspec-directory-subdirectories (directory)
   "Returns list of subdirectories"
-  (remove-if 
-   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir)) 
+  (remove-if
+   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir))
                      (not (file-directory-p dir))))
    (directory-files directory t)))
 
@@ -298,7 +298,7 @@
 (defun rspec-root-directory-p (a-directory)
   "Returns t if a-directory is the root"
   (equal a-directory (rspec-parent-directory a-directory)))
-   
+
 (defun rspec-spec-directory (a-file)
   "Returns the nearest spec directory that could contain specs for a-file"
   (if (file-directory-p a-file)
@@ -368,7 +368,7 @@
 
 (defun rspec-example-name-at-point ()
   "Returns the name of the example in which the point is currently positioned; or nil if it is outside of and example"
-  (save-excursion 
+  (save-excursion
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
@@ -398,8 +398,8 @@
 
 (defun rspec-compile (a-file-or-dir &optional opts)
   "Runs a compile for the specified file or diretory with the specified opts"
-  (global-set-key (kbd "C-c ,r") 
-                  (eval `(lambda () (interactive) 
+  (global-set-key (kbd "C-c ,r")
+                  (eval `(lambda () (interactive)
                            (rspec-from-direcory ,default-directory
                                                 (rspec-compile ,a-file-or-dir (quote ,opts))))))
 
@@ -479,10 +479,11 @@ as the value of the symbol, and the hook as the function definition."
              t)))
      old)))
 
-
-(add-to-list 'compilation-error-regexp-alist-alist 
-	     '(rspec "\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
-(add-to-list 'compilation-error-regexp-alist 'rspec)
+(add-hook 'compilation-mode-hook
+          (lambda ()
+            (add-to-list 'compilation-error-regexp-alist-alist
+                         '(rspec "\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
+            (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
 (condition-case nil
     (progn
