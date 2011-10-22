@@ -71,6 +71,7 @@
 
 ;;; Change Log:
 ;;
+;; 1.4 - Allow .rspec/spec.opts files to be ignored (`rspec-use-opts-file-when-available` customization)
 ;; 1.3 - Bundler support (JD Huntington)
 ;; 1.2 - Rspec2 compatibility  (Anantha Kumaran)
 ;; 1.1 - Run verification processes from project root directory (Joe Hirn)
@@ -126,6 +127,11 @@
 
 (defcustom rspec-use-bundler-when-possible t
   "t when rspec should be run with 'bundle exec' whenever possible. (Gemfile present)"
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-opts-file-when-available t
+  "t if rspec should use .rspec/spec.opts"
   :type 'boolean
   :group 'rspec-mode)
 
@@ -316,11 +322,11 @@
 
 (defun rspec-core-options (&optional default-options)
   "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
-  (if (file-readable-p (rspec-spec-opts-file))
-      (concat "--options " (rspec-spec-opts-file))
-    (if default-options
-        default-options
-      (rspec-default-options))))
+  (cond ((and rspec-use-opts-file-when-available
+              (file-readable-p (rspec-spec-opts-file)))
+         (concat "--options " (rspec-spec-opts-file)))
+        (t (or default-options
+            (rspec-default-options)))))
 
 (defun rspec-bundle-p ()
   (and rspec-use-bundler-when-possible
@@ -338,8 +344,8 @@
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file"
   (if (rspec2-p)
-      (concat (rspec-project-root) ".rspec")
-    (concat (rspec-spec-directory (rspec-project-root)) "/spec.opts")))
+      (expand-file-name ".rspec" (rspec-project-root))
+    (expand-file-name "spec.opts" (rspec-spec-directory (rspec-project-root)))))
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
