@@ -440,6 +440,7 @@
   (let ((directory (file-name-as-directory (or directory default-directory))))
     (cond ((rspec-root-directory-p directory) nil)
           ((file-exists-p (expand-file-name "Rakefile" directory)) directory)
+          ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defmacro rspec-from-direcory (directory body-form)
