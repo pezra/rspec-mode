@@ -439,7 +439,7 @@
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
   (let ((directory (file-name-as-directory (or directory default-directory))))
     (cond ((rspec-root-directory-p directory) nil)
-          ((file-exists-p (concat directory "Rakefile")) directory)
+          ((file-exists-p (expand-file-name "Rakefile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defmacro rspec-from-direcory (directory body-form)
