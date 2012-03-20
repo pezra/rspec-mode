@@ -121,7 +121,7 @@
   :type 'string
   :group 'rspec-mode)
 
-(defcustom rspec-spec-command "spec"
+(defcustom rspec-spec-command "rspec"
   "The command for spec"
   :type 'string
   :group 'rspec-mode)
