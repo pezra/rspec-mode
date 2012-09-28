@@ -136,6 +136,11 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-zeus-when-possible t
+  "t when rspec should be run with 'zeus' whenever possible. (.zeus.sock present)"
+  :type 'boolean
+  :group 'rspec-mode)
+
 (defcustom rspec-use-opts-file-when-available t
   "t if rspec should use .rspec/spec.opts"
   :type 'boolean
@@ -349,6 +354,10 @@
   (and rspec-use-bundler-when-possible
        (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
+(defun rspec-zeus-p ()
+  (and rspec-use-zeus-when-possible
+       (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
+
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
@@ -366,10 +375,11 @@
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
-  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " "")))
-    (concat bundle-command (if rspec-use-rake-flag
-                               (concat rspec-rake-command " spec")
-                             rspec-spec-command))))
+  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
+        (zeus-command (if (rspec-zeus-p) "zeus " "")))
+    (concat bundle-command zeus-command (if rspec-use-rake-flag
+                                            (concat rspec-rake-command " spec")
+                                          rspec-spec-command))))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
