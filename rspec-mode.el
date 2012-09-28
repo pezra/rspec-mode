@@ -356,7 +356,7 @@
 
 (defun rspec-zeus-p ()
   (and rspec-use-zeus-when-possible
-       (file-readable-p (concat (rspec-project-root) ".zeus.sock"))))
+       (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
@@ -376,10 +376,10 @@
 (defun rspec-runner ()
   "Returns command line to run rspec"
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
-        (zeus-command (if (rspec-zeus-p) "zeus " ""))
+        (zeus-command (if (rspec-zeus-p) "zeus " "")))
     (concat bundle-command zeus-command (if rspec-use-rake-flag
                                             (concat rspec-rake-command " spec")
-                                          rspec-spec-command)))))
+                                          rspec-spec-command))))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
