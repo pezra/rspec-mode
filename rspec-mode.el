@@ -136,7 +136,7 @@
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-use-zues-when-possible t
+(defcustom rspec-use-zeus-when-possible t
   "t when rspec should be run with 'zeus' whenever possible. (.zeus.sock present)"
   :type 'boolean
   :group 'rspec-mode)
