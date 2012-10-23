@@ -459,10 +459,10 @@
   `(let ((default-directory ,directory))
      ,body-form))
 
-(defmacro rspec-from-project-root (body-form)
+(defun rspec-from-project-root (body-form)
   "Peform body-form from the project root directory"
-  `(rspec-from-direcory ,(or (rspec-project-root) default-directory)
-                        ,body-form))
+  (rspec-from-direcory (or (rspec-project-root) default-directory)
+		       body-form))
 
 ;; Makes sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
