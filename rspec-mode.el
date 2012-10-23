@@ -508,7 +508,7 @@ as the value of the symbol, and the hook as the function definition."
 (add-hook 'compilation-mode-hook
           (lambda ()
             (add-to-list 'compilation-error-regexp-alist-alist
-                         '(rspec "\\([0-9A-Za-z_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
+                         '(rspec "\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2))
             (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
 (condition-case nil
