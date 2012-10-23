@@ -434,7 +434,7 @@
   "Runs a compile for the specified file or diretory with the specified opts"
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "r") (eval `(lambda () (interactive)
-                                       (rspec-from-direcory ,default-directory
+                                       (rspec-from-directory ,default-directory
                                                             (rspec-compile ,a-file-or-dir (quote ,opts))))))
     (global-set-key rspec-key-command-prefix map))
 
@@ -454,14 +454,14 @@
           ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
-(defmacro rspec-from-direcory (directory body-form)
+(defmacro rspec-from-directory (directory body-form)
   "Peform body-form from the specified directory"
   `(let ((default-directory ,directory))
      ,body-form))
 
 (defmacro rspec-from-project-root (body-form)
   "Peform body-form from the project root directory"
-  `(rspec-from-direcory ,(or (rspec-project-root) default-directory)
+  `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
 ;; Makes sure that Rspec buffers are given the rspec minor mode by default
