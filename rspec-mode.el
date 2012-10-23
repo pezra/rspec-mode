@@ -477,14 +477,14 @@
 (eval-after-load 'ruby-mode
   '(add-hook 'ruby-mode-hook
              (lambda ()
-               (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap))))
+               (local-set-key rspec-key-command-prefix rspec-mode-keymap))))
 
 ;; Add verify related spec keybinding to ruby ruby modes
 ;;;###autoload
 (eval-after-load 'rails
   '(add-hook 'rails-minor-mode-hook
              (lambda ()
-               (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap))))
+               (local-set-key rspec-key-command-prefix rspec-mode-keymap))))
 
 ;; abbrev
 ;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
