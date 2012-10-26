@@ -179,8 +179,11 @@
   (setq imenu-create-index-function 'imenu-default-create-index-function)
   (setq imenu-generic-expression rspec-imenu-generic-expression))
 
-(add-hook 'rspec-mode-hook 'rspec-set-imenu-generic-expression)
-
+(add-hook 'rspec-mode-hook
+          (lambda ()
+            (rspec-set-imenu-generic-expression)
+            (merge-abbrev-tables rspec-mode-abbrev-table
+                                 local-abbrev-table)))
 ;; Snippets
 (if (require 'snippet nil t)
     (snippet-with-abbrev-table
@@ -189,7 +192,11 @@
      ("desc"   . "describe $${ClassName} do\n  $.\nend ")
      ("descm"  . "describe $${ClassName}, \"$${modifier}\" do\n  $.\nend ")
      ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
-     ("bef"    . "before do\n  $.\n  end"))
+     ("bef"    . "before $${:each} do\n  $.\n  end")
+     ("befa"    . "before $${:all} do\n  $.\n  end")
+     ("aft"    . "after $${:each} do\n  $.\n  end")
+     ("afta"    . "after $${:all} do\n  $.\n  end")
+     ("exp"    . "expect { $. }.to"))
   )
 
 
