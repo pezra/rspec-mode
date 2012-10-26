@@ -196,7 +196,7 @@
      ("befa"    . "before $${:all} do\n  $.\n  end")
      ("aft"    . "after $${:each} do\n  $.\n  end")
      ("afta"    . "after $${:all} do\n  $.\n  end")
-     ("exp"    . "expect { $. }.to"))
+     ("exp"    . "expect { $${what exactly?} }.to $."))
   )
 
 
