@@ -6,8 +6,7 @@
 ;; Created: 2011
 ;; Version: 1.3
 ;; Keywords: rspec ruby
-;; Package-Requires: ((ruby-mode "1.1")
-;;                    (mode-compile "2.29"))
+;; Package-Requires: ((ruby-mode "1.0"))
 
 ;;; Commentary:
 ;;
@@ -64,10 +63,10 @@
 ;; Dependencies
 ;; ------------
 ;;
-;; This minor mode depends on `mode-compile`.  The expectations depend
-;; `on el-expectataions.el`.  If `ansi-color` is available it will be
-;; loaded so that rspec output is colorized properly.  If
-;; `rspec-use-rvm` is set to true `rvm.el` is required.
+;; If `ansi-color` is available it will be loaded so that rspec output is
+;; colorized properly. If `rspec-use-rvm` is set to true `rvm.el` is required.
+;;
+;; The expectations depend on `el-expectations.el`.
 ;;
 
 ;;; Change Log:
