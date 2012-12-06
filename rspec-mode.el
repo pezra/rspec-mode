@@ -156,32 +156,35 @@
   :type 'string
   :group 'rspec-mode)
 
-
-
-
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
   :lighter " rSpec"
   (if rspec-mode
-      (local-set-key rspec-key-command-prefix rspec-mode-keymap)
+      (progn
+        (local-set-key rspec-key-command-prefix rspec-mode-keymap)
+        (rspec-set-imenu-generic-expression))
+    (local-unset-key rspec-key-command-prefix)
+    (setq imenu-create-index-function 'ruby-imenu-create-index)
+    (setq imenu-generic-expression nil)))
+
+;;;###autoload
+(define-minor-mode rspec-verifiable-mode
+  "Minor mode for Ruby files that have specs"
+  :lighter ""
+  (if rspec-verifiable-mode
+      (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap)
     (local-unset-key rspec-key-command-prefix)))
-
-
 
 (defvar rspec-imenu-generic-expression
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
   "The imenu regex to parse an outline of the rspec file")
-
-
 
 (defun rspec-set-imenu-generic-expression ()
   (make-local-variable 'imenu-generic-expression)
   (make-local-variable 'imenu-create-index-function)
   (setq imenu-create-index-function 'imenu-default-create-index-function)
   (setq imenu-generic-expression rspec-imenu-generic-expression))
-
-(add-hook 'rspec-mode-hook 'rspec-set-imenu-generic-expression)
 
 ;; Snippets
 (if (require 'snippet nil t)
@@ -193,7 +196,6 @@
      ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
      ("bef"    . "before do\n  $.\n  end"))
   )
-
 
 (defun rspec-beginning-of-example ()
   "Moves point to the beginning of the example in which the point current is."
@@ -213,7 +215,6 @@
   (save-excursion
     (rspec-beginning-of-example)
     (re-search-forward "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)) t)))
-
 
 (defun rspec-toggle-example-pendingness ()
   "Disables active examples and enables pending examples."
@@ -267,9 +268,9 @@
    (if (rspec-buffer-is-spec-p)
        (rspec-target-file-for (buffer-file-name))
      (rspec-spec-file-for (buffer-file-name)))))
+
 (defun rspec-spec-directory-has-lib? (a-file-name)
   (file-directory-p (concat (rspec-spec-directory a-file-name) "/lib")))
-
 
 (defun rspec-spec-file-for (a-file-name)
   "Find spec for the specified file"
@@ -466,27 +467,16 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-;; Makes sure that Rspec buffers are given the rspec minor mode by default
+;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
-(eval-after-load 'ruby-mode
-  '(add-hook 'ruby-mode-hook
-             (lambda ()
-               (when (rspec-buffer-is-spec-p)
-                 (rspec-mode)))))
+(add-hook 'ruby-mode-hook (lambda ()
+                            (if (rspec-buffer-is-spec-p)
+                                (rspec-mode)
+                              (rspec-verifiable-mode))))
 
-;; Add verify related spec keybinding to ruby ruby modes
+;; Add verify related spec keybinding to rails minor mode buffers
 ;;;###autoload
-(eval-after-load 'ruby-mode
-  '(add-hook 'ruby-mode-hook
-             (lambda ()
-               (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap))))
-
-;; Add verify related spec keybinding to ruby ruby modes
-;;;###autoload
-(eval-after-load 'rails
-  '(add-hook 'rails-minor-mode-hook
-             (lambda ()
-               (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap))))
+(add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
 
 ;; abbrev
 ;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
