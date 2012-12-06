@@ -159,22 +159,16 @@
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
-  :lighter " rSpec"
+  :lighter " rSpec" :keymap `((,rspec-key-command-prefix . rspec-mode-keymap))
   (if rspec-mode
-      (progn
-        (local-set-key rspec-key-command-prefix rspec-mode-keymap)
-        (rspec-set-imenu-generic-expression))
-    (local-unset-key rspec-key-command-prefix)
+      (rspec-set-imenu-generic-expression)
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)))
 
 ;;;###autoload
 (define-minor-mode rspec-verifiable-mode
   "Minor mode for Ruby files that have specs"
-  :lighter ""
-  (if rspec-verifiable-mode
-      (local-set-key rspec-key-command-prefix rspec-mode-verifible-keymap)
-    (local-unset-key rspec-key-command-prefix)))
+  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifible-keymap)))
 
 (defvar rspec-imenu-generic-expression
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
