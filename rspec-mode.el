@@ -162,7 +162,9 @@
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
   :lighter " rSpec"
-  (local-set-key rspec-key-command-prefix rspec-mode-keymap))
+  (if rspec-mode
+      (local-set-key rspec-key-command-prefix rspec-mode-keymap)
+    (local-unset-key rspec-key-command-prefix)))
 
 
 
