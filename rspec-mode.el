@@ -164,9 +164,7 @@
         (rspec-set-imenu-generic-expression)
         (when (boundp 'yas-extra-modes)
           (make-local-variable 'yas-extra-modes)
-          (if (listp yas-extra-modes)
-              (push 'rspec-mode yas-extra-modes)
-            (setq yas-extra-modes (list 'rspec-mode yas-extra-modes)))))
+          (setq yas-extra-modes (cons 'rspec-mode (yas-extra-modes)))))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)
     (when (boundp 'yas-extra-modes)
@@ -198,7 +196,7 @@
 (defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
   (require 'yasnippet)
-  (push rspec-snippets-dir yas-snippet-dirs)
+  (setq yas-snippet-dirs (cons rspec-snippets-dir (yas-snippet-dirs)))
   (yas-load-directory rspec-snippets-dir))
 
 (defun rspec-class-from-file-name ()
