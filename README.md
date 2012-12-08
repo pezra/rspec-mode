@@ -7,6 +7,11 @@ I recommend installing via ELPA, but manual installation is simple as well:
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
 
+Provided you have `yasnippet` installed, you can load the snippets:
+
+    (eval-after-load 'rspec-mode
+      '(rspec-install-snippets))
+
 ## Usage
 If `rspec-mode` is installed properly, it will be started
 automatically when `ruby-mode` is started.
