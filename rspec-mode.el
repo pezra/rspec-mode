@@ -91,8 +91,6 @@
 ;;; Code:
 (require 'ruby-mode)
 
-(defconst rspec-mode-abbrev-table (make-abbrev-table))
-
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-mode-verifible-keymap (kbd "a") 'rspec-verify-all)
@@ -489,25 +487,6 @@
 ;; Add verify related spec keybinding to rails minor mode buffers
 ;;;###autoload
 (add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
-
-;; abbrev
-;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
-(defun merge-abbrev-tables (old new)
-  "Merge an old abbrev table into a new one.
-This function requires internal knowledge of how abbrev tables work,
-presuming that they are obarrays with the abbrev as the symbol, the expansion
-as the value of the symbol, and the hook as the function definition."
-  (when old
-    (mapatoms
-     (lambda(it)
-       (or (intern-soft (symbol-name it) new)
-           (define-abbrev new
-             (symbol-name it)
-             (symbol-value it)
-             (symbol-function it)
-             nil
-             t)))
-     old)))
 
 (add-hook 'compilation-mode-hook
           (lambda ()
