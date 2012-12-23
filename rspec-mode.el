@@ -157,8 +157,8 @@
 
 ;;;###autoload
 (define-minor-mode rspec-mode
-  "Minor mode for rSpec files"
-  :lighter " rSpec" :keymap `((,rspec-key-command-prefix . rspec-mode-keymap))
+  "Minor mode for RSpec files"
+  :lighter " RSpec" :keymap `((,rspec-key-command-prefix . rspec-mode-keymap))
   (if rspec-mode
       (rspec-set-imenu-generic-expression)
     (setq imenu-create-index-function 'ruby-imenu-create-index)
@@ -403,21 +403,6 @@
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
 
-(defun rspec-end-of-buffer-target-window (buf-name)
-  "end of line target window"
-  (let ((cur-window (selected-window))
-        (com-buffer (get-buffer buf-name)))
-    (if com-buffer
-        (let ((com-window (get-buffer-window com-buffer)))
-          (cond (com-window
-                 (unwind-protect
-                     (progn
-                       (select-window com-window)
-                       (with-no-warnings
-                         (goto-char (point-max))
-                         (recenter '(t))))
-                   (select-window cur-window))))))))
-
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
   (rspec-compile (rspec-spec-directory (rspec-project-root)) opts))
@@ -437,9 +422,28 @@
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
   (rspec-from-project-root
-   (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir ,(rspec-runner-options opts)) " ")))
-  (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
+   (let ((compilation-scroll-output t))
+     (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir
+                                     ,(rspec-runner-options opts)) " ")
+              'rspec-compilation-mode))))
 
+(defvar rspec-compilation-mode-font-lock-keywords
+  '((compilation--ensure-parse)
+    ("^\\(Pending\\|Failures\\):$"
+     (0 font-lock-function-name-face))
+    ("^[0-9]+ examples?, 0 failures.*$"
+     (0 compilation-info-face))
+    ("^[0-9]+ examples?, \\([0-9]+ failures?\\)"
+     (1 compilation-error-face))))
+
+(define-derived-mode rspec-compilation-mode compilation-mode "RSpec Compilation"
+  "Compilation mode for RSpec output."
+  (set (make-local-variable 'compilation-error-regexp-alist)
+       (cons 'rspec compilation-error-regexp-alist))
+  (set (make-local-variable 'compilation-error-regexp-alist-alist)
+       (cons '(rspec "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2)
+             compilation-error-regexp-alist-alist))
+  (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t)))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
@@ -489,12 +493,6 @@ as the value of the symbol, and the hook as the function definition."
              nil
              t)))
      old)))
-
-(add-hook 'compilation-mode-hook
-          (lambda ()
-            (add-to-list 'compilation-error-regexp-alist-alist
-                         '(rspec "rspec.*\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" (expand-file-name 1) 2))
-            (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
 (condition-case nil
     (progn
