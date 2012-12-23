@@ -403,21 +403,6 @@
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
 
-(defun rspec-end-of-buffer-target-window (buf-name)
-  "end of line target window"
-  (let ((cur-window (selected-window))
-        (com-buffer (get-buffer buf-name)))
-    (if com-buffer
-        (let ((com-window (get-buffer-window com-buffer)))
-          (cond (com-window
-                 (unwind-protect
-                     (progn
-                       (select-window com-window)
-                       (with-no-warnings
-                         (goto-char (point-max))
-                         (recenter '(t))))
-                   (select-window cur-window))))))))
-
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
   (rspec-compile (rspec-spec-directory (rspec-project-root)) opts))
@@ -437,8 +422,9 @@
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
   (rspec-from-project-root
-   (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir ,(rspec-runner-options opts)) " ")))
-  (rspec-end-of-buffer-target-window rspec-compilation-buffer-name))
+   (let ((compilation-scroll-output t))
+     (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir
+                                     ,(rspec-runner-options opts)) " ")))))
 
 
 (defun rspec-project-root (&optional directory)
