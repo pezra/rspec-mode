@@ -153,6 +153,11 @@
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-enable-yasnippet-integration t
+  "When non-nil automatically setup snippets using yasnippet"
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
@@ -191,10 +196,11 @@
     (expand-file-name "snippets" (file-name-directory current)))
   "The directory containing rspec snippets.")
 
-(defun rspec-install-snippets ()
+(defun rspec-yasnippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
-  (setq yas-snippet-dirs (cons rspec-snippets-dir (yas-snippet-dirs)))
-  (yas-load-directory rspec-snippets-dir))
+  (unless (member rspec-snippets-dir yas-snippet-dirs)
+    (add-to-list 'yas-snippet-dirs rspec-snippets-dir)
+    (yas-load-directory rspec-snippets-dir)))
 
 (defun rspec-class-from-file-name ()
   "Guess the name of the class the spec is for."
@@ -509,11 +515,13 @@
              (ansi-color-apply-on-region (point-min) (point-max))
              (toggle-read-only))))
 
+
 (rspec-if-feature
  'yasnippet
- (rspec-install-snippets)
  (add-hook 'rspec-mode-hook
-           (lambda () (yas-minor-mode t))))
+           (lambda () (when rspec-enable-yasnippet-integration
+                        (rspec-yasnippets)
+                        (yas-minor-mode t)))))
 
 
 (provide 'rspec-mode)
