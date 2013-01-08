@@ -193,7 +193,6 @@
 
 (defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
-  (require 'yasnippet)
   (setq yas-snippet-dirs (cons rspec-snippets-dir (yas-snippet-dirs)))
   (yas-load-directory rspec-snippets-dir))
 
@@ -477,6 +476,13 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
+(defmacro rspec-if-feature (feature &rest body-form)
+  "Perform body-form if feature is, or can be made, available"
+  `(progn
+     (message "doing someing if %s is available" ,feature)
+     (if (require ,feature nil t)
+         (progn ,@body-form))))
+
 ;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
 (add-hook 'ruby-mode-hook (lambda ()
@@ -494,15 +500,21 @@
                          '(rspec "rspec.*\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" (expand-file-name 1) 2))
             (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
-(condition-case nil
-    (progn
-      (require 'ansi-color)
-      (defun rspec-colorize-compilation-buffer ()
-        (toggle-read-only)
-        (ansi-color-apply-on-region (point-min) (point-max))
-        (toggle-read-only))
-      (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer))
-    (error nil))
+
+(rspec-if-feature
+ 'ansi-color
+ (add-hook 'compilation-filter-hook
+           (lambda ()
+             (toggle-read-only)
+             (ansi-color-apply-on-region (point-min) (point-max))
+             (toggle-read-only))))
+
+(rspec-if-feature
+ 'yasnippet
+ (rspec-install-snippets)
+ (add-hook 'rspec-mode-hook
+           (lambda () (yas-minor-mode t))))
+
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
