@@ -91,8 +91,6 @@
 ;;; Code:
 (require 'ruby-mode)
 
-(defconst rspec-mode-abbrev-table (make-abbrev-table))
-
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-mode-verifible-keymap (kbd "a") 'rspec-verify-all)
@@ -155,23 +153,37 @@
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-enable-yasnippet-integration t
+  "When non-nil automatically setup snippets using yasnippet"
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for rSpec files"
   :lighter " rSpec" :keymap `((,rspec-key-command-prefix . rspec-mode-keymap))
   (if rspec-mode
-      (rspec-set-imenu-generic-expression)
+      (progn
+        (rspec-set-imenu-generic-expression)
+        (when (boundp 'yas-extra-modes)
+          (make-local-variable 'yas-extra-modes)
+          (setq yas-extra-modes (cons 'rspec-mode (yas-extra-modes)))))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
-    (setq imenu-generic-expression nil)))
+    (setq imenu-generic-expression nil)
+    (when (boundp 'yas-extra-modes)
+      (setq yas-extra-modes (delq 'rspec-mode yas-extra-modes)))))
 
 ;;;###autoload
 (define-minor-mode rspec-verifiable-mode
   "Minor mode for Ruby files that have specs"
   :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifible-keymap)))
 
-(defvar rspec-imenu-generic-expression
+(defconst rspec-imenu-generic-expression
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
   "The imenu regex to parse an outline of the rspec file")
+
+(defconst rspec-spec-file-name-re "\\(_\\|-\\)spec\\.rb\\'"
+  "The regex to identify spec files")
 
 (defun rspec-set-imenu-generic-expression ()
   (make-local-variable 'imenu-generic-expression)
@@ -179,16 +191,26 @@
   (setq imenu-create-index-function 'imenu-default-create-index-function)
   (setq imenu-generic-expression rspec-imenu-generic-expression))
 
-;; Snippets
-(if (require 'snippet nil t)
-    (snippet-with-abbrev-table
-     'rspec-mode-abbrev-table
-     ("helper" . "require 'pathname'\nrequire Pathname(__FILE__).dirname + '../spec_helper'\n\n$.")
-     ("desc"   . "describe $${ClassName} do\n  $.\nend ")
-     ("descm"  . "describe $${ClassName}, \"$${modifier}\" do\n  $.\nend ")
-     ("it"     . "it \"should $${what exactly?}\" do\n  $.\n  end ")
-     ("bef"    . "before do\n  $.\n  end"))
-  )
+(defvar rspec-snippets-dir
+  (let ((current (or load-file-name (buffer-file-name))))
+    (expand-file-name "snippets" (file-name-directory current)))
+  "The directory containing rspec snippets.")
+
+(defun rspec-yasnippets ()
+  "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
+  (unless (member rspec-snippets-dir yas-snippet-dirs)
+    (add-to-list 'yas-snippet-dirs rspec-snippets-dir)
+    (yas-load-directory rspec-snippets-dir)))
+
+(defun rspec-class-from-file-name ()
+  "Guess the name of the class the spec is for."
+  (let* ((name (file-relative-name (buffer-file-name)
+                                   (rspec-spec-directory (buffer-file-name))))
+         (rules `((,rspec-spec-file-name-re . "") ("/" . "::") ("_" . "")))
+         (class (capitalize name)))
+    (dolist (rule rules)
+      (setq class (replace-regexp-in-string (car rule) (cdr rule) class t t)))
+    class))
 
 (defun rspec-beginning-of-example ()
   "Moves point to the beginning of the example in which the point current is."
@@ -336,7 +358,7 @@
 
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
-  (numberp (string-match "\\(_\\|-\\)spec\\.rb$" a-file-name)))
+  (numberp (string-match rspec-spec-file-name-re a-file-name)))
 
 (defun rspec-core-options (&optional default-options)
   "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
@@ -460,6 +482,11 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
+(defmacro rspec-if-feature (feature &rest body)
+  "Perform body if feature is, or can be made, available"
+  `(when (require ,feature nil t)
+     ,@body))
+
 ;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
 (add-hook 'ruby-mode-hook (lambda ()
@@ -471,40 +498,33 @@
 ;;;###autoload
 (add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
 
-;; abbrev
-;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
-(defun merge-abbrev-tables (old new)
-  "Merge an old abbrev table into a new one.
-This function requires internal knowledge of how abbrev tables work,
-presuming that they are obarrays with the abbrev as the symbol, the expansion
-as the value of the symbol, and the hook as the function definition."
-  (when old
-    (mapatoms
-     (lambda(it)
-       (or (intern-soft (symbol-name it) new)
-           (define-abbrev new
-             (symbol-name it)
-             (symbol-value it)
-             (symbol-function it)
-             nil
-             t)))
-     old)))
-
 (add-hook 'compilation-mode-hook
           (lambda ()
             (add-to-list 'compilation-error-regexp-alist-alist
                          '(rspec "rspec.*\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" (expand-file-name 1) 2))
             (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
-(condition-case nil
-    (progn
-      (require 'ansi-color)
-      (defun rspec-colorize-compilation-buffer ()
-        (toggle-read-only)
-        (ansi-color-apply-on-region (point-min) (point-max))
-        (toggle-read-only))
-      (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer))
-    (error nil))
+
+(rspec-if-feature
+ 'ansi-color
+ (add-hook 'compilation-filter-hook
+           (lambda ()
+             (toggle-read-only)
+             (ansi-color-apply-on-region (point-min) (point-max))
+             (toggle-read-only))))
+
+
+(when rspec-enable-yasnippet-integration
+  (rspec-if-feature
+   'yasnippet
+   (add-hook 'rspec-mode-hook
+             (lambda () (when rspec-enable-yasnippet-integration
+                          (rspec-yasnippets)
+                          (yas-minor-mode t))))))
+;; We need the double conditional so that we don't force yasnippet
+;; loading if the user has disabled the integration and so that if the
+;; user disables the intergration for the current session it actually
+;; takes effect.
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
