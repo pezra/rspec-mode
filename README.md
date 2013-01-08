@@ -2,15 +2,15 @@
 Rspec mode provides some convenience functions related to dealing with RSpec.
 
 ## Installation
-I recommend installing via ELPA, but manual installation is simple as well:
+You may install via ELPA, or install manually by downloading 
+`rspec-mode.e` and adding the following to your init.
 
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
 
-Provided you have `yasnippet` installed, you can load the snippets:
-
-    (eval-after-load 'rspec-mode
-      '(rspec-install-snippets))
+It is recommended, but not required, that you also install `yasnippet` and 
+`ansi-color`. These allow rspec-mode to provide snippets 
+and output colorization, respectively.
 
 ## Usage
 If `rspec-mode` is installed properly, it will be started
