@@ -516,13 +516,17 @@
              (toggle-read-only))))
 
 
-(rspec-if-feature
- 'yasnippet
- (add-hook 'rspec-mode-hook
-           (lambda () (when rspec-enable-yasnippet-integration
-                        (rspec-yasnippets)
-                        (yas-minor-mode t)))))
-
+(when rspec-enable-yasnippet-integration
+  (rspec-if-feature
+   'yasnippet
+   (add-hook 'rspec-mode-hook
+             (lambda () (when rspec-enable-yasnippet-integration
+                          (rspec-yasnippets)
+                          (yas-minor-mode t))))))
+;; We need the double conditional so that we don't force yasnippet
+;; loading if the user has disabled the integration and so that if the
+;; user disables the intergration for the current session it actually
+;; takes effect.
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
