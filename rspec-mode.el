@@ -482,12 +482,10 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-(defmacro rspec-if-feature (feature &rest body-form)
-  "Perform body-form if feature is, or can be made, available"
-  `(progn
-     (message "doing someing if %s is available" ,feature)
-     (if (require ,feature nil t)
-         (progn ,@body-form))))
+(defmacro rspec-if-feature (feature &rest body)
+  "Perform body if feature is, or can be made, available"
+  `(when (require ,feature nil t)
+     ,@body))
 
 ;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
