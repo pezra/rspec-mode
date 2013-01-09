@@ -90,6 +90,7 @@
 
 ;;; Code:
 (require 'ruby-mode)
+(require 'ansi-color)
 
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
@@ -165,12 +166,14 @@
   (if rspec-mode
       (progn
         (rspec-set-imenu-generic-expression)
-        (when (boundp 'yas-extra-modes)
+        (when (featurep 'yasnippet)
+          (when rspec-enable-yasnippet-integration
+            (yas-minor-mode-on))
           (make-local-variable 'yas-extra-modes)
           (setq yas-extra-modes (cons 'rspec-mode (yas-extra-modes)))))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)
-    (when (boundp 'yas-extra-modes)
+    (when (featurep 'yasnippet)
       (setq yas-extra-modes (delq 'rspec-mode yas-extra-modes)))))
 
 ;;;###autoload
@@ -196,11 +199,10 @@
     (expand-file-name "snippets" (file-name-directory current)))
   "The directory containing rspec snippets.")
 
-(defun rspec-yasnippets ()
+(defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
-  (unless (member rspec-snippets-dir yas-snippet-dirs)
-    (add-to-list 'yas-snippet-dirs rspec-snippets-dir)
-    (yas-load-directory rspec-snippets-dir)))
+  (setq yas-snippet-dirs (cons rspec-snippets-dir (yas-snippet-dirs)))
+  (yas-load-directory rspec-snippets-dir))
 
 (defun rspec-class-from-file-name ()
   "Guess the name of the class the spec is for."
@@ -504,27 +506,15 @@
                          '(rspec "rspec.*\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" (expand-file-name 1) 2))
             (add-to-list 'compilation-error-regexp-alist 'rspec)))
 
-
-(rspec-if-feature
- 'ansi-color
- (add-hook 'compilation-filter-hook
-           (lambda ()
-             (toggle-read-only)
-             (ansi-color-apply-on-region (point-min) (point-max))
-             (toggle-read-only))))
-
+(add-hook 'compilation-filter-hook
+          (lambda ()
+            (toggle-read-only)
+            (ansi-color-apply-on-region (point-min) (point-max))
+            (toggle-read-only)))
 
 (when rspec-enable-yasnippet-integration
-  (rspec-if-feature
-   'yasnippet
-   (add-hook 'rspec-mode-hook
-             (lambda () (when rspec-enable-yasnippet-integration
-                          (rspec-yasnippets)
-                          (yas-minor-mode t))))))
-;; We need the double conditional so that we don't force yasnippet
-;; loading if the user has disabled the integration and so that if the
-;; user disables the intergration for the current session it actually
-;; takes effect.
+  (eval-after-load 'yasnippet
+    '(rspec-install-snippets)))
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
