@@ -2,10 +2,14 @@
 Rspec mode provides some convenience functions related to dealing with RSpec.
 
 ## Installation
-I recommend installing via ELPA, but manual installation is simple as well:
+You may install via ELPA, or install manually by downloading
+`rspec-mode.el` and adding the following to your init file.
 
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
+
+If `yasnippet` is installed, it will use rspec-mode's snippets. This is
+controlled by the variable `rspec-enable-yasnippet-integration`.
 
 ## Usage
 If `rspec-mode` is installed properly, it will be started
