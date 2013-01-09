@@ -155,7 +155,7 @@
   :group 'rspec-mode)
 
 (defcustom rspec-enable-yasnippet-integration t
-  "When non-nil automatically setup snippets using yasnippet"
+  "When non-nil automatically setup snippets and turn on `yas-minor-mode'"
   :type 'boolean
   :group 'rspec-mode)
 
@@ -166,9 +166,10 @@
   (if rspec-mode
       (progn
         (rspec-set-imenu-generic-expression)
+        (and rspec-enable-yasnippet-integration
+             (require 'yasnippet nil t)
+             (yas-minor-mode-on))
         (when (featurep 'yasnippet)
-          (when rspec-enable-yasnippet-integration
-            (yas-minor-mode-on))
           (make-local-variable 'yas-extra-modes)
           (setq yas-extra-modes (cons 'rspec-mode (yas-extra-modes)))))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
