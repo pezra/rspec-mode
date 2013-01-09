@@ -8,7 +8,8 @@ You may install via ELPA, or install manually by downloading
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
 
-It is recommended, but not required, that you also install `yasnippet` and `ansi-color`. These allow rspec-mode to provide snippets and output colorization, respectively.
+If `yasnippet` is installed, it will use rspec-mode's snippets. This is
+controlled by the variable `rspec-enable-yasnippet-integration`.
 
 ## Usage
 If `rspec-mode` is installed properly, it will be started
