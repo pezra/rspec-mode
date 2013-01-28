@@ -4,7 +4,7 @@
 ;; Authors: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.6
+;; Version: 1.7
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0"))
 
@@ -73,6 +73,7 @@
 ;; Change Log:
 ;; -----------
 ;;
+;; 1.7 - Spring support (Hiroki OHTSUKA)
 ;; 1.6 - Improved keymaps and compile buffer (Dmitry Gutov)
 ;; 1.5 - Allow key prefix to be customized (`rspec-key-command-prefix`)
 ;; 1.4 - Allow .rspec/spec.opts files to be ignored (`rspec-use-opts-file-when-available` customization)
@@ -140,6 +141,11 @@
 
 (defcustom rspec-use-zeus-when-possible t
   "t when rspec should be run with 'zeus' whenever possible. (.zeus.sock present)"
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-spring nil
+  "t when rspec should be run with 'spring'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -357,6 +363,9 @@
   (and rspec-use-zeus-when-possible
        (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
 
+(defun rspec-spring-p ()
+  (and rspec-use-spring))
+
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
@@ -375,8 +384,9 @@
 (defun rspec-runner ()
   "Returns command line to run rspec"
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
-        (zeus-command (if (rspec-zeus-p) "zeus " "")))
-    (concat bundle-command zeus-command (if rspec-use-rake-flag
+        (zeus-command (if (rspec-zeus-p) "zeus " ""))
+        (spring-command (if (rspec-spring-p) "spring " "")))
+    (concat bundle-command zeus-command spring-command (if rspec-use-rake-flag
                                             (concat rspec-rake-command " spec")
                                           rspec-spec-command))))
 
