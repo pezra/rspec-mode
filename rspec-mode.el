@@ -1,14 +1,15 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
-;; Copyright (C) 2008-2011 Peter Williams <http://barelyenough.org>
+;; Copyright (C) 2008-2013 Peter Williams <http://barelyenough.org> and others
 ;; Authors: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.3
+;; Version: 1.6
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0"))
 
-;;; Commentary:
+;; Commentary:
+;; -----------
 ;;
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -25,7 +26,8 @@
 ;; See <http://www.gnu.org/licenses/> for a copy of the GNU General
 ;; Public License.
 
-;;; Documentation:
+;; Documentation:
+;; --------------
 ;;
 ;; This minor mode provides some enhancements to ruby-mode in
 ;; the contexts of RSpec specifications.  Namely, it provides the
@@ -68,9 +70,10 @@
 ;;
 ;; The expectations depend on `el-expectations.el`.
 ;;
-
-;;; Change Log:
+;; Change Log:
+;; -----------
 ;;
+;; 1.6 - Improved keymaps and compile buffer (Dmitry Gutov)
 ;; 1.5 - Allow key prefix to be customized (`rspec-key-command-prefix`)
 ;; 1.4 - Allow .rspec/spec.opts files to be ignored (`rspec-use-opts-file-when-available` customization)
 ;; 1.3 - Bundler support (JD Huntington)
