@@ -426,8 +426,9 @@
       (rvm-activate-corresponding-ruby))
   (rspec-from-project-root
    (let ((compilation-scroll-output t))
-     (compile (mapconcat 'identity `(,(rspec-runner) ,a-file-or-dir
-                                     ,(rspec-runner-options opts)) " ")
+     (compile (mapconcat 'identity `(,(rspec-runner)
+                                     ,(rspec-runner-options opts)
+                                     ,a-file-or-dir) " ")
               'rspec-compilation-mode))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
