@@ -31,3 +31,14 @@ specs. This piece of code does the job:
       (let ((shell-file-name "/bin/bash"))
         ad-do-it))
     (ad-activate 'rspec-compile)
+
+## Contributing
+
+Love RSpec and Emacs? Great help out by contributing. The easiest way to contribute is the checkout the [git probject](https://github.com/pezra/rspec-mode.git), make a change and then submit a pull request.
+
+### Note on Patches/Pull Requests
+
+ * Fork the project.
+ * Make your feature addition or bug fix.
+ * Update the version and changelog in the header of rspec-mode.el to reflect the change.
+ * Send me a pull request. Bonus points for topic branches.
