@@ -241,14 +241,21 @@
                      (save-excursion (forward-line 1) (point))))))
 
 (defun rspec-verify ()
-  "Runs the specified spec, or the spec file for the current buffer."
+  "Runs the specified spec, or the spec file for the current buffer.
+When in `dired-mode' runs all specs in the current directory."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ())))
+  (rspec-run-single-file (if (string= major-mode "dired-mode")
+                             (dired-current-directory)
+                           (rspec-spec-file-for (buffer-file-name)))
+                         (rspec-core-options ())))
 
 (defun rspec-verify-single ()
-  "Runs the specified example at the point of the current buffer."
+  "Runs the specified example at the point of the current buffer.
+When in `dired-mode' runs marked specs or spec at point (works with directories too)."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos)))))
+  (if (string= major-mode "dired-mode")
+      (rspec-compile (mapconcat 'identity (dired-get-marked-files) " ") (rspec-core-options))
+    (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos))))))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
