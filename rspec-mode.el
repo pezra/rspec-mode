@@ -429,7 +429,9 @@
      (compile (mapconcat 'identity `(,(rspec-runner)
                                      ,(rspec-runner-options opts)
                                      ,a-file-or-dir) " ")
-              'rspec-compilation-mode))))
+              (if current-prefix-arg
+                  t
+                'rspec-compilation-mode)))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
