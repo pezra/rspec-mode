@@ -503,7 +503,7 @@ as the value of the symbol, and the hook as the function definition."
       (require 'ansi-color)
       (defun rspec-colorize-compilation-buffer ()
         (toggle-read-only)
-        (ansi-color-apply-on-region (point-min) (point-max))
+        (ansi-color-apply-on-region compilation-filter-start (point))
         (toggle-read-only))
       (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer))
     (error nil))
