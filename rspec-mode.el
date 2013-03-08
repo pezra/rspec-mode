@@ -468,16 +468,22 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-;; Make sure that Rspec buffers are given the rspec minor mode by default
-;;;###autoload
-(add-hook 'ruby-mode-hook (lambda ()
-                            (if (rspec-buffer-is-spec-p)
-                                (rspec-mode)
-                              (rspec-verifiable-mode))))
 
-;; Add verify related spec keybinding to rails minor mode buffers
+;; Utility function to add hooks to multiple modes
+
+
 ;;;###autoload
-(add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
+(defun add-to-multiple-hooks (function1 function2 hooks)
+  (mapc (lambda (hook)
+	  (if (rspec-buffer-is-spec-p)
+	      (add-hook hook function1)
+	    (add-hook hook function2)))
+        hooks))
+
+(eval-after-load 'rspec-mode '(add-to-multiple-hooks 'rspec-verifiable-mode 'rspec-mode
+						     '(ruby-mode-hook
+						       enh-ruby-mode-hook
+						       rails-minor-mode-hook)))
 
 ;; abbrev
 ;; from http://www.opensource.apple.com/darwinsource/Current/emacs-59/emacs/lisp/derived.el
