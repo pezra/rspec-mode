@@ -287,7 +287,7 @@
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for a-spec-file-name"
-  (first
+  (car
    (file-expand-wildcards
         (replace-regexp-in-string
          "/spec/"
@@ -331,7 +331,7 @@
   "Returns the nearest spec directory that could contain specs for a-file"
   (if (file-directory-p a-file)
       (or
-       (first (directory-files a-file t "^spec$"))
+       (car (directory-files a-file t "^spec$"))
        (if (rspec-root-directory-p a-file)
            nil
          (rspec-spec-directory (rspec-parent-directory a-file))))
