@@ -93,6 +93,7 @@
 
 ;;; Code:
 (require 'ruby-mode)
+(require 'cl)
 
 (defconst rspec-mode-abbrev-table (make-abbrev-table))
 
