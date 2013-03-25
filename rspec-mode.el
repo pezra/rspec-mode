@@ -468,11 +468,8 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-
-;; Utility function to add hooks to multiple modes
-
 ;;;###autoload
-(defun add-to-multiple-hooks (hooks)
+(defun rspec-add-to-multiple-hooks (hooks)
   "Add rspec-verifiable-mode to relevant major modes. And make sure that Rspec buffers are given the rspec minor mode"
   (mapc (lambda (hook)
 	  (if (rspec-buffer-is-spec-p)
@@ -481,7 +478,7 @@
         hooks))
 
 ;;;###autoload
-(add-to-multiple-hooks
+(rspec-add-to-multiple-hooks
  '(ruby-mode-hook
    enh-ruby-mode-hook
    rails-minor-mode-hook))
