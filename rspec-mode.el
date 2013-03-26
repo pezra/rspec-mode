@@ -176,6 +176,16 @@
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
   "The imenu regex to parse an outline of the rspec file")
 
+(defmacro rspec-from-directory (directory body-form)
+  "Peform body-form from the specified directory"
+  `(let ((default-directory ,directory))
+     ,body-form))
+
+(defmacro rspec-from-project-root (body-form)
+  "Peform body-form from the project root directory"
+  `(rspec-from-directory (or (rspec-project-root) default-directory)
+                         ,body-form))
+
 (defun rspec-set-imenu-generic-expression ()
   (make-local-variable 'imenu-generic-expression)
   (make-local-variable 'imenu-create-index-function)
@@ -458,15 +468,6 @@
           ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
-(defmacro rspec-from-directory (directory body-form)
-  "Peform body-form from the specified directory"
-  `(let ((default-directory ,directory))
-     ,body-form))
-
-(defmacro rspec-from-project-root (body-form)
-  "Peform body-form from the project root directory"
-  `(rspec-from-directory (or (rspec-project-root) default-directory)
-                        ,body-form))
 
 ;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
