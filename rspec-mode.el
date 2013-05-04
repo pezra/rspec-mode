@@ -245,10 +245,19 @@
   (interactive)
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ())))
 
+(defun rspec-logical-line-number-at-pos ()
+  "Print the current line number (in the buffer) of point."
+  (interactive)
+  (save-restriction
+    (widen)
+    (save-excursion
+      (beginning-of-line)
+      (1+ (count-lines 1 (point))))))
+
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer."
   (interactive)
-  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (line-number-at-pos)))))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name)) (rspec-core-options ()) (concat "--line " (number-to-string (rspec-logical-line-number-at-pos)))))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
