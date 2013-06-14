@@ -93,6 +93,7 @@
 
 ;;; Code:
 (require 'ruby-mode)
+(require 'cl)
 
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
