@@ -1,8 +1,10 @@
-# Emacs Rspec Mode
-Rspec mode provides some convenience functions related to dealing with RSpec.
+# Emacs RSpec Mode
+RSpec mode provides some convenience functions for dealing with RSpec.
 
 ## Installation
-I recommend installing via ELPA, but manual installation is simple as well:
+
+You can install via ELPA, or manually by downloading `rspec-mode` and
+adding the following to your init file:
 
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
@@ -20,7 +22,7 @@ See `rspec-mode.el` for further usage.
 
 ## Gotchas
 
-### Zsh and RVM
+### ZSH and RVM
 If you use `ZSH` and `RVM`, you may encounter problems running the
 specs. It may be so that an older version of Ruby, than the one you
 specified in `.rvmrc`, is used. This is because `ZSH` runs a small
@@ -39,7 +41,7 @@ specs. This piece of code does the job:
 
 ## Contributing
 
-Love RSpec and Emacs? Great help out by contributing. The easiest way to contribute is the checkout the [git probject](https://github.com/pezra/rspec-mode.git), make a change and then submit a pull request.
+Love RSpec and Emacs? Great, help out by contributing. The easiest way to contribute is to checkout the [git probject](https://github.com/pezra/rspec-mode.git), make a change and then submit a pull request.
 
 ### Note on Patches/Pull Requests
 
