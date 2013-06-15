@@ -147,11 +147,6 @@
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-compilation-buffer-name "*compilation*"
-  "The compilation buffer name for spec"
-  :type 'string
-  :group 'rspec-mode)
-
 (defcustom rspec-key-command-prefix  (kbd "C-c ,")
   "The prefix for all rspec related key commands"
   :type 'string
