@@ -93,6 +93,7 @@
 
 ;;; Code:
 (require 'ruby-mode)
+(require 'ansi-color)
 
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
@@ -470,7 +471,13 @@
   (set (make-local-variable 'compilation-error-regexp-alist-alist)
        (cons '(rspec "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2)
              compilation-error-regexp-alist-alist))
-  (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t)))
+  (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t))
+  (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t))
+
+(defun rspec-colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region compilation-filter-start (point))
+  (toggle-read-only))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
@@ -505,16 +512,6 @@
 ;; Add verify related spec keybinding to rails minor mode buffers
 ;;;###autoload
 (add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
-
-(condition-case nil
-    (progn
-      (require 'ansi-color)
-      (defun rspec-colorize-compilation-buffer ()
-        (toggle-read-only)
-        (ansi-color-apply-on-region compilation-filter-start (point))
-        (toggle-read-only))
-      (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer))
-    (error nil))
 
 (provide 'rspec-mode)
 ;;; rspec-mode.el ends here
