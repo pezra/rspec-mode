@@ -491,16 +491,20 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
-(add-hook 'ruby-mode-hook (lambda ()
-                            (if (rspec-buffer-is-spec-p)
-                                (rspec-mode)
-                              (rspec-verifiable-mode))))
+(defun rspec-add-to-multiple-hooks (hooks)
+  "Add rspec-verifiable-mode to relevant major modes. And make sure that Rspec buffers are given the rspec minor mode"
+  (mapc (lambda (hook)
+	  (if (rspec-buffer-is-spec-p)
+	      (add-hook hook rspec-mode)
+	    (add-hook hook rspec-verifiable-mode)))
+        hooks))
 
-;; Add verify related spec keybinding to rails minor mode buffers
 ;;;###autoload
-(add-hook 'rails-minor-mode-hook 'rspec-verifiable-mode)
+(rspec-add-to-multiple-hooks
+ '(ruby-mode-hook
+   enh-ruby-mode-hook
+   rails-minor-mode-hook))
 
 (condition-case nil
     (progn
