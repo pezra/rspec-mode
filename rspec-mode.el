@@ -491,12 +491,16 @@
   `(rspec-from-directory (or (rspec-project-root) default-directory)
                         ,body-form))
 
-;; Make sure that Rspec buffers are given the rspec minor mode by default
 ;;;###autoload
-(add-hook 'ruby-mode-hook (lambda ()
-                            (if (rspec-buffer-is-spec-p)
-                                (rspec-mode)
-                              (rspec-verifiable-mode))))
+(defun rspec-enable-appropriate-mode ()
+  (if (rspec-buffer-is-spec-p)
+      (rspec-mode)
+    (rspec-verifiable-mode)))
+
+;; Hook up all Ruby buffers.
+;;;###autoload
+(dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+  (add-hook hook 'rspec-enable-appropriate-mode))
 
 ;; Add verify related spec keybinding to rails minor mode buffers
 ;;;###autoload
