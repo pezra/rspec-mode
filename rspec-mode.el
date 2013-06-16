@@ -437,18 +437,19 @@
   "Runs a compile for the specified file or diretory with the specified opts"
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "r") (eval `(lambda () (interactive)
-                                       (rspec-from-directory ,default-directory
-                                                            (rspec-compile ,a-file-or-dir (quote ,opts))))))
+                                       (let ((default-directory ,default-directory))
+                                         (rspec-compile ,a-file-or-dir (quote ,opts))))))
     (global-set-key rspec-key-command-prefix map))
 
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
-  (rspec-from-project-root
-   (let ((compilation-scroll-output t))
-     (compile (mapconcat 'identity `(,(rspec-runner)
-                                     ,(rspec-runner-options opts)
-                                     ,a-file-or-dir) " ")
-              'rspec-compilation-mode))))
+
+  (let ((default-directory (or (rspec-project-root) default-directory))
+        (compilation-scroll-output t))
+    (compile (mapconcat 'identity `(,(rspec-runner)
+                                    ,(rspec-runner-options opts)
+                                    ,a-file-or-dir) " ")
+             'rspec-compilation-mode)))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
@@ -482,16 +483,6 @@
           ((file-exists-p (expand-file-name "Rakefile" directory)) directory)
           ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
-
-(defmacro rspec-from-directory (directory body-form)
-  "Peform body-form from the specified directory"
-  `(let ((default-directory ,directory))
-     ,body-form))
-
-(defmacro rspec-from-project-root (body-form)
-  "Peform body-form from the project root directory"
-  `(rspec-from-directory (or (rspec-project-root) default-directory)
-                        ,body-form))
 
 ;;;###autoload
 (defun rspec-enable-appropriate-mode ()
