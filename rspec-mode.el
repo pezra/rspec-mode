@@ -62,6 +62,14 @@
 ;; rspec-use-opts-file-when-available is not set to nil, otherwise it
 ;; will fallback to defaults.
 ;;
+;; You can also launch specs from Dired buffers, to do that, add this:
+;;
+;;   (add-hook 'dired-mode-hook 'rspec-dired-mode)
+;;
+;; It has almost the same keybindings, but there's no toggle-spec
+;; command, and `rspec-dired-verify-single' runs all marked files, or
+;; the file at point.
+;;
 ;; Dependencies
 ;; ------------
 ;;
@@ -108,6 +116,12 @@
 
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
+
+(define-prefix-command 'rspec-dired-mode-keymap)
+(define-key rspec-dired-mode-keymap (kbd "v") 'rspec-dired-verify)
+(define-key rspec-dired-mode-keymap (kbd "s") 'rspec-dired-verify-single)
+(define-key rspec-dired-mode-keymap (kbd "a") 'rspec-verify-all)
+(define-key rspec-dired-mode-keymap (kbd "r") 'rspec-rerun)
 
 (defgroup rspec-mode nil
   "RSpec minor mode."
@@ -174,6 +188,11 @@
 (define-minor-mode rspec-verifiable-mode
   "Minor mode for Ruby files that have specs"
   :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifiable-keymap)))
+
+;;;###autoload
+(define-minor-mode rspec-dired-mode
+  "Minor mode for Dired buffers with spec files"
+  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-dired-mode-keymap)))
 
 (defconst rspec-imenu-generic-expression
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
@@ -257,27 +276,35 @@
                      (save-excursion (forward-line 1) (point))))))
 
 (defun rspec-verify ()
-  "Runs the specified spec, or the spec file for the current buffer.
-When in `dired-mode', runs all specs in the current directory."
+  "Runs the specified spec, or the spec file for the current buffer."
   (interactive)
-  (rspec-run-single-file (if (eq major-mode 'dired-mode)
-                             (dired-current-directory)
-                           (rspec-spec-file-for (buffer-file-name)))
-                         (rspec-core-options ())))
+  (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
+                         (rspec-core-options)))
 
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer.
 When in `dired-mode', runs marked specs or spec at point (works with directories too)."
   (interactive)
-  (if (eq major-mode 'dired-mode)
-      (rspec-compile (mapconcat 'identity (dired-get-marked-files) " ") (rspec-core-options))
-    (rspec-run-single-file
-     (rspec-spec-file-for (buffer-file-name))
-     (rspec-core-options)
-     (concat "--line "
-             (save-restriction
-               (widen)
-               (number-to-string (line-number-at-pos)))))))
+  (rspec-run-single-file
+   (rspec-spec-file-for (buffer-file-name))
+   (rspec-core-options)
+   (concat "--line "
+           (save-restriction
+             (widen)
+             (number-to-string (line-number-at-pos))))))
+
+(defun rspec-dired-verify ()
+  "Runs all specs in the current directory."
+  (interactive)
+  (rspec-run-single-file (dired-current-directory) (rspec-core-options)))
+
+(defun rspec-dired-verify-single ()
+  "Runs marked specs or spec at point (works with directories too).
+Doesn't use rake, calls rspec directly."
+  (interactive)
+  (let (rspec-use-rake-flag)
+    (rspec-compile (mapconcat 'identity (dired-get-marked-files) " ")
+                   (rspec-core-options))))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
