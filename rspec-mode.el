@@ -97,14 +97,15 @@
 (require 'compile)
 
 (define-prefix-command 'rspec-mode-verifible-keymap)
+(define-prefix-command 'rspec-mode-keymap)
+
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-mode-verifible-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-mode-verifible-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(define-key rspec-mode-verifible-keymap (kbd "r") 'rspec-rerun)
 
-(define-prefix-command 'rspec-mode-keymap)
-(define-key rspec-mode-keymap (kbd "v") 'rspec-verify)
-(define-key rspec-mode-keymap (kbd "a") 'rspec-verify-all)
-(define-key rspec-mode-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(set-keymap-parent rspec-mode-keymap rspec-mode-verifible-keymap)
+
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
 
@@ -428,13 +429,24 @@
   "Runs spec on a file with the specified options"
   (rspec-compile (rspec-runner-target spec-file) opts))
 
+(defvar rspec-last-directory nil
+  "Directory the last spec process ran in.")
+
+(defvar rspec-last-arguments nil
+  "Arguments passed to `rspec-compile' at the last invocation.")
+
+(defun rspec-rerun ()
+  "Re-run the last RSpec invocation."
+  (interactive)
+  (if (not rspec-last-directory)
+      (error "No previous verification")
+    (let ((default-directory rspec-last-directory))
+      (apply #'rspec-compile rspec-last-arguments))))
+
 (defun rspec-compile (a-file-or-dir &optional opts)
-  "Runs a compile for the specified file or diretory with the specified opts"
-  (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "r") (eval `(lambda () (interactive)
-                                       (let ((default-directory ,default-directory))
-                                         (rspec-compile ,a-file-or-dir (quote ,opts))))))
-    (global-set-key rspec-key-command-prefix map))
+  "Runs a compile for the specified file or directory with the specified options."
+  (setq rspec-last-directory default-directory
+        rspec-last-arguments (list a-file-or-dir opts))
 
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
