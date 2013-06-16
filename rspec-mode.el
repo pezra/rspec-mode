@@ -406,6 +406,10 @@ Doesn't use rake, calls rspec directly."
   (and rspec-use-zeus-when-possible
        (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
 
+(defun rspec-rake-p ()
+  (and rspec-use-rake-flag
+       (file-exists-p (concat (rspec-project-root) "Rakefile"))))
+
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
@@ -425,7 +429,7 @@ Doesn't use rake, calls rspec directly."
   "Returns command line to run rspec"
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
         (zeus-command (if (rspec-zeus-p) "zeus " "")))
-    (concat bundle-command zeus-command (if rspec-use-rake-flag
+    (concat bundle-command zeus-command (if (rspec-rake-p)
                                             (concat rspec-rake-command " spec")
                                           rspec-spec-command))))
 
@@ -433,14 +437,16 @@ Doesn't use rake, calls rspec directly."
   "Returns string of options for command line"
   (let ((opts (if (listp opts)
                   opts
-                (list opts))))
-    (concat (when rspec-use-rake-flag "SPEC_OPTS=\'")
+                (list opts)))
+        (use-rake (rspec-rake-p)))
+    (concat (when use-rake "SPEC_OPTS=\'")
             (mapconcat 'identity opts " ")
-            (when rspec-use-rake-flag "\'"))))
+            (when use-rake "\'"))))
 
 (defun rspec-runner-target (target)
   "Returns target file/directory wrapped in SPEC if using rake"
-  (concat (when rspec-use-rake-flag "SPEC=\'") target (when rspec-use-rake-flag "\'")))
+  (let ((use-rake (rspec-rake-p)))
+    (concat (when use-rake "SPEC=\'") target (when use-rake "\'"))))
 
 ;;;###autoload
 (defun rspec-buffer-is-spec-p ()
@@ -449,7 +455,8 @@ Doesn't use rake, calls rspec directly."
        (rspec-spec-file-p (buffer-file-name))))
 
 (defun rspec-example-name-at-point ()
-  "Returns the name of the example in which the point is currently positioned; or nil if it is outside of and example"
+  "Returns the name of the example in which the point is currently positioned.
+Or nil if it is outside of any example."
   (save-excursion
     (rspec-beginning-of-example)
     (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
