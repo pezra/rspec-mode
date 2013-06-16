@@ -96,15 +96,15 @@
 (require 'ansi-color)
 (require 'compile)
 
-(define-prefix-command 'rspec-mode-verifible-keymap)
+(define-prefix-command 'rspec-mode-verifiable-keymap)
 (define-prefix-command 'rspec-mode-keymap)
 
-(define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
-(define-key rspec-mode-verifible-keymap (kbd "a") 'rspec-verify-all)
-(define-key rspec-mode-verifible-keymap (kbd "t") 'rspec-toggle-spec-and-target)
-(define-key rspec-mode-verifible-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-mode-verifiable-keymap (kbd "v") 'rspec-verify)
+(define-key rspec-mode-verifiable-keymap (kbd "a") 'rspec-verify-all)
+(define-key rspec-mode-verifiable-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(define-key rspec-mode-verifiable-keymap (kbd "r") 'rspec-rerun)
 
-(set-keymap-parent rspec-mode-keymap rspec-mode-verifible-keymap)
+(set-keymap-parent rspec-mode-keymap rspec-mode-verifiable-keymap)
 
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
@@ -173,7 +173,7 @@
 ;;;###autoload
 (define-minor-mode rspec-verifiable-mode
   "Minor mode for Ruby files that have specs"
-  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifible-keymap)))
+  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifiable-keymap)))
 
 (defconst rspec-imenu-generic-expression
   '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
