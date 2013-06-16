@@ -20,6 +20,13 @@ automatically when `ruby-mode` is started.
 
 See `rspec-mode.el` for further usage.
 
+### Use gem spring
+
+Support [spring](https://github.com/jonleighton/spring), Rails application preloader.
+Please set flag to init.el
+
+    (custom-set-variables '(rspec-use-spring t))
+
 ## Gotchas
 
 ### ZSH and RVM
