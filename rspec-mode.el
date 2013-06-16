@@ -73,8 +73,7 @@
 ;; Dependencies
 ;; ------------
 ;;
-;; If `ansi-color` is available it will be loaded so that rspec output is
-;; colorized properly. If `rspec-use-rvm` is set to true `rvm.el` is required.
+;; If `rspec-use-rvm` is set to true `rvm.el` is required.
 ;;
 ;; The expectations depend on `el-expectations.el`.
 ;;
