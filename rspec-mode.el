@@ -94,6 +94,7 @@
 ;;; Code:
 (require 'ruby-mode)
 (require 'ansi-color)
+(require 'compile)
 
 (define-prefix-command 'rspec-mode-verifible-keymap)
 (define-key rspec-mode-verifible-keymap (kbd "v") 'rspec-verify)
@@ -108,11 +109,12 @@
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
 
 (defgroup rspec-mode nil
-  "Rspec minor mode.")
+  "RSpec minor mode."
+  :group 'languages)
 
 (defcustom rspec-use-rake-flag t
-  "*Whether rspec runner is run using rake spec task or the spec command"
-  :tag "Rspec runner command"
+  "Whether RSpec runner is run using rake spec task or the spec command"
+  :tag "RSpec runner command"
   :type '(radio (const :tag "Use 'rake spec' task" t)
                 (const :tag "Use 'spec' command" nil))
   :group 'rspec-mode)
@@ -330,13 +332,6 @@
   (if (file-name-extension a-file-name)
       a-file-name ;; file has a extension already so do nothing
     (concat a-file-name ".rb")))
-
-(defun rspec-directory-subdirectories (directory)
-  "Returns list of subdirectories"
-  (remove-if
-   (lambda (dir) (or (string-match "^\\.\\.?$" (file-name-nondirectory dir))
-                     (not (file-directory-p dir))))
-   (directory-files directory t)))
 
 (defun rspec-parent-directory (a-directory)
   "Returns the directory of which a-directory is a child"
