@@ -52,6 +52,10 @@
 ;;
 ;;  * reenable the disabled example at the point
 ;;
+;;  * run all specs related to the current buffer (`\C-c ,m`)
+;;
+;;  * run the current spec and all after it (`\C-c ,c`)
+;;
 ;;  * run spec for entire project (bound to `\C-c ,a`)
 ;;
 ;; You can choose whether to run specs using 'rake spec' or the 'spec'
@@ -287,21 +291,23 @@
   "Runs the specs related to the current buffer. This is more fuzzy that a simple verify."
   (interactive)
   (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
-                            (rspec-core-options ())))
+                            (rspec-core-options)))
 
 (defun rspec-verify-continue ()
-  "Runs the current spec file and the spec files located after it."
+  "Runs the current spec file and the spec files located after it.
+This is most useful in combination with the option `--fail-fast',
+in long-running test suites."
   (interactive)
-  (let ((current-spec-file (rspec-compress-spec-file (rspec-spec-file-for (buffer-file-name)))))
+  (let ((current-spec-file (rspec-compress-spec-file
+                            (rspec-spec-file-for (buffer-file-name)))))
     (rspec-run-multiple-files
      (loop for file in (rspec-all-spec-files (buffer-file-name))
            when (not (string-lessp file current-spec-file))
            collect file)
-     (rspec-core-options ()))))
+     (rspec-core-options))))
 
 (defun rspec-verify-single ()
-  "Runs the specified example at the point of the current buffer.
-When in `dired-mode', runs marked specs or spec at point (works with directories too)."
+  "Runs the specified example at the point of the current buffer."
   (interactive)
   (rspec-run-single-file
    (rspec-spec-file-for (buffer-file-name))
