@@ -102,6 +102,7 @@
 (require 'ruby-mode)
 (require 'ansi-color)
 (require 'compile)
+(eval-when-compile (require 'cl))
 
 (define-prefix-command 'rspec-mode-verifiable-keymap)
 (define-prefix-command 'rspec-mode-keymap)
@@ -423,9 +424,10 @@ Doesn't use rake, calls rspec directly."
 
 (defun rspec-all-spec-files (a-file)
   (mapcar 'rspec-compress-spec-file
-          (sort (remove-if-not 'rspec-spec-file-p
-                               (rspec-all-files-under-directory
-                                (rspec-spec-directory a-file)))
+          (sort (loop for file in (rspec-all-files-under-directory
+                                   (rspec-spec-directory a-file))
+                      when (rspec-spec-file-p file)
+                      collect file)
                 'string-lessp)))
 
 (defun rspec-spec-file-p (a-file-name)
