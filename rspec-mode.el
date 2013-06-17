@@ -110,6 +110,8 @@
 (define-key rspec-mode-verifiable-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-mode-verifiable-keymap (kbd "t") 'rspec-toggle-spec-and-target)
 (define-key rspec-mode-verifiable-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-mode-verifiable-keymap (kbd "m") 'rspec-verify-matching)
+(define-key rspec-mode-verifiable-keymap (kbd "c") 'rspec-verify-continue)
 
 (set-keymap-parent rspec-mode-keymap rspec-mode-verifiable-keymap)
 
@@ -280,6 +282,22 @@
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
                          (rspec-core-options)))
 
+(defun rspec-verify-matching ()
+  "Runs the specs related to the current buffer. This is more fuzzy that a simple verify."
+  (interactive)
+  (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
+                            (rspec-core-options ())))
+
+(defun rspec-verify-continue ()
+  "Runs the current spec file and the spec files located after it."
+  (interactive)
+  (let ((current-spec-file (rspec-compress-spec-file (rspec-spec-file-for (buffer-file-name)))))
+    (rspec-run-multiple-files
+     (loop for file in (rspec-all-spec-files (buffer-file-name))
+           when (not (string-lessp file current-spec-file))
+           collect file)
+     (rspec-core-options ()))))
+
 (defun rspec-verify-single ()
   "Runs the specified example at the point of the current buffer.
 When in `dired-mode', runs marked specs or spec at point (works with directories too)."
@@ -385,6 +403,31 @@ Doesn't use rake, calls rspec directly."
          (rspec-spec-directory (rspec-parent-directory a-file))))
     (rspec-spec-directory (rspec-parent-directory a-file))))
 
+(defun rspec-all-related-spec-files (a-file)
+  (let* ((expected-name (file-name-nondirectory (rspec-spec-file-for a-file)))
+         (expected-spec-file (concat "/" expected-name)))
+    (loop for file in (rspec-all-spec-files a-file)
+          when (string-match-p expected-spec-file file)
+          collect file)))
+
+(defun rspec-all-files-under-directory (dir)
+  (let ((files (file-expand-wildcards (concat dir "/*") nil)))
+    (if (null files)
+        files
+      (delete-dups
+       (append files
+               (rspec-all-files-under-directory (concat dir "/*")))))))
+
+(defun rspec-compress-spec-file (a-file)
+  (file-relative-name a-file (rspec-project-root)))
+
+(defun rspec-all-spec-files (a-file)
+  (mapcar 'rspec-compress-spec-file
+          (sort (remove-if-not 'rspec-spec-file-p
+                               (rspec-all-files-under-directory
+                                (rspec-spec-directory a-file)))
+                'string-lessp)))
+
 (defun rspec-spec-file-p (a-file-name)
   "Returns true if the specified file is a spec"
   (numberp (string-match rspec-spec-file-name-re a-file-name)))
@@ -468,6 +511,12 @@ Or nil if it is outside of any example."
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec on a file with the specified options"
   (rspec-compile (rspec-runner-target spec-file) opts))
+
+(defun rspec-run-multiple-files (spec-files &rest opts)
+  "Runs spec on a list of files with the specified options"
+  (if (null spec-files)
+      (message "No spec files found!")
+    (rspec-compile (rspec-runner-target (mapconcat 'identity spec-files " ")) opts)))
 
 (defvar rspec-last-directory nil
   "Directory the last spec process ran in.")
