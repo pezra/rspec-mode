@@ -489,8 +489,7 @@ Doesn't use rake, calls rspec directly."
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
         (zeus-command (if (rspec-zeus-p) "zeus " nil))
         (spring-command (if (rspec-spring-p) "spring " nil)))
-    (concat bundle-command
-            (or zeus-command spring-command)
+    (concat (or zeus-command spring-command bundle-command)
             (if (rspec-rake-p)
                 (concat rspec-rake-command " spec")
               rspec-spec-command))))
