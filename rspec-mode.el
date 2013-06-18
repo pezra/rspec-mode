@@ -1,16 +1,13 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
 ;; Copyright (C) 2008-2013 Peter Williams <http://barelyenough.org> and others
-;; Authors: Peter Williams, et al.
+;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
 ;; Version: 1.6
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0"))
 
-;; Commentary:
-;; -----------
-;;
 ;; This file is NOT part of GNU Emacs.
 ;;
 ;; This program is free software: you can redistribute it and/or modify
@@ -26,8 +23,7 @@
 ;; See <http://www.gnu.org/licenses/> for a copy of the GNU General
 ;; Public License.
 
-;; Documentation:
-;; --------------
+;;; Commentary:
 ;;
 ;; This minor mode provides some enhancements to ruby-mode in
 ;; the contexts of RSpec specifications.  Namely, it provides the
@@ -74,15 +70,13 @@
 ;; command, and `rspec-dired-verify-single' runs all marked files, or
 ;; the file at point.
 ;;
-;; Dependencies
-;; ------------
+;; Dependencies:
 ;;
-;; If `rspec-use-rvm` is set to true `rvm.el` is required.
+;; If `rspec-use-rvm` is set to true `rvm.el' is required.
 ;;
-;; The expectations depend on `el-expectations.el`.
+;; The expectations depend on `el-expectations.el'.
 ;;
-;; Change Log:
-;; -----------
+;;; Change Log:
 ;;
 ;; 1.6 - Improved keymaps and compile buffer (Dmitry Gutov)
 ;; 1.5 - Allow key prefix to be customized (`rspec-key-command-prefix`)
@@ -467,7 +461,7 @@ Doesn't use rake, calls rspec directly."
 
 (defun rspec-rake-p ()
   (and rspec-use-rake-when-possible
-       ;; Looks inefficient, but the calculation of the root is very
+       ;; Looks inefficient, but the calculation of the root is quite
        ;; fast. Unless this is used over TRAMP, I suppose.
        (not (rspec-spring-p))
        (file-exists-p (concat (rspec-project-root) "Rakefile"))))
