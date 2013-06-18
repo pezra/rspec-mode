@@ -60,7 +60,7 @@
 ;;
 ;; You can choose whether to run specs using 'rake spec' or the 'spec'
 ;; command. Use the customization interface (customize-group
-;; rspec-mode) or override using (setq rspec-use-rake-flag TVAL).
+;; rspec-mode) or override using (setq rspec-use-rake-when-possible TVAL).
 ;;
 ;; Options will be loaded from spec.opts or .rspec if it exists and
 ;; rspec-use-opts-file-when-available is not set to nil, otherwise it
@@ -133,12 +133,15 @@
   "RSpec minor mode."
   :group 'languages)
 
-(defcustom rspec-use-rake-flag t
-  "Whether RSpec runner is run using rake spec task or the spec command"
+(defcustom rspec-use-rake-when-possible t
+  "When non-nil and Rakefile is present, run specs via rake spec task."
   :tag "RSpec runner command"
   :type '(radio (const :tag "Use 'rake spec' task" t)
                 (const :tag "Use 'spec' command" nil))
   :group 'rspec-mode)
+
+(define-obsolete-variable-alias 'rspec-use-rake-flag
+  'rspec-use-rake-when-possible "1.7")
 
 (defcustom rspec-rake-command "rake"
   "The command for rake"
@@ -151,27 +154,28 @@
   :group 'rspec-mode)
 
 (defcustom rspec-use-rvm nil
-  "t when RVM in is in use. (Requires rvm.el)"
+  "When t, use RVM. Requires rvm.el."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-bundler-when-possible t
-  "t when rspec should be run with 'bundle exec' whenever possible. (Gemfile present)"
+  "When t and Gemfile is present, run specs with 'bundle exec'.
+Not used when running specs using Zeus or Spring."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-zeus-when-possible t
-  "t when rspec should be run with 'zeus' whenever possible. (.zeus.sock present)"
+  "When t and .zeus.sock is present, run specs with 'zeus'."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-spring-when-possible t
-  "t when rspec should be run with 'spring' whenever possible. (tmp/spring/spring.pid present)"
+  "When t and tmp/spring/spring.pid is present, run specs with 'spring'."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-opts-file-when-available t
-  "t if rspec should use .rspec/spec.opts"
+  "When t, RSpec should use .rspec/spec.opts."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -331,7 +335,7 @@ in long-running test suites."
   "Runs marked specs or spec at point (works with directories too).
 Doesn't use rake, calls rspec directly."
   (interactive)
-  (let (rspec-use-rake-flag)
+  (let (rspec-use-rake-when-possible)
     (rspec-compile (mapconcat 'identity (dired-get-marked-files) " ")
                    (rspec-core-options))))
 
@@ -462,7 +466,10 @@ Doesn't use rake, calls rspec directly."
        (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
 
 (defun rspec-rake-p ()
-  (and rspec-use-rake-flag
+  (and rspec-use-rake-when-possible
+       ;; Looks inefficient, but the calculation of the root is very
+       ;; fast. Unless this is used over TRAMP, I suppose.
+       (not (rspec-spring-p))
        (file-exists-p (concat (rspec-project-root) "Rakefile"))))
 
 (defun rspec-spring-p ()
