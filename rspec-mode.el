@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.6
+;; Version: 1.7
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0"))
 
@@ -78,9 +78,15 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.7 - Support for Spring (Tomy Kaira)
+;;     - New commands: `rspec-verify-matching', `rspec-verify-continue'
+;;       (Jean-Louis Giordano)
+;;     - Run specs from Dired (Adam Sokolnicki)
+;;     - Include Yasnippet snippets collection (Dmitry Gutov)
 ;; 1.6 - Improved keymaps and compile buffer (Dmitry Gutov)
-;; 1.5 - Allow key prefix to be customized (`rspec-key-command-prefix`)
-;; 1.4 - Allow .rspec/spec.opts files to be ignored (`rspec-use-opts-file-when-available` customization)
+;; 1.5 - Allow key prefix to be customized (`rspec-key-command-prefix')
+;; 1.4 - Allow .rspec/spec.opts files to be ignored (user option
+;;       `rspec-use-opts-file-when-available')
 ;; 1.3 - Bundler support (JD Huntington)
 ;; 1.2 - Rspec2 compatibility  (Anantha Kumaran)
 ;; 1.1 - Run verification processes from project root directory (Joe Hirn)
