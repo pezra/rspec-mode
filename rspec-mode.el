@@ -165,6 +165,11 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-spring-when-possible t
+  "t when rspec should be run with 'spring' whenever possible. (tmp/spring/spring.pid present)"
+  :type 'boolean
+  :group 'rspec-mode)
+
 (defcustom rspec-use-opts-file-when-available t
   "t if rspec should use .rspec/spec.opts"
   :type 'boolean
@@ -460,6 +465,10 @@ Doesn't use rake, calls rspec directly."
   (and rspec-use-rake-flag
        (file-exists-p (concat (rspec-project-root) "Rakefile"))))
 
+(defun rspec-spring-p ()
+  (and rspec-use-spring-when-possible
+       (file-exists-p (concat (rspec-project-root) "tmp/spring/spring.pid"))))
+
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
@@ -478,10 +487,13 @@ Doesn't use rake, calls rspec directly."
 (defun rspec-runner ()
   "Returns command line to run rspec"
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
-        (zeus-command (if (rspec-zeus-p) "zeus " "")))
-    (concat bundle-command zeus-command (if (rspec-rake-p)
-                                            (concat rspec-rake-command " spec")
-                                          rspec-spec-command))))
+        (zeus-command (if (rspec-zeus-p) "zeus " nil))
+        (spring-command (if (rspec-spring-p) "spring " nil)))
+    (concat bundle-command
+            (or zeus-command spring-command)
+            (if (rspec-rake-p)
+                (concat rspec-rake-command " spec")
+              rspec-spec-command))))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
