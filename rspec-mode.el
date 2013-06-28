@@ -243,6 +243,17 @@ Not used when running specs using Zeus or Spring."
       (setq class (replace-regexp-in-string (car rule) (cdr rule) class t t)))
     class))
 
+(defun rspec-top-level-desc-p ()
+  "Return t if point is on the first \"describe\" block opener."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (beginning-of-line)
+      (not (catch 'found
+             (while (re-search-backward "\\_<describe\\_>" nil t)
+               (unless (nth 8 (syntax-ppss))
+                 (throw 'found t))))))))
+
 (defun rspec-beginning-of-example ()
   "Moves point to the beginning of the example in which the point current is."
   (interactive)
