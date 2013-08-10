@@ -78,7 +78,7 @@
 ;;
 ;;; Change Log:
 ;;
-;; 1.8 - Support for feature specs (Ales Guzik)
+;; 1.8 - Support for Capybara's acceptance test DSL (Ales Guzik)
 ;; 1.7 - Support for Spring (Tomy Kaira)
 ;;     - New commands: `rspec-verify-matching', `rspec-verify-continue'
 ;;       (Jean-Louis Giordano)
