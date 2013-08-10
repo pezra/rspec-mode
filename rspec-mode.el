@@ -534,14 +534,6 @@ Doesn't use rake, calls rspec directly."
   (and (buffer-file-name)
        (rspec-spec-file-p (buffer-file-name))))
 
-(defun rspec-example-name-at-point ()
-  "Returns the name of the example in which the point is currently positioned.
-Or nil if it is outside of any example."
-  (save-excursion
-    (rspec-beginning-of-example)
-    (re-search-forward "\\(it\\|scenario\\)[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
-    (match-string 1)))
-
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
   (rspec-compile (rspec-spec-directory (rspec-project-root)) opts))
