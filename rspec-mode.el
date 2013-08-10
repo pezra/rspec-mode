@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.7
+;; Version: 1.8
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0"))
 
@@ -78,6 +78,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.8 - Support for feature specs (Ales Guzik)
 ;; 1.7 - Support for Spring (Tomy Kaira)
 ;;     - New commands: `rspec-verify-matching', `rspec-verify-continue'
 ;;       (Jean-Louis Giordano)
@@ -210,7 +211,7 @@ Not used when running specs using Zeus or Spring."
   :lighter "" :keymap `((,rspec-key-command-prefix . rspec-dired-mode-keymap)))
 
 (defconst rspec-imenu-generic-expression
-  '(("Examples"  "^\\( *\\(it\\|describe\\|context\\) +.+\\)"          1))
+  '(("Examples"  "^\\( *\\(it\\|describe\\|context\\|feature\\|scenario\\) +.+\\)"          1))
   "The imenu regex to parse an outline of the rspec file")
 
 (defconst rspec-spec-file-name-re "\\(_\\|-\\)spec\\.rb\\'"
@@ -250,7 +251,7 @@ Not used when running specs using Zeus or Spring."
       (widen)
       (beginning-of-line)
       (not (catch 'found
-             (while (re-search-backward "\\_<describe\\_>" nil t)
+             (while (re-search-backward "\\_<\\(describe\\|feature\\)\\_>" nil t)
                (unless (nth 8 (syntax-ppss))
                  (throw 'found t))))))))
 
@@ -261,7 +262,7 @@ Not used when running specs using Zeus or Spring."
     (goto-char
      (save-excursion
        (end-of-line)
-       (unless (and (search-backward-regexp "^[[:space:]]*it[[:space:]]*(?[\"']" nil t)
+       (unless (and (search-backward-regexp "^[[:space:]]*\\(it\\|scenario\\)[[:space:]]*(?[\"']" nil t)
                     (save-excursion (ruby-end-of-block) (< start (point))))
          (error "Unable to find an example"))
        (point)))))
@@ -538,7 +539,7 @@ Doesn't use rake, calls rspec directly."
 Or nil if it is outside of any example."
   (save-excursion
     (rspec-beginning-of-example)
-    (re-search-forward "it[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
+    (re-search-forward "\\(it\\|scenario\\)[[:space:]]+['\"]\\(.*\\)['\"][[:space:]]*\\(do\\|DO\\|Do\\|{\\)")
     (match-string 1)))
 
 (defun rspec-run (&optional opts)
