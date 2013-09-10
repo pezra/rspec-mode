@@ -41,7 +41,7 @@ specs. This piece of code does the job:
 
 ## Contributing
 
-Love RSpec and Emacs? Great, help out by contributing. The easiest way to contribute is to checkout the [git probject](https://github.com/pezra/rspec-mode.git), make a change and then submit a pull request.
+Love RSpec and Emacs? Great, help out by contributing. The easiest way to contribute is to checkout the [git project](https://github.com/pezra/rspec-mode.git), make a change and then submit a pull request.
 
 ### Note on Patches/Pull Requests
 
