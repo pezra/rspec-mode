@@ -194,7 +194,7 @@ Not used when running specs using Zeus or Spring."
         (rspec-set-imenu-generic-expression)
         (when (boundp 'yas-extra-modes)
           (make-local-variable 'yas-extra-modes)
-          (setq yas-extra-modes (cons 'rspec-mode (yas-extra-modes)))))
+          (add-to-list 'yas-extra-modes 'rspec-mode)))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)
     (when (boundp 'yas-extra-modes)
