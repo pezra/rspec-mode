@@ -14,6 +14,9 @@ Provided you have `yasnippet` installed, you can load the snippets:
     (eval-after-load 'rspec-mode
       '(rspec-install-snippets))
 
+(This isn't done automatically to avoid conflicts with snippets you
+may already have set up.)
+
 ## Usage
 If `rspec-mode` is installed properly, it will be started
 automatically when `ruby-mode` is started.
