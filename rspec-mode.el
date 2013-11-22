@@ -486,7 +486,13 @@ Doesn't use rake, calls rspec directly."
 
 (defun rspec-spring-p ()
   (and rspec-use-spring-when-possible
-       (file-exists-p (concat (rspec-project-root) "tmp/spring/spring.pid"))))
+       (let ((root (rspec-project-root)))
+         (or
+          ;; Older versions
+          (file-exists-p (concat root "tmp/spring/spring.pid"))
+          ;; 0.9.2+
+          (file-exists-p (concat temporary-file-directory "spring/"
+                                 (md5 (substring root 0 -1)) ".pid"))))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
