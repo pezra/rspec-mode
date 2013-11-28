@@ -193,8 +193,12 @@ Not used when running specs using Zeus or Spring."
       (progn
         (rspec-set-imenu-generic-expression)
         (when (boundp 'yas-extra-modes)
-          (make-local-variable 'yas-extra-modes)
-          (add-to-list 'yas-extra-modes 'rspec-mode)))
+          (if (fboundp 'yas-activate-extra-mode)
+              ;; Yasnippet 0.8.1+
+              (yas-activate-extra-mode 'rspec-mode)
+            (make-local-variable 'yas-extra-modes)
+            (add-to-list 'yas-extra-modes 'rspec-mode)
+            (yas--load-pending-jits))))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)
     (when (boundp 'yas-extra-modes)
