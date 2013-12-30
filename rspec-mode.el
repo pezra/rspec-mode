@@ -235,7 +235,7 @@ Not used when running specs using Zeus or Spring."
 (defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
   (require 'yasnippet)
-  (setq yas-snippet-dirs (cons rspec-snippets-dir (yas-snippet-dirs)))
+  (add-to-list 'yas-snippet-dirs rspec-snippets-dir t)
   (yas-load-directory rspec-snippets-dir))
 
 (defun rspec-class-from-file-name ()
