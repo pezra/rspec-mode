@@ -9,13 +9,12 @@ adding the following to your init file:
     (add-to-list 'load-path "/path/to/rspec-mode")
     (require 'rspec-mode)
 
-Provided you have `yasnippet` installed, you can load the snippets:
+Provided you have `yasnippet` installed, you can load the snippets by
+adding the rspec-mode snippets directory to `yas-snippet-dirs`
 
-    (eval-after-load 'rspec-mode
-      '(rspec-install-snippets))
-
-(This isn't done automatically to avoid conflicts with snippets you
-may already have set up.)
+    (eval-after-load 'yasnippet
+      '(progn
+         (add-to-list 'yas-snippet-dirs rspec-snippets-dir t)))
 
 ## Usage
 If `rspec-mode` is installed properly, it will be started

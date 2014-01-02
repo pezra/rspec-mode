@@ -227,16 +227,11 @@ Not used when running specs using Zeus or Spring."
   (setq imenu-create-index-function 'imenu-default-create-index-function)
   (setq imenu-generic-expression rspec-imenu-generic-expression))
 
+;;;###autoload
 (defvar rspec-snippets-dir
   (let ((current (or load-file-name (buffer-file-name))))
     (expand-file-name "snippets" (file-name-directory current)))
   "The directory containing rspec snippets.")
-
-(defun rspec-install-snippets ()
-  "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
-  (require 'yasnippet)
-  (add-to-list 'yas-snippet-dirs rspec-snippets-dir t)
-  (yas-load-directory rspec-snippets-dir))
 
 (defun rspec-class-from-file-name ()
   "Guess the name of the class the spec is for."
