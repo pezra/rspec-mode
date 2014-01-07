@@ -362,8 +362,9 @@ Doesn't use rake, calls rspec directly."
 
 (defun rspec-toggle-spec-and-target (&optional other-window)
   "Switches to the spec for the current buffer if it is a
-   non-spec file, or switch to the target of the current buffer
-   if the current is a spec"
+non-spec file, or switch to the target of the current buffer
+if the current is a spec.  With prefix argument, does a
+find-file-other-window."
   (interactive "P")
   (let ((func (if other-window
 		  'find-file-other-window
