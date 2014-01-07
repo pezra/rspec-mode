@@ -360,15 +360,18 @@ Doesn't use rake, calls rspec directly."
   (interactive)
   (rspec-run (rspec-core-options)))
 
-(defun rspec-toggle-spec-and-target ()
+(defun rspec-toggle-spec-and-target (&optional other-window)
   "Switches to the spec for the current buffer if it is a
    non-spec file, or switch to the target of the current buffer
    if the current is a spec"
-  (interactive)
-  (find-file
-   (if (rspec-buffer-is-spec-p)
-       (rspec-target-file-for (buffer-file-name))
-     (rspec-spec-file-for (buffer-file-name)))))
+  (interactive "P")
+  (let ((func (if other-window
+		  'find-file-other-window
+		'find-file))
+	(where (if (rspec-buffer-is-spec-p)
+		   (rspec-target-file-for (buffer-file-name))
+		 (rspec-spec-file-for (buffer-file-name)))))
+    (apply func (list where))))
 
 (defun rspec-spec-directory-has-lib? (a-file-name)
   (file-directory-p (concat (rspec-spec-directory a-file-name) "/lib")))
