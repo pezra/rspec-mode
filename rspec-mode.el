@@ -1,6 +1,6 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
-;; Copyright (C) 2008-2013 Peter Williams <http://barelyenough.org> and others
+;; Copyright (C) 2008-2014 Peter Williams <http://barelyenough.org> and others
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
@@ -115,6 +115,7 @@
 (define-key rspec-mode-verifiable-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-mode-verifiable-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-mode-verifiable-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(define-key rspec-mode-verifiable-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
 (define-key rspec-mode-verifiable-keymap (kbd "r") 'rspec-rerun)
 (define-key rspec-mode-verifiable-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-mode-verifiable-keymap (kbd "c") 'rspec-verify-continue)
@@ -360,19 +361,24 @@ Doesn't use rake, calls rspec directly."
   (interactive)
   (rspec-run (rspec-core-options)))
 
-(defun rspec-toggle-spec-and-target (&optional other-window)
-  "Switches to the spec for the current buffer if it is a
-non-spec file, or switch to the target of the current buffer
-if the current is a spec.  With prefix argument, does a
-find-file-other-window."
-  (interactive "P")
-  (let ((func (if other-window
-		  'find-file-other-window
-		'find-file))
-	(where (if (rspec-buffer-is-spec-p)
-		   (rspec-target-file-for (buffer-file-name))
-		 (rspec-spec-file-for (buffer-file-name)))))
-    (apply func (list where))))
+(defun rspec-toggle-spec-and-target ()
+  "Switches to the spec or the target file for the current buffer.
+If the current buffer is visiting a spec file, switches to the
+target, otherwise the spec."
+  (interactive)
+  (find-file (rspec-spec-or-target)))
+
+(defun rspec-find-spec-or-target-other-window ()
+  "Finds in the other window the spec or the target file.
+If the current buffer is visiting a spec file, finds the target,
+otherwise the spec."
+  (interactive)
+  (find-file-other-window (rspec-spec-or-target)))
+
+(defun rspec-spec-or-target ()
+  (if (rspec-buffer-is-spec-p)
+      (rspec-target-file-for (buffer-file-name))
+    (rspec-spec-file-for (buffer-file-name))))
 
 (defun rspec-spec-directory-has-lib? (a-file-name)
   (file-directory-p (concat (rspec-spec-directory a-file-name) "/lib")))
