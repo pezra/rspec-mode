@@ -349,12 +349,10 @@ in long-running test suites."
   (rspec-run-single-file (dired-current-directory) (rspec-core-options)))
 
 (defun rspec-dired-verify-single ()
-  "Runs marked specs or spec at point (works with directories too).
-Doesn't use rake, calls rspec directly."
+  "Runs marked specs or spec at point (works with directories too)."
   (interactive)
-  (let (rspec-use-rake-when-possible)
-    (rspec-compile (mapconcat 'identity (dired-get-marked-files) " ")
-                   (rspec-core-options))))
+  (rspec-compile (rspec-runner-target (dired-get-marked-files))
+                 (rspec-core-options)))
 
 (defun rspec-verify-all ()
   "Runs the 'spec' rake task for the project of the current file."
@@ -476,10 +474,11 @@ otherwise the spec."
   (numberp (string-match rspec-spec-file-name-re a-file-name)))
 
 (defun rspec-core-options (&optional default-options)
-  "Returns string of options that instructs spec to use options file if it exists, or sensible defaults otherwise"
+  "Returns string of options that instructs spec to use options
+file if it exists, or sensible defaults otherwise"
   (cond ((and rspec-use-opts-file-when-available
               (file-readable-p (rspec-spec-opts-file)))
-         (concat "--options " (rspec-spec-opts-file)))
+         (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
         (t (or default-options
             (rspec-default-options)))))
 
@@ -544,9 +543,14 @@ otherwise the spec."
             (when use-rake "\'"))))
 
 (defun rspec-runner-target (target)
-  "Returns target file/directory wrapped in SPEC if using rake"
+  "Processes TARGET to pass it to runner.
+TARGET can be a file, a directory, of a list of such."
   (let ((use-rake (rspec-rake-p)))
-    (concat (when use-rake "SPEC=\'") target (when use-rake "\'"))))
+    (concat (when use-rake "SPEC=\'")
+            (if (listp target)
+                (mapconcat #'shell-quote-argument target " ")
+              (shell-quote-argument target))
+            (when use-rake "\'"))))
 
 ;;;###autoload
 (defun rspec-buffer-is-spec-p ()
@@ -556,7 +560,9 @@ otherwise the spec."
 
 (defun rspec-run (&optional opts)
   "Runs spec with the specified options"
-  (rspec-compile (rspec-spec-directory (rspec-project-root)) opts))
+  (rspec-compile (rspec-runner-target
+                  (rspec-spec-directory (rspec-project-root)))
+                 opts))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Runs spec on a file with the specified options"
@@ -566,7 +572,7 @@ otherwise the spec."
   "Runs spec on a list of files with the specified options"
   (if (null spec-files)
       (message "No spec files found!")
-    (rspec-compile (rspec-runner-target (mapconcat 'identity spec-files " ")) opts)))
+    (rspec-compile (rspec-runner-target spec-files) opts)))
 
 (defvar rspec-last-directory nil
   "Directory the last spec process ran in.")
@@ -582,10 +588,10 @@ otherwise the spec."
     (let ((default-directory rspec-last-directory))
       (apply #'rspec-compile rspec-last-arguments))))
 
-(defun rspec-compile (a-file-or-dir &optional opts)
-  "Runs a compile for the specified file or directory with the specified options."
+(defun rspec-compile (target &optional opts)
+  "Runs a compile for TARGET with the specified options."
   (setq rspec-last-directory default-directory
-        rspec-last-arguments (list a-file-or-dir opts))
+        rspec-last-arguments (list target opts))
 
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
@@ -594,7 +600,7 @@ otherwise the spec."
         (compilation-scroll-output t))
     (compile (mapconcat 'identity `(,(rspec-runner)
                                     ,(rspec-runner-options opts)
-                                    ,a-file-or-dir) " ")
+                                    ,target) " ")
              'rspec-compilation-mode)))
 
 (defvar rspec-compilation-mode-font-lock-keywords
