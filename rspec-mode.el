@@ -543,8 +543,8 @@ file if it exists, or sensible defaults otherwise"
             (when use-rake "\'"))))
 
 (defun rspec-runner-target (target)
-  "Processes TARGET to pass it to runner.
-TARGET can be a file, a directory, of a list of such."
+  "Processes TARGET to pass it to the runner.
+TARGET can be a file, a directory, or a list of such."
   (let ((use-rake (rspec-rake-p)))
     (concat (when use-rake "SPEC=\'")
             (if (listp target)
