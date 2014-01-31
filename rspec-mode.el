@@ -494,7 +494,7 @@ file if it exists, or sensible defaults otherwise"
   (and rspec-use-rake-when-possible
        ;; Looks inefficient, but the calculation of the root is quite
        ;; fast. Unless this is used over TRAMP, I suppose.
-       (not (rspec-spring-p))
+       (not (or (rspec-spring-p) (rspec-zeus-p)))
        (file-exists-p (concat (rspec-project-root) "Rakefile"))))
 
 (defun rspec-spring-p ()
