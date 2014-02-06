@@ -74,8 +74,6 @@
 ;;
 ;; If `rspec-use-rvm` is set to true `rvm.el' is required.
 ;;
-;; The expectations depend on `el-expectations.el'.
-;;
 ;;; Change Log:
 ;;
 ;; 1.8 - Support for Capybara's acceptance test DSL (Ales Guzik)
