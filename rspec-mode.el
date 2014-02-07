@@ -105,6 +105,7 @@
 (require 'ruby-mode)
 (require 'ansi-color)
 (require 'compile)
+(require 'cl-lib)
 (eval-when-compile (require 'cl))
 
 (define-prefix-command 'rspec-mode-verifiable-keymap)
