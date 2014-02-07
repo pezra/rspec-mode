@@ -106,7 +106,6 @@
 (require 'ansi-color)
 (require 'compile)
 (require 'cl-lib)
-(eval-when-compile (require 'cl))
 
 (define-prefix-command 'rspec-mode-verifiable-keymap)
 (define-prefix-command 'rspec-mode-keymap)
@@ -326,9 +325,9 @@ in long-running test suites."
   (let ((current-spec-file (rspec-compress-spec-file
                             (rspec-spec-file-for (buffer-file-name)))))
     (rspec-run-multiple-files
-     (loop for file in (rspec-all-spec-files (buffer-file-name))
-           when (not (string-lessp file current-spec-file))
-           collect file)
+     (cl-loop for file in (rspec-all-spec-files (buffer-file-name))
+              when (not (string-lessp file current-spec-file))
+              collect file)
      (rspec-core-options))))
 
 (defun rspec-verify-single ()
@@ -445,9 +444,9 @@ otherwise the spec."
 (defun rspec-all-related-spec-files (a-file)
   (let* ((expected-name (file-name-nondirectory (rspec-spec-file-for a-file)))
          (expected-spec-file (concat "/" expected-name)))
-    (loop for file in (rspec-all-spec-files a-file)
-          when (string-match-p expected-spec-file file)
-          collect file)))
+    (cl-loop for file in (rspec-all-spec-files a-file)
+             when (string-match-p expected-spec-file file)
+             collect file)))
 
 (defun rspec-all-files-under-directory (dir)
   (let ((files (file-expand-wildcards (concat dir "/*") nil)))
@@ -462,10 +461,10 @@ otherwise the spec."
 
 (defun rspec-all-spec-files (a-file)
   (mapcar 'rspec-compress-spec-file
-          (sort (loop for file in (rspec-all-files-under-directory
-                                   (rspec-spec-directory a-file))
-                      when (rspec-spec-file-p file)
-                      collect file)
+          (sort (cl-loop for file in (rspec-all-files-under-directory
+                                      (rspec-spec-directory a-file))
+                         when (rspec-spec-file-p file)
+                         collect file)
                 'string-lessp)))
 
 (defun rspec-spec-file-p (a-file-name)
