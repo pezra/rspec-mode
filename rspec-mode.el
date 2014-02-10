@@ -6,7 +6,7 @@
 ;; Created: 2011
 ;; Version: 1.8
 ;; Keywords: rspec ruby
-;; Package-Requires: ((ruby-mode "1.0"))
+;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
 ;; This file is NOT part of GNU Emacs.
 ;;
