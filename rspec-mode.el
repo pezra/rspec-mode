@@ -400,10 +400,10 @@ otherwise the spec."
   "Find the target for a-spec-file-name"
   (car
    (file-expand-wildcards
-        (replace-regexp-in-string
-         "/spec/"
-         (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
-         (rspec-targetize-file-name a-spec-file-name)))))
+    (replace-regexp-in-string
+     "/spec/"
+     (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
+     (rspec-targetize-file-name a-spec-file-name)))))
 
 (defun rspec-specize-file-name (a-file-name)
   "Returns a-file-name but converted in to a spec file name"
@@ -413,9 +413,9 @@ otherwise the spec."
 
 (defun rspec-targetize-file-name (a-file-name)
   "Returns a-file-name but converted into a non-spec file name"
-     (concat (file-name-directory a-file-name)
-             (rspec-file-name-with-default-extension
-              (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
+  (concat (file-name-directory a-file-name)
+          (rspec-file-name-with-default-extension
+           (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
 
 (defun rspec-file-name-with-default-extension (a-file-name)
   "Adds .rb file extension to a-file-name if it does not already have an extension"
@@ -478,7 +478,7 @@ file if it exists, or sensible defaults otherwise"
               (file-readable-p (rspec-spec-opts-file)))
          (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
         (t (or default-options
-            (rspec-default-options)))))
+               (rspec-default-options)))))
 
 (defun rspec-bundle-p ()
   (and rspec-use-bundler-when-possible
