@@ -6,7 +6,7 @@
 ;; Created: 2011
 ;; Version: 1.8
 ;; Keywords: rspec ruby
-;; Package-Requires: ((ruby-mode "1.0"))
+;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
 ;; This file is NOT part of GNU Emacs.
 ;;
@@ -74,8 +74,6 @@
 ;;
 ;; If `rspec-use-rvm` is set to true `rvm.el' is required.
 ;;
-;; The expectations depend on `el-expectations.el'.
-;;
 ;;; Change Log:
 ;;
 ;; 1.8 - Support for Capybara's acceptance test DSL (Ales Guzik)
@@ -107,7 +105,7 @@
 (require 'ruby-mode)
 (require 'ansi-color)
 (require 'compile)
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (define-prefix-command 'rspec-mode-verifiable-keymap)
 (define-prefix-command 'rspec-mode-keymap)
@@ -327,9 +325,9 @@ in long-running test suites."
   (let ((current-spec-file (rspec-compress-spec-file
                             (rspec-spec-file-for (buffer-file-name)))))
     (rspec-run-multiple-files
-     (loop for file in (rspec-all-spec-files (buffer-file-name))
-           when (not (string-lessp file current-spec-file))
-           collect file)
+     (cl-loop for file in (rspec-all-spec-files (buffer-file-name))
+              when (not (string-lessp file current-spec-file))
+              collect file)
      (rspec-core-options))))
 
 (defun rspec-verify-single ()
@@ -402,10 +400,10 @@ otherwise the spec."
   "Find the target for a-spec-file-name"
   (car
    (file-expand-wildcards
-        (replace-regexp-in-string
-         "/spec/"
-         (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
-         (rspec-targetize-file-name a-spec-file-name)))))
+    (replace-regexp-in-string
+     "/spec/"
+     (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
+     (rspec-targetize-file-name a-spec-file-name)))))
 
 (defun rspec-specize-file-name (a-file-name)
   "Returns a-file-name but converted in to a spec file name"
@@ -415,9 +413,9 @@ otherwise the spec."
 
 (defun rspec-targetize-file-name (a-file-name)
   "Returns a-file-name but converted into a non-spec file name"
-     (concat (file-name-directory a-file-name)
-             (rspec-file-name-with-default-extension
-              (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
+  (concat (file-name-directory a-file-name)
+          (rspec-file-name-with-default-extension
+           (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
 
 (defun rspec-file-name-with-default-extension (a-file-name)
   "Adds .rb file extension to a-file-name if it does not already have an extension"
@@ -446,9 +444,9 @@ otherwise the spec."
 (defun rspec-all-related-spec-files (a-file)
   (let* ((expected-name (file-name-nondirectory (rspec-spec-file-for a-file)))
          (expected-spec-file (concat "/" expected-name)))
-    (loop for file in (rspec-all-spec-files a-file)
-          when (string-match-p expected-spec-file file)
-          collect file)))
+    (cl-loop for file in (rspec-all-spec-files a-file)
+             when (string-match-p expected-spec-file file)
+             collect file)))
 
 (defun rspec-all-files-under-directory (dir)
   (let ((files (file-expand-wildcards (concat dir "/*") nil)))
@@ -463,10 +461,10 @@ otherwise the spec."
 
 (defun rspec-all-spec-files (a-file)
   (mapcar 'rspec-compress-spec-file
-          (sort (loop for file in (rspec-all-files-under-directory
-                                   (rspec-spec-directory a-file))
-                      when (rspec-spec-file-p file)
-                      collect file)
+          (sort (cl-loop for file in (rspec-all-files-under-directory
+                                      (rspec-spec-directory a-file))
+                         when (rspec-spec-file-p file)
+                         collect file)
                 'string-lessp)))
 
 (defun rspec-spec-file-p (a-file-name)
@@ -480,7 +478,7 @@ file if it exists, or sensible defaults otherwise"
               (file-readable-p (rspec-spec-opts-file)))
          (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
         (t (or default-options
-            (rspec-default-options)))))
+               (rspec-default-options)))))
 
 (defun rspec-bundle-p ()
   (and rspec-use-bundler-when-possible
