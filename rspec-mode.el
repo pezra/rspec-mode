@@ -621,9 +621,9 @@ TARGET can be a file, a directory, or a list of such."
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t))
 
 (defun rspec-colorize-compilation-buffer ()
-  (toggle-read-only)
+  (read-only-mode)
   (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
+  (read-only-mode))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
