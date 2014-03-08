@@ -184,6 +184,17 @@ Not used when running specs using Zeus or Spring."
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-default-spec-command-arguments "--format specdoc --reverse"
+  "Default command line arguments passed to rspec-command"
+  :type 'string
+  :group 'rspec-mode)
+
+
+(defcustom rspec2-default-spec-command-arguments "--format documentation"
+  "Default command line arguments passed to rspec-command if rspec2 is detected"
+  :type 'string
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files"
@@ -511,8 +522,8 @@ file if it exists, or sensible defaults otherwise"
 
 (defun rspec-default-options ()
   (if (rspec2-p)
-      "--format documentation"
-    (concat "--format specdoc " "--reverse")))
+      rspec2-default-spec-command-arguments
+    rspec-default-spec-command-arguments))
 
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file"
