@@ -184,14 +184,8 @@ Not used when running specs using Zeus or Spring."
   :type 'string
   :group 'rspec-mode)
 
-(defcustom rspec-default-spec-command-arguments "--format specdoc --reverse"
-  "Default command line arguments passed to rspec-command"
-  :type 'string
-  :group 'rspec-mode)
-
-
-(defcustom rspec2-default-spec-command-arguments "--format documentation"
-  "Default command line arguments passed to rspec-command if rspec2 is detected"
+(defcustom rspec-command-options "--format documentation"
+  "Default options used with rspec-command"
   :type 'string
   :group 'rspec-mode)
 
@@ -482,14 +476,13 @@ otherwise the spec."
   "Returns true if the specified file is a spec"
   (numberp (string-match rspec-spec-file-name-re a-file-name)))
 
-(defun rspec-core-options (&optional default-options)
+(defun rspec-core-options ()
   "Returns string of options that instructs spec to use options
 file if it exists, or sensible defaults otherwise"
   (cond ((and rspec-use-opts-file-when-available
               (file-readable-p (rspec-spec-opts-file)))
          (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
-        (t (or default-options
-               (rspec-default-options)))))
+        (t rspec-command-options)))
 
 (defun rspec-bundle-p ()
   (and rspec-use-bundler-when-possible
@@ -519,11 +512,6 @@ file if it exists, or sensible defaults otherwise"
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
-
-(defun rspec-default-options ()
-  (if (rspec2-p)
-      rspec2-default-spec-command-arguments
-    rspec-default-spec-command-arguments))
 
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file"
