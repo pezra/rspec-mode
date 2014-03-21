@@ -184,6 +184,11 @@ Not used when running specs using Zeus or Spring."
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-command-options "--format documentation"
+  "Default options used with rspec-command"
+  :type 'string
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files"
@@ -471,14 +476,13 @@ otherwise the spec."
   "Returns true if the specified file is a spec"
   (numberp (string-match rspec-spec-file-name-re a-file-name)))
 
-(defun rspec-core-options (&optional default-options)
+(defun rspec-core-options ()
   "Returns string of options that instructs spec to use options
 file if it exists, or sensible defaults otherwise"
   (cond ((and rspec-use-opts-file-when-available
               (file-readable-p (rspec-spec-opts-file)))
          (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
-        (t (or default-options
-               (rspec-default-options)))))
+        (t rspec-command-options)))
 
 (defun rspec-bundle-p ()
   (and rspec-use-bundler-when-possible
@@ -508,11 +512,6 @@ file if it exists, or sensible defaults otherwise"
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
       (file-readable-p (concat (rspec-project-root) ".rspec"))))
-
-(defun rspec-default-options ()
-  (if (rspec2-p)
-      "--format documentation"
-    (concat "--format specdoc " "--reverse")))
 
 (defun rspec-spec-opts-file ()
   "Returns filename of spec opts file"
