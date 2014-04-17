@@ -612,10 +612,16 @@ TARGET can be a file, a directory, or a list of such."
 (define-derived-mode rspec-compilation-mode compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
   (set (make-local-variable 'compilation-error-regexp-alist)
-       (cons 'rspec compilation-error-regexp-alist))
+       (append '(rspec rspec-capybara-html rspec-capybara-screenshot)
+               compilation-error-regexp-alist))
   (set (make-local-variable 'compilation-error-regexp-alist-alist)
-       (cons '(rspec "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2)
-             compilation-error-regexp-alist-alist))
+       (append '((rspec-capybara-html
+                  "Saved file \\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
+                 (rspec-capybara-screenshot
+                  "Screenshot: \\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
+                 (rspec
+                  "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1))
+               compilation-error-regexp-alist-alist))
   (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t))
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t))
 
