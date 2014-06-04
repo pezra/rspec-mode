@@ -521,13 +521,15 @@ file if it exists, or sensible defaults otherwise"
 
 (defun rspec-runner ()
   "Returns command line to run rspec"
-  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
-        (zeus-command (if (rspec-zeus-p) "zeus " nil))
-        (spring-command (if (rspec-spring-p) "spring " nil)))
+  (let* ((command-prefix (if (boundp 'rbenv-binary-paths) (file-name-as-directory (cdr (assoc 'shims-path rbenv-binary-paths))) ""))
+         (bundle-command (if (rspec-bundle-p) 
+                             (concat command-prefix "bundle exec " "")))
+         (zeus-command (if (rspec-zeus-p) (concat command-prefix "zeus ") nil))
+         (spring-command (if (rspec-spring-p) (concat command-prefix "spring ") nil)))
     (concat (or zeus-command spring-command bundle-command)
             (if (rspec-rake-p)
-                (concat rspec-rake-command " spec")
-              rspec-spec-command))))
+                (concat command-prefix rspec-rake-command " spec")
+              (concat command-prefix rspec-spec-command)))))
 
 (defun rspec-runner-options (&optional opts)
   "Returns string of options for command line"
