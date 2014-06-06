@@ -339,12 +339,12 @@ in long-running test suites."
   "Runs the specified example at the point of the current buffer."
   (interactive)
   (rspec-run-single-file
-   (rspec-spec-file-for (buffer-file-name))
-   (rspec-core-options)
-   (concat "--line "
-           (save-restriction
-             (widen)
-             (number-to-string (line-number-at-pos))))))
+   (cons
+    (rspec-spec-file-for (buffer-file-name))
+    (save-restriction
+      (widen)
+      (number-to-string (line-number-at-pos))))
+   (rspec-core-options)))
 
 (defun rspec-dired-verify ()
   "Runs all specs in the current directory."
@@ -541,11 +541,16 @@ file if it exists, or sensible defaults otherwise"
 
 (defun rspec-runner-target (target)
   "Processes TARGET to pass it to the runner.
-TARGET can be a file, a directory, or a list of such."
+TARGET can be a file, a directory, a list of such,
+or a cons (FILE . LINE), to run one example."
   (let ((use-rake (rspec-rake-p)))
     (concat (when use-rake "SPEC=\'")
             (if (listp target)
-                (mapconcat #'shell-quote-argument target " ")
+                (if (listp (cdr target))
+                    (mapconcat #'shell-quote-argument target " ")
+                  (concat (shell-quote-argument (car target))
+                          ":"
+                          (cdr target)))
               (shell-quote-argument target))
             (when use-rake "\'"))))
 
@@ -623,12 +628,30 @@ TARGET can be a file, a directory, or a list of such."
                   "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1))
                compilation-error-regexp-alist-alist))
   (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t))
-  (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t))
+  (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
+  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
 
 (defun rspec-colorize-compilation-buffer ()
   (toggle-read-only)
   (ansi-color-apply-on-region compilation-filter-start (point))
   (toggle-read-only))
+
+(defun rspec-handle-error (buffer _msg)
+  (save-excursion
+    (goto-char (point-max))
+    (when (save-excursion
+            (forward-line -10)
+            (search-forward "`+' for LL():Rake::Scope::EmptyScope" nil t))
+      (let ((inhibit-modification-hooks t)
+            (inhibit-read-only t)
+            (url "https://github.com/pezra/rspec-mode/issues/84"))
+        (insert (format "\n%s\n"
+                        (propertize
+                         "You seem to be using Rake 0.9. Rake 10 is recommended."
+                         'font-lock-face 'error)))
+        (insert "See ")
+        (insert-text-button url 'type 'help-url 'help-args (list url))
+        (insert ".\n")))))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
