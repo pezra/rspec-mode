@@ -636,7 +636,7 @@ or a cons (FILE . LINE), to run one example."
   (ansi-color-apply-on-region compilation-filter-start (point))
   (toggle-read-only))
 
-(defun rspec-handle-error (buffer _msg)
+(defun rspec-handle-error (&rest ignore)
   (save-excursion
     (goto-char (point-max))
     (when (save-excursion
