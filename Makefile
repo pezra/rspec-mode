@@ -6,7 +6,7 @@ elpa: *.el
 	echo "(define-package \"rspec-mode\" \"$$version\" \
 	\"Enhance ruby-mode for RSpec\")" \
 	> "$$dir"/rspec-mode-pkg.el; \
-	tar cvf rspec-mode-$$version.tar --mode 644 "$$dir"
+	tar cvf rspec-mode-$$version.tar "$$dir"
 
 clean:
 	@rm -rf rspec-mode-*/ rspec-mode-*.tar *.elc
