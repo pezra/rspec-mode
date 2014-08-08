@@ -114,7 +114,9 @@
 (define-key rspec-mode-verifiable-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-mode-verifiable-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-mode-verifiable-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(define-key rspec-mode-verifiable-keymap (kbd "e") 'rspec-toggle-spec-and-target-find-example)
 (define-key rspec-mode-verifiable-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
+(define-key rspec-mode-verifiable-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
 (define-key rspec-mode-verifiable-keymap (kbd "r") 'rspec-rerun)
 (define-key rspec-mode-verifiable-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-mode-verifiable-keymap (kbd "c") 'rspec-verify-continue)
@@ -370,12 +372,45 @@ target, otherwise the spec."
   (interactive)
   (find-file (rspec-spec-or-target)))
 
+(defun rspec--toggle-spec-and-target-find-method (toggle-function)
+  (defun get-method-name ()
+    (save-excursion
+      (end-of-line)
+      (search-backward-regexp "\\(?:describe ['\"][#\\.]\\(.*\\)['\"] do\\|def \\(?:self\\)?\\(.*\\)[ (\\$]\\)")
+      (if (match-string 1)
+          (match-string 1)
+        (match-string 2))))
+
+  (condition-case ex
+      (let ((target-regexp (if (rspec-buffer-is-spec-p)
+                               (format "def \\(self\\)?\\.?%s" (get-method-name))
+                             (format "describe ['\"]#?%s['\"]" (get-method-name)))))
+        (funcall toggle-function)
+        (if (string-match-p target-regexp (buffer-string))
+            (progn
+              (beginning-of-buffer)
+              (search-forward-regexp target-regexp))))
+    ('error (message "No method/spec definition before point"))))
+
+(defun rspec-toggle-spec-and-target-find-example ()
+  "Just like rspec-toggle-spec-and-target but tries to toggle between
+the specific example and method given the current point."
+  (interactive)
+  (rspec--toggle-spec-and-target-find-method 'rspec-toggle-spec-and-target))
+
 (defun rspec-find-spec-or-target-other-window ()
   "Finds in the other window the spec or the target file.
 If the current buffer is visiting a spec file, finds the target,
 otherwise the spec."
   (interactive)
   (find-file-other-window (rspec-spec-or-target)))
+
+(defun rspec-find-spec-or-target-find-example-other-window ()
+  "Finds in the other window the spec or the target file, and tries
+  to find the corresponding example or method given the current
+  point."
+  (interactive)
+  (rspec--toggle-spec-and-target-find-method 'rspec-find-spec-or-target-other-window))
 
 (defun rspec-spec-or-target ()
   (if (rspec-buffer-is-spec-p)
