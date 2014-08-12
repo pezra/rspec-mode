@@ -373,24 +373,28 @@ target, otherwise the spec."
   (find-file (rspec-spec-or-target)))
 
 (defun rspec--toggle-spec-and-target-find-method (toggle-function)
-  (defun get-method-name ()
-    (save-excursion
-      (end-of-line)
-      (search-backward-regexp "\\(?:describe ['\"][#\\.]\\(.*\\)['\"] do\\|def \\(?:self\\)?\\(.*\\)[ (\\$]\\)")
-      (if (match-string 1)
-          (match-string 1)
-        (match-string 2))))
-
-  (condition-case ex
-      (let ((target-regexp (if (rspec-buffer-is-spec-p)
-                               (format "def \\(self\\)?\\.?%s" (get-method-name))
-                             (format "describe ['\"]#?%s['\"]" (get-method-name)))))
-        (funcall toggle-function)
-        (if (string-match-p target-regexp (buffer-string))
-            (progn
-              (beginning-of-buffer)
-              (search-forward-regexp target-regexp))))
-    ('error (message "No method/spec definition before point"))))
+  (cl-labels
+      ((get-spec-name ()
+                      (save-excursion
+                        (end-of-line)
+                        (search-backward-regexp "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do")
+                        (match-string 1)))
+       (get-method-name ()
+                        (save-excursion
+                          (end-of-line)
+                          (search-backward-regexp "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)")
+                          (match-string 1))))
+    (condition-case ex
+        (let ((target-regexp (if (rspec-buffer-is-spec-p)
+                                 (format "def \\(self\\)?\\.?%s" (get-spec-name))
+                               (format "\\(describe\\|context\\) ['\"]#?%s['\"]" (get-method-name)))))
+          (funcall toggle-function)
+          (if (string-match-p target-regexp (buffer-string))
+              (progn
+                (beginning-of-buffer)
+                (search-forward-regexp target-regexp))
+            (message "No matching method/spec.")))
+      ('search-failed (message "No method/spec definition before point.")))))
 
 (defun rspec-toggle-spec-and-target-find-example ()
   "Just like rspec-toggle-spec-and-target but tries to toggle between
