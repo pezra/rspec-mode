@@ -378,24 +378,27 @@ target, otherwise the spec."
       ((get-spec-name ()
                       (save-excursion
                         (end-of-line)
-                        (re-search-backward "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do")
+                        (or
+                         (re-search-backward "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do" nil t)
+                         (error "No method spec before point"))
                         (match-string 1)))
        (get-method-name ()
                         (save-excursion
                           (end-of-line)
-                          (re-search-backward "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)")
+                          (or
+                           (re-search-backward "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)" nil t)
+                           (error "No method definition before point"))
                           (match-string 1))))
-    (condition-case ex
-        (let ((target-regexp (if (rspec-buffer-is-spec-p)
-                                 (format "def \\(self\\)?\\.?%s" (get-spec-name))
-                               (format "\\(describe\\|context\\) ['\"]#?%s['\"]" (get-method-name)))))
-          (funcall toggle-function)
-          (if (string-match-p target-regexp (buffer-string))
-              (progn
-                (beginning-of-buffer)
-                (re-search-forward target-regexp))
-            (message "No matching method/spec.")))
-      ('search-failed (message "No method/spec definition before point.")))))
+    (let* ((spec-p (rspec-buffer-is-spec-p))
+           (target-regexp (if spec-p
+                              (format "def \\(self\\)?\\.?%s" (get-spec-name))
+                            (format "\\(describe\\|context\\) ['\"]#?%s['\"]" (get-method-name)))))
+      (funcall toggle-function)
+      (if (string-match-p target-regexp (buffer-string))
+          (progn
+            (beginning-of-buffer)
+            (re-search-forward target-regexp))
+        (message "No matching %s" (if spec-p "method" "spec"))))))
 
 (defun rspec-toggle-spec-and-target-find-example ()
   "Just like rspec-toggle-spec-and-target but tries to toggle between
