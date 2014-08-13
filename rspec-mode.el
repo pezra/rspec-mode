@@ -273,7 +273,7 @@ Not used when running specs using Zeus or Spring."
     (goto-char
      (save-excursion
        (end-of-line)
-       (unless (and (search-backward-regexp "^[[:space:]]*\\(it\\|scenario\\)[[:space:]]*(?[\"']" nil t)
+       (unless (and (re-search-backward "^[[:space:]]*\\(it\\|scenario\\)[[:space:]]*(?[\"']" nil t)
                     (save-excursion (ruby-end-of-block) (< start (point))))
          (error "Unable to find an example"))
        (point)))))
@@ -308,7 +308,8 @@ Not used when running specs using Zeus or Spring."
   (when (rspec-example-pending-p)
     (save-excursion
       (rspec-beginning-of-example)
-      (search-forward-regexp "^[[:space:]]*pending\\([[:space:](]\\|$\\)" (save-excursion (ruby-end-of-block) (point)))
+      (re-search-forward "^[[:space:]]*pending\\([[:space:](]\\|$\\)"
+                         (save-excursion (ruby-end-of-block) (point)))
       (beginning-of-line)
       (delete-region (save-excursion (beginning-of-line) (point))
                      (save-excursion (forward-line 1) (point))))))
@@ -377,12 +378,12 @@ target, otherwise the spec."
       ((get-spec-name ()
                       (save-excursion
                         (end-of-line)
-                        (search-backward-regexp "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do")
+                        (re-search-backward "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do")
                         (match-string 1)))
        (get-method-name ()
                         (save-excursion
                           (end-of-line)
-                          (search-backward-regexp "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)")
+                          (re-search-backward "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)")
                           (match-string 1))))
     (condition-case ex
         (let ((target-regexp (if (rspec-buffer-is-spec-p)
@@ -392,7 +393,7 @@ target, otherwise the spec."
           (if (string-match-p target-regexp (buffer-string))
               (progn
                 (beginning-of-buffer)
-                (search-forward-regexp target-regexp))
+                (re-search-forward target-regexp))
             (message "No matching method/spec.")))
       ('search-failed (message "No method/spec definition before point.")))))
 
