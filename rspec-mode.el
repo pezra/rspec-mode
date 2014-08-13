@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.10
+;; Version: 1.11
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -76,6 +76,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
 ;; 1.9 - Support for RSpec 3.
 ;; 1.8 - Support for Capybara's acceptance test DSL (Ales Guzik)
 ;; 1.7 - Support for Spring (Tomy Kaira)
