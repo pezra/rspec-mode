@@ -192,11 +192,11 @@ Not used when running specs using Zeus or Spring."
   :type 'string
   :group 'rspec-mode)
 
-(defcustom rspec-snippets-fg-syntax 1
-  "When 0, use full syntax for FactoryGirl snippets. When 1, use full syntax if
+(defcustom rspec-snippets-fg-syntax nil
+  "Then nil, use full syntax if
 FactoryGirl::Syntax::Methods is not included in the spec_helper file, and uses the concise syntax
-otherwise. When 2, use the concise syntax."
-  :type 'boolean
+otherwise. When 'full, use full syntax for FactoryGirl snippets. When 'concise, use the concise syntax."
+  :type 'symbol
   :group 'rspec-mode)
 
 ;;;###autoload
@@ -711,16 +711,15 @@ or a cons (FILE . LINE), to run one example."
 
 (defun rspec--include-fg-syntax-methods-p ()
   "Check wether FactoryGirl::Syntax::Methods is included in spec_helper"
-  (with-temp-buffer
-    (let* ((root-path (rspec-project-root))
-           (spec-helper-path (concat root-path "spec/spec_helper.rb"))
-           (uses-factory-girl-regexp "include +FactoryGirl::Syntax::Methods"))
-      (with-temp-buffer
-        (insert-file-contents spec-helper-path)
-        (cond
-         ((= 0 rspec-snippets-fg-syntax) nil)
-         ((= 1 rspec-snippets-fg-syntax) (re-search-forward uses-factory-girl-regexp nil t))
-         ((= 2 rspec-snippets-fg-syntax) t))))))
+  (let* ((root-path (rspec-project-root))
+         (spec-helper-path (concat root-path "spec/spec_helper.rb"))
+         (uses-factory-girl-regexp "include +FactoryGirl::Syntax::Methods"))
+    (with-temp-buffer
+      (insert-file-contents spec-helper-path)
+      (cl-case rspec-snippets-fg-syntax
+        ('full nil)
+        ('concise t)
+        ('nil (re-search-forward uses-factory-girl-regexp nil t))))))
 
 (defun rspec-snippets-fg-method-prefix (method)
   "Return FactoryGirl method for snippet aware of FactoryGirl::Syntax::Methods inclusion in the spec_helper file."
