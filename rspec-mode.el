@@ -726,8 +726,9 @@ or a cons (FILE . LINE), to run one example."
         ('concise t)
         ('nil (re-search-forward uses-factory-girl-regexp nil t))))))
 
-(defun rspec-snippets-fg-method-prefix (method)
-  "Return FactoryGirl method for snippet aware of FactoryGirl::Syntax::Methods inclusion in the spec_helper file."
+(defun rspec-snippets-fg-method-call (method)
+  "Return FactoryGirl method call for METHOD, for use in snippets.
+Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
   (if (rspec--include-fg-syntax-methods-p)
       method
     (concat "FactoryGirl." method)))
