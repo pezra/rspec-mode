@@ -174,7 +174,7 @@ Not used when running specs using Zeus or Spring."
   :group 'rspec-mode)
 
 (defcustom rspec-use-spring-when-possible t
-  "When t and tmp/spring/spring.pid is present, run specs with 'spring'."
+  "When t and spring.pid is present, run specs with 'spring'."
   :type 'boolean
   :group 'rspec-mode)
 
