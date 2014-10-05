@@ -235,7 +235,7 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
 (define-minor-mode rspec-dired-mode
   "Minor mode for Dired buffers with spec files
 
-\\{rspec-dired-mode-map"
+\\{rspec-dired-mode-map}"
   :lighter "" :keymap `((,rspec-key-command-prefix . rspec-dired-mode-keymap)))
 
 (defconst rspec-imenu-generic-expression
