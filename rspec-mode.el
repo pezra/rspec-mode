@@ -109,20 +109,20 @@
 (require 'compile)
 (require 'cl-lib)
 
-(define-prefix-command 'rspec-mode-verifiable-keymap)
+(define-prefix-command 'rspec-verifiable-mode-keymap)
 (define-prefix-command 'rspec-mode-keymap)
 
-(define-key rspec-mode-verifiable-keymap (kbd "v") 'rspec-verify)
-(define-key rspec-mode-verifiable-keymap (kbd "a") 'rspec-verify-all)
-(define-key rspec-mode-verifiable-keymap (kbd "t") 'rspec-toggle-spec-and-target)
-(define-key rspec-mode-verifiable-keymap (kbd "e") 'rspec-toggle-spec-and-target-find-example)
-(define-key rspec-mode-verifiable-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
-(define-key rspec-mode-verifiable-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
-(define-key rspec-mode-verifiable-keymap (kbd "r") 'rspec-rerun)
-(define-key rspec-mode-verifiable-keymap (kbd "m") 'rspec-verify-matching)
-(define-key rspec-mode-verifiable-keymap (kbd "c") 'rspec-verify-continue)
+(define-key rspec-verifiable-mode-keymap (kbd "v") 'rspec-verify)
+(define-key rspec-verifiable-mode-keymap (kbd "a") 'rspec-verify-all)
+(define-key rspec-verifiable-mode-keymap (kbd "t") 'rspec-toggle-spec-and-target)
+(define-key rspec-verifiable-mode-keymap (kbd "e") 'rspec-toggle-spec-and-target-find-example)
+(define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
+(define-key rspec-verifiable-mode-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
+(define-key rspec-verifiable-mode-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
+(define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
 
-(set-keymap-parent rspec-mode-keymap rspec-mode-verifiable-keymap)
+(set-keymap-parent rspec-mode-keymap rspec-verifiable-mode-keymap)
 
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
@@ -205,7 +205,9 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
 
 ;;;###autoload
 (define-minor-mode rspec-mode
-  "Minor mode for RSpec files"
+  "Minor mode for RSpec files
+
+\\{rspec-mode-map}"
   :lighter " RSpec" :keymap `((,rspec-key-command-prefix . rspec-mode-keymap))
   (if rspec-mode
       (progn
@@ -224,12 +226,16 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
 
 ;;;###autoload
 (define-minor-mode rspec-verifiable-mode
-  "Minor mode for Ruby files that have specs"
-  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-mode-verifiable-keymap)))
+  "Minor mode for Ruby files that have specs
+
+\\{rspec-verifiable-mode-map}"
+  :lighter "" :keymap `((,rspec-key-command-prefix . rspec-verifiable-mode-keymap)))
 
 ;;;###autoload
 (define-minor-mode rspec-dired-mode
-  "Minor mode for Dired buffers with spec files"
+  "Minor mode for Dired buffers with spec files
+
+\\{rspec-dired-mode-map"
   :lighter "" :keymap `((,rspec-key-command-prefix . rspec-dired-mode-keymap)))
 
 (defconst rspec-imenu-generic-expression
