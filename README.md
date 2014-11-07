@@ -6,14 +6,14 @@ RSpec mode provides some convenience functions for dealing with RSpec.
 You can install via ELPA, or manually by downloading `rspec-mode` and
 adding the following to your init file:
 
-```lisp
+```emacs
 (add-to-list 'load-path "/path/to/rspec-mode")
 (require 'rspec-mode)
 ```
 
 Provided you have `yasnippet` installed, you can load the snippets:
 
-```lisp
+```emacs
 (eval-after-load 'rspec-mode
  '(rspec-install-snippets))
 ```
@@ -31,7 +31,8 @@ See `rspec-mode.el` for further usage.
 ## Gotchas
 ### Debugging
 
-To use `binding.pry` or `byebug`, install `inf-ruby` add this to your init:
+To use `binding.pry` or `byebug`, install `inf-ruby` and add this to
+your init file:
 
 ```emacs
 (add-hook 'after-init-hook 'inf-ruby-switch-setup) 
@@ -51,7 +52,7 @@ which contains another `ruby` binary.
 What you can do to solve this is to use `BASH` for running the
 specs. This piece of code does the job:
 
-```lisp
+```emacs
 (defadvice rspec-compile (around rspec-compile-around)
   "Use BASH shell for running the specs because of ZSH issues."
   (let ((shell-file-name "/bin/bash"))
