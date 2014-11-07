@@ -390,20 +390,20 @@ target, otherwise the spec."
                       (save-excursion
                         (end-of-line)
                         (or
-                         (re-search-backward "\\(?:describe\\|context\\) ['\"][#\\.]\\(.*\\)['\"] do" nil t)
+                         (re-search-backward "\\(?:describe\\|context\\) ['\"][#\\.]\\([_a-zA-Z\?]*\\)['\"] do" nil t)
                          (error "No method spec before point"))
                         (match-string 1)))
        (get-method-name ()
                         (save-excursion
                           (end-of-line)
                           (or
-                           (re-search-backward "def \\(?:self\\)?\\(.?[_a-zA-Z]+\\)" nil t)
+                           (re-search-backward "def \\(?:self\\)?\\(.?[_a-zA-Z\\?]+\\)" nil t)
                            (error "No method definition before point"))
                           (match-string 1))))
     (let* ((spec-p (rspec-buffer-is-spec-p))
            (target-regexp (if spec-p
-                              (format "def \\(self\\)?\\.?%s" (get-spec-name))
-                            (format "\\(describe\\|context\\) ['\"]#?%s['\"]" (get-method-name)))))
+                              (format "def \\(self\\)?\\.?%s" (regexp-quote (get-spec-name)))
+                            (format "\\(describe\\|context\\) ['\"]#?%s['\"]" (regexp-quote (get-method-name))))))
       (funcall toggle-function)
       (if (string-match-p target-regexp (buffer-string))
           (progn
