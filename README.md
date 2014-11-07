@@ -29,6 +29,15 @@ automatically when `ruby-mode` is started.
 See `rspec-mode.el` for further usage.
 
 ## Gotchas
+### Debugging
+
+To use `binding.pry` or `byebug`, install `inf-ruby` add this to your init:
+
+```emacs
+(add-hook 'after-init-hook 'inf-ruby-switch-setup) 
+```
+
+When you've hit the breakpoint, hit `C-x C-q` to enable `inf-ruby`.
 
 ### ZSH and RVM
 
