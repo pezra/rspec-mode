@@ -202,7 +202,7 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
           (const concise)
           (const nil))
   :group 'rspec-mode)
-  
+
 (defcustom rspec-auto-scroll t
   "Auto scroll the output"
   :type 'boolean
@@ -733,7 +733,7 @@ or a cons (FILE . LINE), to run one example."
   (cl-case rspec-snippets-fg-syntax
     (full nil)
     (concise t)
-    (nil
+    (t
      (with-temp-buffer
        (insert-file-contents
         (concat (rspec-project-root) "spec/spec_helper.rb"))
