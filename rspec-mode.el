@@ -687,7 +687,7 @@ or a cons (FILE . LINE), to run one example."
   (set (make-local-variable 'compilation-error-regexp-alist-alist)
        '((rspec-capybara-html "Saved file \\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
          (rspec-capybara-screenshot "Screenshot: \\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
-         (rspec "rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1))
+         (rspec "^rspec +\\([0-9A-Za-z@_./\:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1))
        )
   (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t))
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
