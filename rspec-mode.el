@@ -562,13 +562,15 @@ file if it exists, or sensible defaults otherwise"
 
 (defun rspec-spring-p ()
   (and rspec-use-spring-when-possible
-       (let ((root (rspec-project-root)))
+       (let ((root (substring (rspec-project-root) 0 -1))
+              (ruby-version (shell-command-to-string "ruby -e 'print RUBY_VERSION'")))
          (or
           ;; Older versions
-          (file-exists-p (concat root "tmp/spring/spring.pid"))
+          (file-exists-p (format "/%s/tmp/spring/spring.pid" root))
           ;; 0.9.2+
-          (file-exists-p (concat temporary-file-directory "spring/"
-                                 (md5 (substring root 0 -1)) ".pid"))))))
+          (file-exists-p (format "/%s/spring/%s.pid" temporary-file-directory (md5 root)))
+          ;; 1.2.0+
+          (file-exists-p (format "/%s/spring/%s.pid" (getenv "XDG_RUNTIME_DIR") (md5 (concat ruby-version root))))))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
