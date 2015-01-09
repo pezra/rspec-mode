@@ -560,17 +560,19 @@ file if it exists, or sensible defaults otherwise"
        (not (or (rspec-spring-p) (rspec-zeus-p)))
        (file-exists-p (concat (rspec-project-root) "Rakefile"))))
 
+
 (defun rspec-spring-p ()
   (and rspec-use-spring-when-possible
-       (let ((root (substring (rspec-project-root) 0 -1))
-              (ruby-version (shell-command-to-string "ruby -e 'print RUBY_VERSION'")))
+       (let ((root (directory-file-name (rspec-project-root))))
          (or
           ;; Older versions
-          (file-exists-p (format "/%s/tmp/spring/spring.pid" root))
+          (file-exists-p (format "%s/tmp/spring/spring.pid" root))
           ;; 0.9.2+
-          (file-exists-p (format "/%s/spring/%s.pid" temporary-file-directory (md5 root)))
+          (file-exists-p (format "%s/spring/%s.pid" temporary-file-directory (md5 root)))
           ;; 1.2.0+
-          (file-exists-p (format "/%s/spring/%s.pid" (getenv "XDG_RUNTIME_DIR") (md5 (concat ruby-version root))))))))
+          (let ((path (and (getenv "XDG_RUNTIME_DIR") temporary-file-directory))
+                (ruby-version (shell-command-to-string "ruby -e 'print RUBY_VERSION'")))
+            (file-exists-p (format "%s/spring/%s.pid" path (md5 (concat ruby-version root)))))))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
