@@ -61,6 +61,12 @@ specs. This piece of code does the job:
 (ad-activate 'rspec-compile)
 ```
 
+### Auto-scrolling
+
+Set `compilation-scroll-output`. For example, `(setq compilation-scroll-output t)`
+will turn on auto scrolling.
+
+
 ## Contributing
 
 Love RSpec and Emacs? Great, help out by contributing. The easiest way

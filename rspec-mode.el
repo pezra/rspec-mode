@@ -203,11 +203,6 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
           (const nil))
   :group 'rspec-mode)
 
-(defcustom rspec-auto-scroll t
-  "Auto scroll the output"
-  :type 'boolean
-  :group 'rspec-mode)
-
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
@@ -664,8 +659,7 @@ or a cons (FILE . LINE), to run one example."
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
 
-  (let ((default-directory (or (rspec-project-root) default-directory))
-        (compilation-scroll-output rspec-auto-scroll))
+  (let ((default-directory (or (rspec-project-root) default-directory)))
     (compile (mapconcat 'identity `(,(rspec-runner)
                                     ,(rspec-runner-options opts)
                                     ,target) " ")
