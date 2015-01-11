@@ -680,7 +680,8 @@ or a cons (FILE . LINE), to run one example."
 (defvar rspec--compilation-error-regexp-alist-alist
       '((rspec-capybara-html "Saved file \\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
         (rspec-capybara-screenshot "Screenshot: \\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
-        (rspec "^\\(?:rspec\\|\\(?: +#\\)\\) \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1)))
+        (rspec "^ +# \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\):in" 1 2 nil 2 1)
+        (rspec-summary "^rspec \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1)))
 
 (define-derived-mode rspec-compilation-mode compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
