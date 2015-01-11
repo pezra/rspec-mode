@@ -2,22 +2,21 @@
 (require 'rspec-mode)
 
 ;;; Test regexp matches in compilation buffer
-(defun rspec--test-re ()
-  (nth 1 (assq 'rspec rspec--compilation-error-regexp-alist-alist)))
+(defun rspec--test-compilation-match-p (example)
+  (some 'identity (mapcar (lambda (n) (string-match (nth 1 n) example)) rspec--compilation-error-regexp-alist-alist)))
 
 (ert-deftest rspec--test-regexp-backtrace ()
   "matches backtrace"
-  (let ((example "    # ./app/controllers/posts_controller.rb:7:in `create'"))
-    (should (string-match (rspec--test-re) example))))
+  (should (rspec--test-compilation-match-p "    # ./app/controllers/posts_controller.rb:7:in `create'")))
 
 (ert-deftest rspec--test-regexp-summary ()
   "matches rspec summary lines"
-  (let
-      ((example "rspec ./spec/foo/bar_spec.rb:21 # description"))
-    (should (string-match (rspec--test-re) example))))
+  (should (rspec--test-compilation-match-p "rspec ./spec/foo/bar_spec.rb:21 # description")))
 
 (ert-deftest rspec--test-regexp-deprecation ()
   "does not match deprecation warnings"
-  (let
-      ((example "/path/to/file.rb:112: warning: duplicated key at line 132 ignored: :foobar"))
-    (should-not (string-match (rspec--test-re) example))))
+  (should-not (rspec--test-compilation-match-p "/path/to/file.rb:112: warning: duplicated key at line 132 ignored: :foobar")))
+
+(ert-deftest rspec--test-regexp-pending ()
+  "does not match pending specs"
+  (should-not (rspec--test-compilation-match-p "    # ./spec/controllers/pages_controller_spec.rb:65")))
