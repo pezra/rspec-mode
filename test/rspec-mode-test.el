@@ -2,8 +2,12 @@
 (require 'rspec-mode)
 
 ;;; Test regexp matches in compilation buffer
-(defun rspec--test-compilation-match-p (example)
-  (some 'identity (mapcar (lambda (n) (string-match (nth 1 n) example)) rspec--compilation-error-regexp-alist-alist)))
+(defun rspec--test-compilation-match-p (example &optional type)
+  "Check if string `example' with type `type' matches any of compilation regexps"
+  (let* ((type (or type 'error))
+         (types '((error . 2) (warning . 1) (info . 0)))
+         (type-num (cdr (assq type types))))
+    (some (lambda (n) (and (string-match (nth 1 n) example) (= type-num (nth 5 n)))) rspec--compilation-error-regexp-alist-alist)))
 
 (ert-deftest rspec--test-regexp-backtrace ()
   "matches backtrace"
@@ -18,5 +22,7 @@
   (should-not (rspec--test-compilation-match-p "/path/to/file.rb:112: warning: duplicated key at line 132 ignored: :foobar")))
 
 (ert-deftest rspec--test-regexp-pending ()
-  "does not match pending specs"
-  (should-not (rspec--test-compilation-match-p "    # ./spec/controllers/pages_controller_spec.rb:65")))
+  "matches pending specs as info"
+  (let ((example "    # ./spec/controllers/pages_controller_spec.rb:65"))
+    (should-not (rspec--test-compilation-match-p example 'error))
+    (should (rspec--test-compilation-match-p example 'info))))
