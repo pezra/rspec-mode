@@ -677,20 +677,18 @@ or a cons (FILE . LINE), to run one example."
     ("^[0-9]+ examples?, \\([0-9]+ failures?\\)"
      (1 compilation-error-face))))
 
-(defvar rspec--compilation-error-regexp-alist-alist
+(defvar rspec-compilation-error-regexp-alist-alist
       '((rspec-capybara-html "Saved file \\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
         (rspec-capybara-screenshot "Screenshot: \\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
         (rspec "^ +# \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\):in" 1 2 nil 2 1)
         (rspec-deprecations "^ +# \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 0 1)
         (rspec-summary "^rspec \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1)))
 
-(define-derived-mode rspec-compilation-mode compilation-mode "RSpec Compilation"
+(defvar rspec-compilation-error-regexp-alist
+  (mapcar 'car rspec-compilation-error-regexp-alist-alist))
+
+(define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
-  (set (make-local-variable 'compilation-error-regexp-alist-alist)
-       rspec--compilation-error-regexp-alist-alist)
-  (set (make-local-variable 'compilation-error-regexp-alist)
-       (mapcar 'car rspec--compilation-error-regexp-alist-alist))
-  (setq font-lock-defaults '(rspec-compilation-mode-font-lock-keywords t))
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
 
