@@ -406,9 +406,9 @@ target, otherwise the spec."
   "Just like rspec-verify-single but tries to find examples for
 method given the current point."
   (interactive)
-  (when (rspec-toggle-spec-and-target-find-example)
-    (rspec-verify-single))
-  (rspec-toggle-spec-and-target))
+  (save-window-excursion
+    (when (rspec-toggle-spec-and-target-find-example)
+      (rspec-verify-single))))
 
 (defun rspec--toggle-spec-and-target-find-method (toggle-function)
   (cl-labels
