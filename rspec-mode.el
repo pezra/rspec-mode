@@ -403,11 +403,12 @@ target, otherwise the spec."
   (find-file (rspec-spec-or-target)))
 
 (defun rspec-verify-method ()
-  "Just like rspec-verify-single but tries to find examples for
-method given the current point."
+  "Just like `rspec-verify-single' but tries to find examples for
+the method at point."
   (interactive)
-  (save-window-excursion
-    (when (rspec-toggle-spec-and-target-find-example)
+  (save-excursion
+    (when (rspec--toggle-spec-and-target-find-method
+           (lambda () (set-buffer (find-file-noselect (rspec-spec-or-target)))))
       (rspec-verify-single))))
 
 (defun rspec--toggle-spec-and-target-find-method (toggle-function)
