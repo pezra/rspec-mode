@@ -121,6 +121,7 @@
 (define-key rspec-verifiable-mode-keymap (kbd "r") 'rspec-rerun)
 (define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
+(define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
 
 (set-keymap-parent rspec-mode-keymap rspec-verifiable-mode-keymap)
 
@@ -401,6 +402,14 @@ target, otherwise the spec."
   (interactive)
   (find-file (rspec-spec-or-target)))
 
+(defun rspec-verify-method ()
+  "Just like rspec-verify-single but tries to find examples for
+method given the current point."
+  (interactive)
+  (save-window-excursion
+    (when (rspec-toggle-spec-and-target-find-example)
+      (rspec-verify-single))))
+
 (defun rspec--toggle-spec-and-target-find-method (toggle-function)
   (cl-labels
       ((get-spec-name ()
@@ -426,7 +435,8 @@ target, otherwise the spec."
           (progn
             (beginning-of-buffer)
             (re-search-forward target-regexp))
-        (message "No matching %s" (if spec-p "method" "spec"))))))
+        (message "No matching %s" (if spec-p "method" "spec"))
+        nil))))
 
 (defun rspec-toggle-spec-and-target-find-example ()
   "Just like rspec-toggle-spec-and-target but tries to toggle between
