@@ -29,20 +29,15 @@
 ;; the contexts of RSpec specifications.  Namely, it provides the
 ;; following capabilities:
 ;;
-;;  * toggle back and forth between a spec and it's target (bound to
+;;  * toggle back and forth between a spec and its target (bound to
 ;;    `\C-c ,t`)
 ;;
-;;  * toggle back and forth between a method and it's examples in the spec file
+;;  * toggle back and forth between a method and its examples in the spec file
 ;;    (bound to `\C-c ,e`)
 ;;
 ;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
 ;;
-;;  * verify the spec defined in the current buffer if it is a spec
-;;    file (bound to `\C-c ,v`)
-;;
-;;  * verify the example defined at point (bound to `\C-c ,s`)
-;;
-;;  * verify the method defined at point if it is a code file (bound to `\C-c ,s`)
+;;  * verify the example or method defined at point (bound to `\C-c ,s`)
 ;;
 ;;  * re-run the last verification process (bound to `\C-c ,r`)
 ;;
@@ -445,8 +440,8 @@ the method at point."
         nil))))
 
 (defun rspec-toggle-spec-and-target-find-example ()
-  "Just like rspec-toggle-spec-and-target but tries to toggle between
-the specific example and method given at point."
+  "Just like `rspec-toggle-spec-and-target' but tries to toggle between
+the method and its corresponding examples."
   (interactive)
   (rspec--toggle-spec-and-target-find-method 'rspec-toggle-spec-and-target))
 
@@ -458,8 +453,8 @@ otherwise the spec."
   (find-file-other-window (rspec-spec-or-target)))
 
 (defun rspec-find-spec-or-target-find-example-other-window ()
-  "Find in the other window the spec or the target file, and tries
-  to find the corresponding example or method at point."
+  "Find in the other window the spec or the target file, and try
+to navigate to the example or method corresponding to point."
   (interactive)
   (rspec--toggle-spec-and-target-find-method 'rspec-find-spec-or-target-other-window))
 
@@ -489,7 +484,7 @@ otherwise the spec."
   (string-match (concat "^" (expand-file-name (regexp-quote (concat (rspec-project-root a-file-name) "/lib")))) a-file-name))
 
 (defun rspec-target-file-for (a-spec-file-name)
-  "Find the target for a-spec-file-name."
+  "Find the target for A-SPEC-FILE-NAME."
   (car
    (file-expand-wildcards
     (replace-regexp-in-string
@@ -516,11 +511,11 @@ otherwise the spec."
     (concat a-file-name ".rb")))
 
 (defun rspec-parent-directory (a-directory)
-  "Returns the directory of which a-directory is a child"
+  "Returns the directory of which A-DIRECTORY is a child"
   (file-name-directory (directory-file-name a-directory)))
 
 (defun rspec-root-directory-p (a-directory)
-  "Return t if a-directory is the root."
+  "Return t if A-DIRECTORY is the root."
   (equal a-directory (rspec-parent-directory a-directory)))
 
 (defun rspec-spec-directory (a-file)
