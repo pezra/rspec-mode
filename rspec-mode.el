@@ -40,19 +40,17 @@
 ;;  * verify the spec defined in the current buffer if it is a spec
 ;;    file (bound to `\C-c ,v`)
 ;;
-;;  * verify the example defined at the point of the current buffer (bound to `\C-c ,s`)
+;;  * verify the example defined at point (bound to `\C-c ,s`)
 ;;
-;;  * verify the method defined at the point of the current buffer if it is a
-;;    code file (bound to `\C-c ,s`)
+;;  * verify the method defined at point if it is a code file (bound to `\C-c ,s`)
 ;;
 ;;  * re-run the last verification process (bound to `\C-c ,r`)
 ;;
-;;  * toggle the pendingness of the example at the point (bound to
-;;    `\C-c ,d`)
+;;  * toggle the pendingness of the example at point (bound to `\C-c ,d`)
 ;;
-;;  * disable the example at the point by making it pending
+;;  * disable the example at point by making it pending
 ;;
-;;  * reenable the disabled example at the point
+;;  * reenable the disabled example at point
 ;;
 ;;  * run all specs related to the current buffer (`\C-c ,m`)
 ;;
@@ -328,7 +326,7 @@ info, are considered errors."
     (rspec-disable-example)))
 
 (defun rspec-disable-example ()
-  "Disable the example in which the point is located."
+  "Disable the example at point."
   (interactive)
   (when (not (rspec-example-pending-p))
     (save-excursion
@@ -338,7 +336,7 @@ info, are considered errors."
       (indent-for-tab-command))))
 
 (defun rspec-enable-example ()
-  "Enable the example in which the point is located."
+  "Enable the example at point."
   (interactive)
   (when (rspec-example-pending-p)
     (save-excursion
@@ -375,7 +373,7 @@ in long-running test suites."
      (rspec-core-options))))
 
 (defun rspec-verify-single ()
-  "Run the specified example at the point of the current buffer."
+  "Run the specified example at point."
   (interactive)
   (rspec-run-single-file
    (cons
@@ -437,7 +435,7 @@ target, otherwise the spec."
 
 (defun rspec-toggle-spec-and-target-find-example ()
   "Just like rspec-toggle-spec-and-target but tries to toggle between
-the specific example and method given the current point."
+the specific example and method given at point."
   (interactive)
   (rspec--toggle-spec-and-target-find-method 'rspec-toggle-spec-and-target))
 
@@ -450,8 +448,7 @@ otherwise the spec."
 
 (defun rspec-find-spec-or-target-find-example-other-window ()
   "Find in the other window the spec or the target file, and tries
-  to find the corresponding example or method given the current
-  point."
+  to find the corresponding example or method at point."
   (interactive)
   (rspec--toggle-spec-and-target-find-method 'rspec-find-spec-or-target-other-window))
 
