@@ -32,6 +32,9 @@
 ;;  * toggle back and forth between a spec and it's target (bound to
 ;;    `\C-c ,t`)
 ;;
+;;  * toggle back and forth between a method and it's examples in the spec file
+;;    (bound to `\C-c ,e`)
+;;
 ;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
 ;;
 ;;  * verify the spec defined in the current buffer if it is a spec
