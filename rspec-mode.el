@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.11
+;; Version: 1.12
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -38,6 +38,9 @@
 ;;    file (bound to `\C-c ,v`)
 ;;
 ;;  * verify the example defined at the point of the current buffer (bound to `\C-c ,s`)
+;;
+;;  * verify the method defined at the point of the current buffer if it is a
+;;    code file (bound to `\C-c ,s`)
 ;;
 ;;  * re-run the last verification process (bound to `\C-c ,r`)
 ;;
@@ -76,6 +79,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.12 - Run specs for single method (Renan Ranelli)
 ;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
 ;; 1.9 - Support for RSpec 3.
 ;; 1.8 - Support for Capybara's acceptance test DSL (Ales Guzik)
