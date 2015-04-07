@@ -215,6 +215,13 @@ info, are considered errors."
                  (const :tag "No skip" 0))
   :group 'rspec-mode)
 
+(defcustom rspec-expose-dsl-globally nil
+  "Defines whether the RSpec DSL is assumed to be exposed
+  globally, and so prepend snippets at the top level with
+  'RSpec.'."
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
