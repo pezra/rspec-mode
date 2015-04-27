@@ -752,15 +752,19 @@ or a cons (FILE . LINE), to run one example."
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--include-fg-syntax-methods-p ()
-  "Check whether FactoryGirl::Syntax::Methods is included in spec_helper."
+  "Check whether FactoryGirl::Syntax::Methods is included in rails_helper or spec_helper."
   (cl-case rspec-snippets-fg-syntax
     (full nil)
     (concise t)
     (t
-     (with-temp-buffer
-       (insert-file-contents
-        (concat (rspec-project-root) "spec/spec_helper.rb"))
-       (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)))))
+     (cl-find-if
+      (lambda (path)
+        (let ((expanded-path (expand-file-name path (rspec-project-root))))
+          (when (file-exists-p expanded-path)
+                (with-temp-buffer
+                  (insert-file-contents expanded-path)
+                  (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)))))
+      '("spec/rails_helper.rb" "spec/spec_helper.rb")))))
 
 (defun rspec-snippets-fg-method-call (method)
   "Return FactoryGirl method call for METHOD, for use in snippets.
