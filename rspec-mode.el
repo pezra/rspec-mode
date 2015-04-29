@@ -761,9 +761,11 @@ or a cons (FILE . LINE), to run one example."
       (lambda (path)
         (let ((expanded-path (expand-file-name path (rspec-project-root))))
           (when (file-exists-p expanded-path)
-                (with-temp-buffer
-                  (insert-file-contents expanded-path)
-                  (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)))))
+            (with-temp-buffer
+              (insert-file-contents expanded-path)
+              (ruby-mode)
+              (when (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)
+                (not (nth 4 (syntax-ppss))))))))
       '("spec/rails_helper.rb" "spec/spec_helper.rb")))))
 
 (defun rspec-snippets-fg-method-call (method)
