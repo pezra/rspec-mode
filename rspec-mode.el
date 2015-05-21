@@ -732,20 +732,17 @@ or a cons (FILE . LINE), to run one example."
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
   (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
 
-(defun re-seq (regexp string)
-  "Get a list of all regexp matches in a string"
-  (save-match-data
-    (let ((pos 0)
-          matches)
-      (while (string-match regexp string pos)
-        (push (match-string-no-properties 1 string) matches)
-        (setq pos (match-end 0)))
-      (reverse matches))))
-
-(defun rspec-store-failures (compilation-buffer process-result)
+(defun rspec-store-failures (&rest ignore)
+  "Store the file and line number of the failed examples from this run."
   (let* ((body (buffer-string))
-          (matches (re-seq "^rspec \\([0-9A-Za-z@_./:-]+\\.rb:[0-9]+\\)" body)))
-    (setq rspec-last-failed-specs matches)))
+          (failure-regexp "^rspec \\([0-9A-Za-z@_./:-]+\\.rb:[0-9]+\\)")
+          (failures (save-match-data
+                      (let ((pos 0) matches)
+                        (while (string-match failure-regexp body pos)
+                          (push (match-string-no-properties 1 body) matches)
+                          (setq pos (match-end 0)))
+                        (reverse matches)))))
+    (setq rspec-last-failed-specs failures)))
 
 (defun rspec-colorize-compilation-buffer ()
   (toggle-read-only)
