@@ -1,10 +1,10 @@
 ;;; rspec-mode.el --- Enhance ruby-mode for RSpec
 
-;; Copyright (C) 2008-2014 Peter Williams <http://barelyenough.org> and others
+;; Copyright (C) 2008-2015 Peter Williams <http://barelyenough.org> and others
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.12
+;; Version: 1.13
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -40,6 +40,8 @@
 ;;  * verify the example or method defined at point (bound to `\C-c ,s`)
 ;;
 ;;  * re-run the last verification process (bound to `\C-c ,r`)
+;;
+;;  * re-run just the failed examples from the last run (bound to `\C-c ,f`)
 ;;
 ;;  * toggle the pendingness of the example at point (bound to `\C-c ,d`)
 ;;
@@ -122,6 +124,7 @@
 (define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
+(define-key rspec-verifiable-mode-keymap (kbd "f") 'rspec-run-last-failed)
 
 (set-keymap-parent rspec-mode-keymap rspec-verifiable-mode-keymap)
 
@@ -361,6 +364,11 @@ info, are considered errors."
   (interactive)
   (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
                             (rspec-core-options)))
+
+(defun rspec-run-last-failed ()
+  "Run just the specs that failed during the last invocation."
+  (interactive)
+  (rspec-run-multiple-files rspec-last-failed-specs (rspec-core-options)))
 
 (defun rspec-verify-continue ()
   "Run the current spec file and the spec files located after it.
@@ -668,6 +676,9 @@ or a cons (FILE . LINE), to run one example."
       (message "No spec files found!")
     (rspec-compile (rspec-runner-target spec-files) opts)))
 
+(defvar rspec-last-failed-specs nil
+  "The file and line number of the specs that failed during the last run.")
+
 (defvar rspec-last-directory nil
   "Directory the last spec process ran in.")
 
@@ -718,7 +729,17 @@ or a cons (FILE . LINE), to run one example."
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
+  (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
   (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
+
+(defun rspec-store-failures (&rest ignore)
+  "Store the file and line number of the failed examples from this run."
+  (let (failures)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^rspec \\([0-9A-Za-z@_./:-]+\\.rb:[0-9]+\\)" nil t)
+        (push (match-string-no-properties 1) failures)))
+    (setq rspec-last-failed-specs (reverse failures))))
 
 (defun rspec-colorize-compilation-buffer ()
   (toggle-read-only)
