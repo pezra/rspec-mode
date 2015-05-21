@@ -734,15 +734,12 @@ or a cons (FILE . LINE), to run one example."
 
 (defun rspec-store-failures (&rest ignore)
   "Store the file and line number of the failed examples from this run."
-  (let* ((body (buffer-string))
-          (failure-regexp "^rspec \\([0-9A-Za-z@_./:-]+\\.rb:[0-9]+\\)")
-          (failures (save-match-data
-                      (let ((pos 0) matches)
-                        (while (string-match failure-regexp body pos)
-                          (push (match-string-no-properties 1 body) matches)
-                          (setq pos (match-end 0)))
-                        (reverse matches)))))
-    (setq rspec-last-failed-specs failures)))
+  (let (failures)
+    (save-excursion
+      (goto-char (point-min))
+        (while (re-search-forward "^rspec \\([0-9A-Za-z@_./:-]+\\.rb:[0-9]+\\)" nil t)
+          (push (match-string-no-properties 1) failures)))
+    (setq rspec-last-failed-specs (reverse failures))))
 
 (defun rspec-colorize-compilation-buffer ()
   (toggle-read-only)
