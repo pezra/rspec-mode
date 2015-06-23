@@ -449,7 +449,7 @@ the method at point."
       (funcall toggle-function)
       (if (string-match-p target-regexp (buffer-string))
           (progn
-            (beginning-of-buffer)
+            (goto-char (point-min))
             (re-search-forward target-regexp))
         (message "No matching %s" (if spec-p "method" "spec"))
         nil))))
