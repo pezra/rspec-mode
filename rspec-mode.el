@@ -225,6 +225,13 @@ info, are considered errors."
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-holder-dirs '("app" "lib")
+  "List of directories whose names should be omitted when looking
+for spec files corresponding to files inside them."
+  :type '(repeat string)
+  :safe 'listp
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
@@ -478,34 +485,34 @@ to navigate to the example or method corresponding to point."
       (rspec-target-file-for (buffer-file-name))
     (rspec-spec-file-for (buffer-file-name))))
 
-(defun rspec-spec-directory-has-lib? (a-file-name)
-  (file-directory-p (concat (rspec-spec-directory a-file-name) "/lib")))
-
 (defun rspec-spec-file-for (a-file-name)
   "Find spec for the specified file."
   (if (rspec-spec-file-p a-file-name)
       a-file-name
-    (let ((replace-regex (if (and (rspec-target-lib-file-p a-file-name) (rspec-spec-directory-has-lib? a-file-name))
-                             "^\\.\\./"
-                           "^\\.\\./[^/]+/"))
+    (let ((replace-regex (if (rspec-target-in-holder-dir-p a-file-name)
+                             "^\\.\\./[^/]+/"
+                           "^\\.\\./"))
           (relative-file-name (file-relative-name a-file-name (rspec-spec-directory a-file-name))))
       (rspec-specize-file-name (expand-file-name (replace-regexp-in-string replace-regex "" relative-file-name)
                                                  (rspec-spec-directory a-file-name))))))
 
-(defun rspec-spec-lib-file-p (a-spec-file-name)
-  (string-match (concat "^" (expand-file-name (regexp-quote (concat (rspec-spec-directory a-spec-file-name) "/lib")))) a-spec-file-name))
-
-(defun rspec-target-lib-file-p (a-file-name)
-  (string-match (concat "^" (expand-file-name (regexp-quote (concat (rspec-project-root a-file-name) "/lib")))) a-file-name))
+(defun rspec-target-in-holder-dir-p (a-file-name)
+  (string-match (concat "^" (concat
+                             (regexp-quote
+                              (rspec-project-root a-file-name))
+                             (regexp-opt rspec-holder-dirs)
+                             "/"))
+                a-file-name))
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for A-SPEC-FILE-NAME."
-  (car
-   (file-expand-wildcards
-    (replace-regexp-in-string
-     "/spec/"
-     (if (rspec-spec-lib-file-p a-spec-file-name) "/" "/*/")
-     (rspec-targetize-file-name a-spec-file-name)))))
+  (cl-loop for dir in (cons "." rspec-holder-dirs)
+           for target = (replace-regexp-in-string
+                         "/spec/"
+                         (concat "/" dir "/")
+                         (rspec-targetize-file-name a-spec-file-name))
+           if (file-exists-p target)
+           return target))
 
 (defun rspec-specize-file-name (a-file-name)
   "Return A-FILE-NAME but converted in to a spec file name."
