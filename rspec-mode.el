@@ -225,7 +225,7 @@ info, are considered errors."
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-holder-dirs '("app" "lib")
+(defcustom rspec-primary-source-dirs '("app" "lib")
   "List of directories whose names should be omitted when looking
 for spec files corresponding to files inside them."
   :type '(repeat string)
@@ -500,13 +500,13 @@ to navigate to the example or method corresponding to point."
   (string-match (concat "^" (concat
                              (regexp-quote
                               (rspec-project-root a-file-name))
-                             (regexp-opt rspec-holder-dirs)
+                             (regexp-opt rspec-primary-source-dirs)
                              "/"))
                 a-file-name))
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for A-SPEC-FILE-NAME."
-  (cl-loop for dir in (cons "." rspec-holder-dirs)
+  (cl-loop for dir in (cons "." rspec-primary-source-dirs)
            for target = (replace-regexp-in-string
                          "/spec/"
                          (concat "/" dir "/")
