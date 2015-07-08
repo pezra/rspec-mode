@@ -26,31 +26,37 @@ may already have set up.)
 If `rspec-mode` is installed properly, it will be started
 automatically when `ruby-mode` is started.
 
-Command                                                             | Description                                                                                                               | RSpec Verifiable mode binding
-------------------------------------------------------------------- |---------------------------------------------------------------------------------------------------------------------------|------------------------------
-<kbd>M-x rspec-verify</kbd>                                         | Verify the spec file associated with the current buffer                                                                   | `C-c , v`
-<kbd>M-x rspec-verify-all</kbd>                                     | Run spec for entire project                                                                                               | `C-c , a`
-<kbd>M-x rspec-toggle-spec-and-target</kbd>                         | Toggle back and forth between a spec and its target                                                                       | `C-c , t`
-<kbd>M-x rspec-toggle-spec-and-target-find-example</kbd>            | Toggle back and forth between a method and its examples in the spec file                                                  | `C-c , e`
-<kbd>M-x rspec-find-spec-or-target-other-window</kbd>               | Find in the other window the spec or the target file                                                                      | `C-c , 4 t`
-<kbd>M-x rspec-find-spec-or-target-find-example-other-window</kbd>  | Find in the other window the spec or the target file, and try to navigate to the example or method corresponding to point | `C-c , 4 e`
-<kbd>M-x rspec-rerun</kbd>                                          | Re-run the last verification process                                                                                      | `C-c , r`
-<kbd>M-x rspec-verify-matching</kbd>                                | Run all specs related to the current buffer                                                                               | `C-c , m`
-<kbd>M-x rspec-verify-continue</kbd>                                | Run the current spec and all after it                                                                                     | `C-c , c`
-<kbd>M-x rspec-verify-method</kbd>                                  | Verify the example or method defined at point                                                                             | `C-c , s`
-<kbd>M-x rspec-run-last-failed</kbd>                                | Re-run just the failed examples from the last run                                                                         | `C-c , f`
+### RSpec Verifiable mode
 
-Command                                         | Description                                    | RSpec mode binding
-------------------------------------------------|------------------------------------------------|-------------------
-<kbd>M-x rspec-verify-single</kbd>              | Run the specified example at point             | `C-c , s`
-<kbd>M-x rspec-toggle-example-pendingness</kbd> | Toggle the pendingness of the example at point | `C-c , d`
+Keybinding  | Description                                                                                                               |
+------------|---------------------------------------------------------------------------------------------------------------------------|
+`C-c , v`   | Verify the spec file associated with the current buffer                                                                   |
+`C-c , a`   | Run spec for entire project                                                                                               |
+`C-c , t`   | Toggle back and forth between a spec and its target                                                                       |
+`C-c , e`   | Toggle back and forth between a method and its examples in the spec file                                                  |
+`C-c , 4 t` | Find in the other window the spec or the target file                                                                      |
+`C-c , 4 e` | Find in the other window the spec or the target file, and try to navigate to the example or method corresponding to point |
+`C-c , r`   | Re-run the last verification process                                                                                      |
+`C-c , m`   | Run all specs related to the current buffer                                                                               |
+`C-c , c`   | Run the current spec and all after it                                                                                     |
+`C-c , s`   | Verify the example or method defined at point                                                                             |
+`C-c , f`   | Re-run just the failed examples from the last run                                                                         |
 
-Command                                  | Description                                                    | RSpec Dired mode binding
------------------------------------------|----------------------------------------------------------------|-------------------------
-<kbd>M-x rspec-dired-verify</kbd>        | Run all specs in the current directory                         | `C-c , v`
-<kbd>M-x rspec-dired-verify-single</kbd> | Run marked specs or spec at point (works with directories too) | `C-c , s`
-<kbd>M-x rspec-verify-all</kbd>          | Run the 'spec' rake task for the project of the current file   | `C-c , a`
-<kbd>M-x rspec-rerun</kbd>               | Re-run the last RSpec invocation                               | `C-c , r`
+### RSpec mode
+
+Keybinding | Description                                    |
+-----------|------------------------------------------------|
+`C-c , s`  | Run the specified example at point             |
+`C-c , d`  | Toggle the pendingness of the example at point |
+
+### RSpec Dired mode
+
+Keybinding | Description                                                    |
+-----------|----------------------------------------------------------------|
+ `C-c , v` | Run all specs in the current directory                         |
+ `C-c , s` | Run marked specs or spec at point (works with directories too) |
+ `C-c , a` | Run the 'spec' rake task for the project of the current file   |
+ `C-c , r` | Re-run the last RSpec invocation                               |
 
 See `rspec-mode.el` for further usage.
 
