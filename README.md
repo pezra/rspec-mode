@@ -28,19 +28,19 @@ automatically when `ruby-mode` is started.
 
 ### RSpec Verifiable mode
 
-Keybinding  | Description                                                                                                               |
-------------|---------------------------------------------------------------------------------------------------------------------------|
-`C-c , v`   | Verify the spec file associated with the current buffer                                                                   |
-`C-c , a`   | Run spec for entire project                                                                                               |
-`C-c , t`   | Toggle back and forth between a spec and its target                                                                       |
-`C-c , e`   | Toggle back and forth between a method and its examples in the spec file                                                  |
-`C-c , 4 t` | Find in the other window the spec or the target file                                                                      |
-`C-c , 4 e` | Find in the other window the spec or the target file, and try to navigate to the example or method corresponding to point |
-`C-c , r`   | Re-run the last verification process                                                                                      |
-`C-c , m`   | Run all specs related to the current buffer                                                                               |
-`C-c , c`   | Run the current spec and all after it                                                                                     |
-`C-c , s`   | Verify the example or method defined at point                                                                             |
-`C-c , f`   | Re-run just the failed examples from the last run                                                                         |
+Keybinding  | Description                                                                   |
+------------|-------------------------------------------------------------------------------|
+`C-c , v`   | Verify the spec file associated with the current buffer                       |
+`C-c , a`   | Run spec for entire project                                                   |
+`C-c , t`   | Toggle back and forth between a spec and its target                           |
+`C-c , e`   | Toggle back and forth between a method and its examples in the spec file      |
+`C-c , 4 t` | Find in the other window the spec or the target file                          |
+`C-c , 4 e` | As above, but try to navigate to the example or method corresponding to point |
+`C-c , r`   | Re-run the last verification process                                          |
+`C-c , m`   | Run all specs related to the current buffer                                   |
+`C-c , c`   | Run the current spec and all after it                                         |
+`C-c , s`   | Verify the example or method defined at point                                 |
+`C-c , f`   | Re-run just the failed examples from the last run                             |
 
 ### RSpec mode
 
