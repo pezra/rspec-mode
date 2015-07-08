@@ -53,10 +53,10 @@ Keybinding | Description                                    |
 
 Keybinding | Description                                                    |
 -----------|----------------------------------------------------------------|
- `C-c , v` | Run all specs in the current directory                         |
- `C-c , s` | Run marked specs or spec at point (works with directories too) |
- `C-c , a` | Run the 'spec' rake task for the project of the current file   |
- `C-c , r` | Re-run the last RSpec invocation                               |
+`C-c , v`  | Run all specs in the current directory                         |
+`C-c , s`  | Run marked specs or spec at point (works with directories too) |
+`C-c , a`  | Run the 'spec' rake task for the project of the current file   |
+`C-c , r`  | Re-run the last RSpec invocation                               |
 
 See `rspec-mode.el` for further usage.
 
