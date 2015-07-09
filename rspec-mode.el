@@ -25,35 +25,9 @@
 
 ;;; Commentary:
 ;;
-;; This minor mode provides some enhancements to ruby-mode in
-;; the contexts of RSpec specifications.  Namely, it provides the
-;; following capabilities:
-;;
-;;  * toggle back and forth between a spec and its target (bound to
-;;    `\C-c ,t`)
-;;
-;;  * toggle back and forth between a method and its examples in the spec file
-;;    (bound to `\C-c ,e`)
-;;
-;;  * verify the spec file associated with the current buffer (bound to `\C-c ,v`)
-;;
-;;  * verify the example or method defined at point (bound to `\C-c ,s`)
-;;
-;;  * re-run the last verification process (bound to `\C-c ,r`)
-;;
-;;  * re-run just the failed examples from the last run (bound to `\C-c ,f`)
-;;
-;;  * toggle the pendingness of the example at point (bound to `\C-c ,d`)
-;;
-;;  * disable the example at point by making it pending
-;;
-;;  * reenable the disabled example at point
-;;
-;;  * run all specs related to the current buffer (`\C-c ,m`)
-;;
-;;  * run the current spec and all after it (`\C-c ,c`)
-;;
-;;  * run spec for entire project (bound to `\C-c ,a`)
+;; This minor mode provides some enhancements to ruby-mode in the
+;; contexts of RSpec specifications.  Refer to the README for a
+;; summary of keybindings and their descriptions.
 ;;
 ;; You can choose whether to run specs using 'rake spec' or the 'spec'
 ;; command. Use the customization interface (customize-group
