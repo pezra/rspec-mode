@@ -28,6 +28,8 @@ automatically when `ruby-mode` is started.
 
 ### RSpec Verifiable mode
 
+These keybindings are available in any Ruby source file:
+
 Keybinding  | Description                                                                   |
 ------------|-------------------------------------------------------------------------------|
 `C-c , v`   | Verify the spec file associated with the current buffer                       |
@@ -44,12 +46,16 @@ Keybinding  | Description                                                       
 
 ### RSpec mode
 
+These keybindings are available in Ruby spec files:
+
 Keybinding | Description                                    |
 -----------|------------------------------------------------|
 `C-c , s`  | Run the specified example at point             |
 `C-c , d`  | Toggle the pendingness of the example at point |
 
 ### RSpec Dired mode
+
+These keybindings are available in Dired buffers:
 
 Keybinding | Description                                                    |
 -----------|----------------------------------------------------------------|
