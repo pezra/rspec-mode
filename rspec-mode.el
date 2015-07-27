@@ -566,9 +566,13 @@ file if it exists, or sensible defaults otherwise."
   (and rspec-use-bundler-when-possible
        (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
+(defun rspec-zeus-file-path ()
+  (or (getenv "ZEUSSOCK")
+      (concat (rspec-project-root) ".zeus.sock")))
+
 (defun rspec-zeus-p ()
   (and rspec-use-zeus-when-possible
-       (file-exists-p (concat (rspec-project-root) ".zeus.sock"))))
+       (file-exists-p (rspec-zeus-file-path))))
 
 (defun rspec-rake-p ()
   (and rspec-use-rake-when-possible
