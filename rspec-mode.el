@@ -583,6 +583,7 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec-spring-p ()
   (and rspec-use-spring-when-possible
+       (not (equal (getenv "SPRING_DISABLE") "1"))
        (let ((root (directory-file-name (rspec-project-root))))
          (or
           ;; Older versions
