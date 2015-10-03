@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.13 - Add a variable to autosave current buffer where it makes sense
 ;; 1.12 - Run specs for single method (Renan Ranelli)
 ;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
 ;; 1.9 - Support for RSpec 3.
@@ -206,6 +207,12 @@ for spec files corresponding to files inside them."
   :safe 'listp
   :group 'rspec-mode)
 
+(defcustom rspec-autosave-buffer nil
+  "If t save the current buffer when running
+`rspec-verify', `rspec-verify-single', `rspec-verify-matching' & `rspec-verify-continue'."
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
@@ -337,12 +344,14 @@ for spec files corresponding to files inside them."
 (defun rspec-verify ()
   "Run the specified spec, or the spec file for the current buffer."
   (interactive)
+  (rspec--autosave-buffer-maybe)
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
                          (rspec-core-options)))
 
 (defun rspec-verify-matching ()
   "Run the specs related to the current buffer. This is more fuzzy that a simple verify."
   (interactive)
+  (rspec--autosave-buffer-maybe)
   (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
                             (rspec-core-options)))
 
@@ -356,6 +365,7 @@ for spec files corresponding to files inside them."
 This is most useful in combination with the option `--fail-fast',
 in long-running test suites."
   (interactive)
+  (rspec--autosave-buffer-maybe)
   (let ((current-spec-file (rspec-compress-spec-file
                             (rspec-spec-file-for (buffer-file-name)))))
     (rspec-run-multiple-files
@@ -367,6 +377,7 @@ in long-running test suites."
 (defun rspec-verify-single ()
   "Run the specified example at point."
   (interactive)
+  (rspec--autosave-buffer-maybe)
   (rspec-run-single-file
    (cons
     (rspec-spec-file-for (buffer-file-name))
@@ -773,6 +784,12 @@ or a cons (FILE . LINE), to run one example."
               (when (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)
                 (not (nth 4 (syntax-ppss))))))))
       '("spec/rails_helper.rb" "spec/spec_helper.rb")))))
+
+(defun rspec--autosave-buffer-maybe ()
+  "Saves the current buffer if `rspec-autosave-buffer' is t and
+the buffer is a spec or a target file."
+  (when (and rspec-autosave-buffer (rspec-spec-or-target))
+    (save-buffer)))
 
 (defun rspec-snippets-fg-method-call (method)
   "Return FactoryGirl method call for METHOD, for use in snippets.
