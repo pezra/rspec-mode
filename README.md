@@ -21,6 +21,17 @@ Provided you have `yasnippet` installed, you can load the snippets:
 (This isn't done automatically to avoid conflicts with snippets you
 may already have set up.)
 
+### RVM
+
+If you use RVM, you may have to set `rspec-use-rvm` to true to make
+`rspec-mode` function properly:
+
+```emacs
+(setq rspec-use-rvm t)
+```
+
+Or set it using Emacs' customization system.
+
 ## Usage
 
 If `rspec-mode` is installed properly, it will be started
