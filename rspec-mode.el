@@ -570,7 +570,7 @@ to navigate to the example or method corresponding to point."
 file if it exists, or sensible defaults otherwise."
   (cond ((and rspec-use-opts-file-when-available
               (file-readable-p (rspec-spec-opts-file)))
-         (concat "--options " (shell-quote-argument (rspec-spec-opts-file))))
+         (concat "--options " (rspec--shell-quote-local (rspec-spec-opts-file))))
         (t rspec-command-options)))
 
 (defun rspec-bundle-p ()
@@ -615,6 +615,13 @@ file if it exists, or sensible defaults otherwise."
       (expand-file-name ".rspec" (rspec-project-root))
     (expand-file-name "spec.opts" (rspec-spec-directory (rspec-project-root)))))
 
+(defun rspec--shell-quote-local (file)
+  (let ((remote (file-remote-p file)))
+    (shell-quote-argument
+     (if remote
+         (substring file (length remote))
+       file))))
+
 (defun rspec-runner ()
   "Return command line to run rspec."
   (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
@@ -643,11 +650,11 @@ or a cons (FILE . LINE), to run one example."
     (concat (when use-rake "SPEC=\'")
             (if (listp target)
                 (if (listp (cdr target))
-                    (mapconcat #'shell-quote-argument target " ")
-                  (concat (shell-quote-argument (car target))
+                    (mapconcat #'rspec--shell-quote-local target " ")
+                  (concat (rspec--shell-quote-local (car target))
                           ":"
                           (cdr target)))
-              (shell-quote-argument target))
+              (rspec--shell-quote-local target))
             (when use-rake "\'"))))
 
 ;;;###autoload
