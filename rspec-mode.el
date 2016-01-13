@@ -29,7 +29,7 @@
 ;; contexts of RSpec specifications.  Refer to the README for a
 ;; summary of keybindings and their descriptions.
 ;;
-;; You can choose whether to run specs using 'rake spec' or the 'spec'
+;; You can choose whether to run specs using 'rake spec' or the 'rspec'
 ;; command. Use the customization interface (customize-group
 ;; rspec-mode) or override using (setq rspec-use-rake-when-possible TVAL).
 ;;
@@ -116,11 +116,11 @@
   "RSpec minor mode."
   :group 'languages)
 
-(defcustom rspec-use-rake-when-possible t
+(defcustom rspec-use-rake-when-possible nil
   "When non-nil and Rakefile is present, run specs via rake spec task."
   :tag "RSpec runner command"
   :type '(radio (const :tag "Use 'rake spec' task" t)
-                (const :tag "Use 'spec' command" nil))
+                (const :tag "Use 'rspec' command" nil))
   :group 'rspec-mode)
 
 (define-obsolete-variable-alias 'rspec-use-rake-flag
