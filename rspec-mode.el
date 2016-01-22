@@ -209,7 +209,8 @@ for spec files corresponding to files inside them."
 
 (defcustom rspec-autosave-buffer nil
   "If t save the current buffer when running
-`rspec-verify', `rspec-verify-single', `rspec-verify-matching' & `rspec-verify-continue'."
+`rspec-verify', `rspec-verify-single', `rspec-verify-matching',
+`rspec-verify-continue' & `rspec-run-last-failed'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -358,6 +359,7 @@ for spec files corresponding to files inside them."
 (defun rspec-run-last-failed ()
   "Run just the specs that failed during the last invocation."
   (interactive)
+  (rspec--autosave-buffer-maybe)
   (rspec-run-multiple-files rspec-last-failed-specs (rspec-core-options)))
 
 (defun rspec-verify-continue ()
