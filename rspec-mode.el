@@ -493,13 +493,19 @@ to navigate to the example or method corresponding to point."
 
 (defun rspec-target-file-for (a-spec-file-name)
   "Find the target for A-SPEC-FILE-NAME."
-  (cl-loop for dir in (cons "." rspec-primary-source-dirs)
-           for target = (replace-regexp-in-string
-                         "/spec/"
-                         (concat "/" dir "/")
-                         (rspec-targetize-file-name a-spec-file-name))
-           if (file-exists-p target)
-           return target))
+  (cl-loop for extension in (list "rb" "rake")
+           for candidate = (rspec-targetize-file-name a-spec-file-name
+                                                       extension)
+           for filename = (cl-loop for dir in (cons "."
+                                                    rspec-primary-source-dirs)
+                                   for target = (replace-regexp-in-string
+                                                 "/spec/"
+                                                 (concat "/" dir "/")
+                                                 candidate)
+                                   if (file-exists-p target)
+                                   return target)
+           if filename
+           return filename))
 
 (defun rspec-specize-file-name (a-file-name)
   "Return A-FILE-NAME but converted in to a spec file name."
@@ -507,11 +513,12 @@ to navigate to the example or method corresponding to point."
    (file-name-directory a-file-name)
    (replace-regexp-in-string "\\(\\.\\(rb\\|rake\\)\\)?$" "_spec.rb" (file-name-nondirectory a-file-name))))
 
-(defun rspec-targetize-file-name (a-file-name)
-  "Return A-FILE-NAME but converted into a non-spec file name."
+(defun rspec-targetize-file-name (a-file-name extension)
+  "Return A-FILE-NAME but converted into a non-spec file name with EXTENSION."
   (concat (file-name-directory a-file-name)
           (rspec-file-name-with-default-extension
-           (replace-regexp-in-string "_spec\\.rb" "" (file-name-nondirectory a-file-name)))))
+           (replace-regexp-in-string "_spec\\.rb" (concat "." extension)
+                                     (file-name-nondirectory a-file-name)))))
 
 (defun rspec-file-name-with-default-extension (a-file-name)
   "Add .rb file extension to A-FILE-NAME if it does not already have an extension."
