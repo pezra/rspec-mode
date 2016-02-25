@@ -505,7 +505,7 @@ to navigate to the example or method corresponding to point."
   "Return A-FILE-NAME but converted in to a spec file name."
   (concat
    (file-name-directory a-file-name)
-   (replace-regexp-in-string "\\(\\.rb\\)?$" "_spec.rb" (file-name-nondirectory a-file-name))))
+   (replace-regexp-in-string "\\(\\.\\(rb\\|rake\\)\\)?$" "_spec.rb" (file-name-nondirectory a-file-name))))
 
 (defun rspec-targetize-file-name (a-file-name)
   "Return A-FILE-NAME but converted into a non-spec file name."
