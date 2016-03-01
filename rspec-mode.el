@@ -47,10 +47,14 @@
 ;;
 ;; Dependencies:
 ;;
-;; If `rspec-use-rvm` is set to true `rvm.el' is required.
+;; This minor mode can support both the rbenv and rvm version
+;; managers.  When either `rspec-use-rbenv` or `rspec-use-rvm` is set
+;; to true, then the corresponding library (`rbenv.el' or `rvm.el') is
+;; required.
 ;;
 ;;; Change Log:
 ;;
+;; 1.14 - rbenv support (Gary Iams)
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
 ;; 1.12 - Run specs for single method (Renan Ranelli)
 ;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
@@ -134,6 +138,11 @@
 (defcustom rspec-spec-command "rspec"
   "The command for spec."
   :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-use-rbenv nil
+  "When t, use rbenv. Requires rbenv.el."
+  :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-rvm nil
@@ -713,6 +722,9 @@ or a cons (FILE . LINE), to run one example."
   "Run a compile for TARGET with the specified options OPTS."
   (setq rspec-last-directory default-directory
         rspec-last-arguments (list target opts))
+
+  (if rspec-use-rbenv
+    (rbenv-use-corresponding))
 
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
