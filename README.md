@@ -66,6 +66,18 @@ Keybinding | Description                                                    |
 
 See `rspec-mode.el` for further usage.
 
+### System notifications
+
+If `rspec-notification-command` is set to a command string, it will be
+used to display notificaitons after every RSpec run.
+
+For example, with `terminal-notifier` installed on OSX this variable can be set to:
+
+```
+(custom-set-variables
+ '(rspec-notification-command "terminal-notifier -message"))
+```
+
 ## Gotchas
 ### Debugging
 

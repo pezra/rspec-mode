@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.14 - Add `rspec-notification-command' variable, that defines notification command
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
 ;; 1.12 - Run specs for single method (Renan Ranelli)
 ;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
@@ -169,6 +170,11 @@ Not used when running specs using Zeus or Spring."
 
 (defcustom rspec-command-options "--format documentation"
   "Default options used with rspec-command."
+  :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-notification-command nil
+  "Command used to send notification after rspec-command is finished."
   :type 'string
   :group 'rspec-mode)
 
@@ -746,7 +752,18 @@ or a cons (FILE . LINE), to run one example."
   "Compilation mode for RSpec output."
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
-  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
+  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
+  (add-hook 'compilation-finish-functions 'rspec-send-notification nil t))
+
+(defun rspec-send-notification (&rest ignore)
+  (if rspec-notification-command
+      (progn
+        (rspec-store-failures)
+        (let* ((failures-count (length rspec-last-failed-specs))
+               (command (format "%s \"RSpec finished failures: %d\""
+                                rspec-notification-command
+                                failures-count)))
+          (shell-command command)))))
 
 (defun rspec-store-failures (&rest ignore)
   "Store the file and line number of the failed examples from this run."
