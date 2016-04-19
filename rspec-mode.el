@@ -645,19 +645,20 @@ file if it exists, or sensible defaults otherwise."
     (expand-file-name "spec.opts" (rspec-spec-directory (rspec-project-root)))))
 
 (defun rspec--shell-quote-local (file)
-  (let ((remote (file-remote-p file)))
+  (let ((remote (file-remote-p file))
+        (vagrant (rspec-vagrant-p)))
     (shell-quote-argument
-     (if remote
-         (substring file (length remote))
-       file))))
+     (cond
+      (remote (substring file (length remote)))
+      (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
+                                         rspec-vagrant-cwd file))
+      (t  file)))))
 
 (defun rspec--vagrant-wrapper (command)
   (if (rspec-vagrant-p)
       (format "vagrant ssh -c 'cd %s; %s'"
-              rspec-vagrant-cwd
-              (replace-regexp-in-string (rspec-project-root)
-                                        rspec-vagrant-cwd
-                                        command))
+              (shell-quote-argument rspec-vagrant-cwd)
+              command)
     command))
 
 (defun rspec-runner ()
