@@ -51,7 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
-;; 1.14 - Add option to run spec commands in a vagrant box through
+;; 1.14 - Add option to run spec commands in a Vagrant box through
 ;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
 ;; 1.12 - Run specs for single method (Renan Ranelli)
@@ -144,7 +144,7 @@
   :group 'rspec-mode)
 
 (defcustom rspec-vagrant-cwd "~/"
-  "Working directory when running inside vagrant. Use trailing slash."
+  "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
   :group 'rspec-mode)
 
@@ -155,7 +155,7 @@ Not used when running specs using Zeus or Spring."
   :group 'rspec-mode)
 
 (defcustom rspec-use-vagrant-when-possible nil
-  "When t and Vagrant file is present, run specs inside vagrant box using 'vagrant ssh -c'."
+  "When t and Vagrant file is present, run specs inside Vagrant box using 'vagrant ssh -c'."
   :type 'boolean
   :group 'rspec-mode)
 
