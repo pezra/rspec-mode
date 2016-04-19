@@ -143,7 +143,7 @@
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-vagrant-cwd "~/"
+(defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
   :group 'rspec-mode)
