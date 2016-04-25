@@ -51,6 +51,8 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.14 - Add option to run spec commands in a Vagrant box through
+;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
 ;; 1.12 - Run specs for single method (Renan Ranelli)
 ;; 1.11 - Switching between method, its specs and back (Renan Ranelli)
@@ -141,9 +143,19 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-vagrant-cwd "/vagrant/"
+  "Working directory when running inside Vagrant. Use trailing slash."
+  :type 'string
+  :group 'rspec-mode)
+
 (defcustom rspec-use-bundler-when-possible t
   "When t and Gemfile is present, run specs with 'bundle exec'.
 Not used when running specs using Zeus or Spring."
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-vagrant-when-possible nil
+  "When t and Vagrant file is present, run specs inside Vagrant box using 'vagrant ssh -c'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -586,6 +598,10 @@ file if it exists, or sensible defaults otherwise."
   (and rspec-use-bundler-when-possible
        (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
+(defun rspec-vagrant-p ()
+  (and rspec-use-vagrant-when-possible
+       (file-readable-p (concat (rspec-project-root) "Vagrantfile"))))
+
 (defun rspec-zeus-file-path ()
   (or (getenv "ZEUSSOCK")
       (concat (rspec-project-root) ".zeus.sock")))
@@ -629,11 +645,21 @@ file if it exists, or sensible defaults otherwise."
     (expand-file-name "spec.opts" (rspec-spec-directory (rspec-project-root)))))
 
 (defun rspec--shell-quote-local (file)
-  (let ((remote (file-remote-p file)))
+  (let ((remote (file-remote-p file))
+        (vagrant (rspec-vagrant-p)))
     (shell-quote-argument
-     (if remote
-         (substring file (length remote))
-       file))))
+     (cond
+      (remote (substring file (length remote)))
+      (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
+                                         rspec-vagrant-cwd file))
+      (t  file)))))
+
+(defun rspec--vagrant-wrapper (command)
+  (if (rspec-vagrant-p)
+      (format "vagrant ssh -c 'cd %s; %s'"
+              (shell-quote-argument rspec-vagrant-cwd)
+              command)
+    command))
 
 (defun rspec-runner ()
   "Return command line to run rspec."
@@ -718,9 +744,10 @@ or a cons (FILE . LINE), to run one example."
       (rvm-activate-corresponding-ruby))
 
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (compile (mapconcat 'identity `(,(rspec-runner)
-                                    ,(rspec-runner-options opts)
-                                    ,target) " ")
+    (compile (rspec--vagrant-wrapper
+              (mapconcat 'identity `(,(rspec-runner)
+                                     ,(rspec-runner-options opts)
+                                     ,target) " "))
              'rspec-compilation-mode)))
 
 (defvar rspec-compilation-mode-font-lock-keywords
