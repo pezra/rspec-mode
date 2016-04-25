@@ -103,7 +103,7 @@ specs. This piece of code does the job:
 
 You can run specs inside a Vagrant box. You can enable it through the
 `rspec-use-vagrant-when-possible` customization option. You can also set the
-directory where you're project is inside your box through the
+directory where your project is inside your box through the
 `rspec-vagrant-cwd` option. This will run specs through the `vagrant ssh -c 'cd
 <cwd>; <rspec command>'`.
 
