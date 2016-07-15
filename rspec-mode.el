@@ -813,6 +813,7 @@ or a cons (FILE . LINE), to run one example."
            (error "Could not determine the project root."))
           ((file-exists-p (expand-file-name "Rakefile" directory)) directory)
           ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
+          ((file-exists-p (expand-file-name "Berksfile" directory)) directory)
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--include-fg-syntax-methods-p ()
