@@ -226,6 +226,11 @@ for spec files corresponding to files inside them."
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-pry-rescue nil
+  "If t, prepend `rspec-spec-command' with 'rescue', so that 'pry-rescue' can be used."
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
@@ -667,6 +672,8 @@ file if it exists, or sensible defaults otherwise."
         (zeus-command (if (rspec-zeus-p) "zeus " nil))
         (spring-command (if (rspec-spring-p) "spring " nil)))
     (concat (or zeus-command spring-command bundle-command)
+            (if rspec-use-pry-rescue
+                "rescue ")
             (if (rspec-rake-p)
                 (concat rspec-rake-command " spec")
               rspec-spec-command))))
