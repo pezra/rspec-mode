@@ -1,3 +1,11 @@
+EMACS ?= emacs
+
+.PHONY: elpa clean test
+
+test:
+	${EMACS} -Q --batch -l ert --directory . -l test/rspec-mode-test.el \
+	         --eval '(ert-run-tests-batch-and-exit)'
+
 elpa: *.el
 	@version=`grep -o "Version: .*" rspec-mode.el | cut -c 10-`; \
 	dir=rspec-mode-$$version; \
