@@ -27,4 +27,5 @@
   "matches pending specs as info"
   (let ((example "    # ./spec/controllers/pages_controller_spec.rb:65"))
     (should-not (rspec--test-compilation-match-p example 'error))
-    (should (rspec--test-compilation-match-p example 'info))))
+    (should-not (rspec--test-compilation-match-p example 'info))
+    (should (rspec--test-compilation-match-p example 'warning))))
