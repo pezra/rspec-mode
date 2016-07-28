@@ -1,4 +1,6 @@
 ;; -*- lexical-binding: t; -*-
+(require 'cl-lib)
+(require 'ert)
 (require 'rspec-mode)
 
 ;;; Test regexp matches in compilation buffer
@@ -7,7 +9,7 @@
   (let* ((type (or type 'error))
          (types '((error . 2) (warning . 1) (info . 0)))
          (type-num (cdr (assq type types))))
-    (some (lambda (n) (and (string-match (nth 1 n) example) (= type-num (nth 5 n)))) rspec--compilation-error-regexp-alist-alist)))
+    (cl-some (lambda (n) (and (string-match (nth 1 n) example) (= type-num (nth 5 n)))) rspec-compilation-error-regexp-alist-alist)))
 
 (ert-deftest rspec--test-regexp-backtrace ()
   "matches backtrace"
@@ -25,4 +27,5 @@
   "matches pending specs as info"
   (let ((example "    # ./spec/controllers/pages_controller_spec.rb:65"))
     (should-not (rspec--test-compilation-match-p example 'error))
-    (should (rspec--test-compilation-match-p example 'info))))
+    (should-not (rspec--test-compilation-match-p example 'info))
+    (should (rspec--test-compilation-match-p example 'warning))))
