@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.13
+;; Version: 1.15
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,8 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.15 - Add option to run spec commands in a Docker container
+;;        through "docker exec".
 ;; 1.14 - Add option to run spec commands in a Vagrant box through
 ;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
@@ -143,6 +145,16 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-docker-container "container"
+  "Name of the docker container to run rspec in"
+  :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-docker-cwd "/app/"
+  "Working directory when running inside Docker. Use trailing slash."
+  :type 'string
+  :group 'rspec-mode)
+
 (defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
@@ -151,6 +163,11 @@
 (defcustom rspec-use-bundler-when-possible t
   "When t and Gemfile is present, run specs with 'bundle exec'.
 Not used when running specs using Zeus or Spring."
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-docker-when-possible nil
+  "When t and Dockerfile is present, run specs inside Docker container using 'docker exec'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -598,6 +615,10 @@ file if it exists, or sensible defaults otherwise."
   (and rspec-use-bundler-when-possible
        (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
+(defun rspec-docker-p ()
+  (and rspec-use-docker-when-possible
+       (file-readable-p (concat (rspec-project-root) "Dockerfile"))))
+
 (defun rspec-vagrant-p ()
   (and rspec-use-vagrant-when-possible
        (file-readable-p (concat (rspec-project-root) "Vagrantfile"))))
@@ -646,13 +667,23 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec--shell-quote-local (file)
   (let ((remote (file-remote-p file))
+        (docker (rspec-docker-p))
         (vagrant (rspec-vagrant-p)))
     (shell-quote-argument
      (cond
       (remote (substring file (length remote)))
+      (docker (replace-regexp-in-string (regexp-quote (rspec-project-root))
+                                         rspec-docker-cwd file))
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
       (t  file)))))
+
+(defun rspec--docker-wrapper (command)
+  (if (rspec-docker-p)
+      (format "docker exec %s bash -c \"%s\""
+              rspec-docker-container
+              command)
+    command))
 
 (defun rspec--vagrant-wrapper (command)
   (if (rspec-vagrant-p)
@@ -745,9 +776,10 @@ or a cons (FILE . LINE), to run one example."
 
   (let ((default-directory (or (rspec-project-root) default-directory)))
     (compile (rspec--vagrant-wrapper
-              (mapconcat 'identity `(,(rspec-runner)
+              (rspec--docker-wrapper
+               (mapconcat 'identity `(,(rspec-runner)
                                      ,(rspec-runner-options opts)
-                                     ,target) " "))
+                                     ,target) " ")))
              'rspec-compilation-mode)))
 
 (defvar rspec-compilation-mode-font-lock-keywords
