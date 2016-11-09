@@ -145,13 +145,18 @@
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-docker-container "container"
-  "Name of the docker container to run rspec in"
+(defcustom rspec-docker-command "docker-compose run"
+  "Docker command to run."
+  :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-docker-container "rspec-container-name"
+  "Name of the docker container to run rspec in."
   :type 'string
   :group 'rspec-mode)
 
 (defcustom rspec-docker-cwd "/app/"
-  "Working directory when running inside Docker. Use trailing slash."
+  "Working directory when running inside Docker.  Use trailing slash."
   :type 'string
   :group 'rspec-mode)
 
@@ -680,7 +685,8 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
-      (format "docker exec %s bash -c \"%s\""
+      (format "%s %s bash -c \"%s\""
+              rspec-docker-command
               rspec-docker-container
               command)
     command))
