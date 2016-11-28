@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.13
+;; Version: 1.15
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.15 - Add option to run spec command via "bin/rspec".
 ;; 1.14 - Add option to run spec commands in a Vagrant box through
 ;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
@@ -166,6 +167,11 @@ Not used when running specs using Zeus or Spring."
 
 (defcustom rspec-use-spring-when-possible t
   "When t and spring.pid is present, run specs with 'spring'."
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-binstubs-always t
+  "When t, run specs with bin/"
   :type 'boolean
   :group 'rspec-mode)
 
@@ -663,10 +669,11 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec-runner ()
   "Return command line to run rspec."
-  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
+  (let ((binstub-command (if rspec-use-binstubs-always "bin/" nil))
+        (bundle-command (if (rspec-bundle-p) "bundle exec " ""))
         (zeus-command (if (rspec-zeus-p) "zeus " nil))
         (spring-command (if (rspec-spring-p) "spring " nil)))
-    (concat (or zeus-command spring-command bundle-command)
+    (concat (or binstub-command zeus-command spring-command bundle-command)
             (if (rspec-rake-p)
                 (concat rspec-rake-command " spec")
               rspec-spec-command))))
