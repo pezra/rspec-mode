@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.13
+;; Version: 1.15
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.15 - Add option to run spec command via "bin/rspec".
 ;; 1.14 - Add option to run spec commands in a Vagrant box through
 ;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
