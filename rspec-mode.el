@@ -169,6 +169,11 @@ Not used when running specs using Zeus or Spring."
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-binstubs-always t
+  "When t, run specs with bin/"
+  :type 'boolean
+  :group 'rspec-mode)
+
 (defcustom rspec-use-opts-file-when-available t
   "When t, RSpec should use .rspec/spec.opts."
   :type 'boolean
@@ -663,10 +668,11 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec-runner ()
   "Return command line to run rspec."
-  (let ((bundle-command (if (rspec-bundle-p) "bundle exec " ""))
+  (let ((binstub-command (if rspec-use-binstubs-always "bin/" nil))
+        (bundle-command (if (rspec-bundle-p) "bundle exec " ""))
         (zeus-command (if (rspec-zeus-p) "zeus " nil))
         (spring-command (if (rspec-spring-p) "spring " nil)))
-    (concat (or zeus-command spring-command bundle-command)
+    (concat (or binstub-command zeus-command spring-command bundle-command)
             (if (rspec-rake-p)
                 (concat rspec-rake-command " spec")
               rspec-spec-command))))
