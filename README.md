@@ -107,6 +107,23 @@ directory where your project is inside your box through the
 `rspec-vagrant-cwd` option. This will run specs through the `vagrant ssh -c 'cd
 <cwd>; <rspec command>'`.
 
+### Docker
+
+You can run specs inside a Docker container. This can be enabled through the
+`rspec-use-docker-when-possible` option. This enabled, rspec is executed
+through `docker-compose run`.
+The following customization options are available:
+
+Option                           | Default value         | Description                                  |
+---------------------------------|-----------------------|-----------------------                       |
+`rspec-use-docker-when-possible` | `nil`                 | Enable docker                                |
+`rspec-docker-command`           | `docker-compose run`  | Docker command to run                        |
+`rspec-docker-cwd`               | `/app/`               | Path rspec to run in inside of the container |
+`rspec-docker-container`         | `rspec-container-name`| Name of the container to run rspec into      |
+
+To define the options for different projects, have a look at [Per-Directory Local Variables](https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html).
+
+
 ### Auto-scrolling
 
 Set `compilation-scroll-output`. For example, `(setq compilation-scroll-output t)`
