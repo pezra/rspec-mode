@@ -100,6 +100,7 @@
 (define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-verifiable-mode-keymap (kbd "y") 'rspec-yank-last-command)
 (define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
@@ -772,8 +773,8 @@ or a cons (FILE . LINE), to run one example."
     (let ((default-directory rspec-last-directory))
       (apply #'rspec-compile rspec-last-arguments))))
 
-(defun rspec-copy-last-command ()
-  "Copy the last RSpec command to the clipboard."
+(defun rspec-yank-last-command ()
+  "Yank the last RSpec command to the clipboard."
   (interactive)
   (if (not rspec-last-directory)
       (error "No previous verification")
