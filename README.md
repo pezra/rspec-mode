@@ -39,6 +39,7 @@ Keybinding  | Description                                                       
 `C-c , 4 t` | Find in the other window the spec or the target file                          |
 `C-c , 4 e` | As above, but try to navigate to the example or method corresponding to point |
 `C-c , r`   | Re-run the last verification process                                          |
+`C-c , y`   | Yank the last verification command to clipboard                               |
 `C-c , m`   | Run all specs related to the current buffer                                   |
 `C-c , c`   | Run the current spec and all after it                                         |
 `C-c , s`   | Verify the example or method defined at point                                 |
