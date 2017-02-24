@@ -772,6 +772,14 @@ or a cons (FILE . LINE), to run one example."
     (let ((default-directory rspec-last-directory))
       (apply #'rspec-compile rspec-last-arguments))))
 
+(defun rspec-copy-last-command ()
+  "Copy the last RSpec command to the clipboard."
+  (interactive)
+  (if (not rspec-last-directory)
+      (error "No previous verification")
+    (let ((default-directory rspec-last-directory))
+      (kill-new (apply #'rspec-compile-command rspec-last-arguments)))))
+
 (defun rspec-compile (target &optional opts)
   "Run a compile for TARGET with the specified options OPTS."
   (setq rspec-last-directory default-directory
@@ -781,12 +789,18 @@ or a cons (FILE . LINE), to run one example."
       (rvm-activate-corresponding-ruby))
 
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (compile (rspec--vagrant-wrapper
-              (rspec--docker-wrapper
-               (mapconcat 'identity `(,(rspec-runner)
-                                     ,(rspec-runner-options opts)
-                                     ,target) " ")))
-             'rspec-compilation-mode)))
+    (compile
+     (rspec-compile-command target opts)
+     'rspec-compilation-mode)))
+
+(defun rspec-compile-command (target &optional opts)
+  "Composes RSpec command line for the compile function"
+  (let ((default-directory (or (rspec-project-root) default-directory)))
+    (rspec--vagrant-wrapper
+     (rspec--docker-wrapper
+      (mapconcat 'identity `(,(rspec-runner)
+                             ,(rspec-runner-options opts)
+                             ,target) " ")))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
