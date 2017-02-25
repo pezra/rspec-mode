@@ -797,12 +797,11 @@ or a cons (FILE . LINE), to run one example."
 
 (defun rspec-compile-command (target &optional opts)
   "Composes RSpec command line for the compile function"
-  (let ((default-directory (or (rspec-project-root) default-directory)))
-    (rspec--vagrant-wrapper
-     (rspec--docker-wrapper
-      (mapconcat 'identity `(,(rspec-runner)
-                             ,(rspec-runner-options opts)
-                             ,target) " ")))))
+  (rspec--vagrant-wrapper
+    (rspec--docker-wrapper
+    (mapconcat 'identity `(,(rspec-runner)
+                            ,(rspec-runner-options opts)
+                            ,target) " "))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
