@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.15
+;; Version: 1.16
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
 ;; 1.15 - Add option to run spec commands in a Docker container
 ;;        through "docker exec".
 ;; 1.14 - Add option to run spec commands in a Vagrant box through
@@ -100,6 +101,7 @@
 (define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-verifiable-mode-keymap (kbd "y") 'rspec-yank-last-command)
 (define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
@@ -772,6 +774,14 @@ or a cons (FILE . LINE), to run one example."
     (let ((default-directory rspec-last-directory))
       (apply #'rspec-compile rspec-last-arguments))))
 
+(defun rspec-yank-last-command ()
+  "Yank the last RSpec command to the clipboard."
+  (interactive)
+  (if (not rspec-last-directory)
+      (error "No previous verification")
+    (let ((default-directory rspec-last-directory))
+      (kill-new (apply #'rspec-compile-command rspec-last-arguments)))))
+
 (defun rspec-compile (target &optional opts)
   "Run a compile for TARGET with the specified options OPTS."
   (setq rspec-last-directory default-directory
@@ -781,12 +791,17 @@ or a cons (FILE . LINE), to run one example."
       (rvm-activate-corresponding-ruby))
 
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (compile (rspec--vagrant-wrapper
-              (rspec--docker-wrapper
-               (mapconcat 'identity `(,(rspec-runner)
-                                     ,(rspec-runner-options opts)
-                                     ,target) " ")))
-             'rspec-compilation-mode)))
+    (compile
+     (rspec-compile-command target opts)
+     'rspec-compilation-mode)))
+
+(defun rspec-compile-command (target &optional opts)
+  "Composes RSpec command line for the compile function"
+  (rspec--vagrant-wrapper
+    (rspec--docker-wrapper
+    (mapconcat 'identity `(,(rspec-runner)
+                            ,(rspec-runner-options opts)
+                            ,target) " "))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
