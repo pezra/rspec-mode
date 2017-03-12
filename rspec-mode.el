@@ -661,11 +661,14 @@ file if it exists, or sensible defaults otherwise."
           ;; 1.2.0+
           (let* ((path (or (getenv "XDG_RUNTIME_DIR") temporary-file-directory))
                  (ruby-version (shell-command-to-string "ruby -e 'print RUBY_VERSION'"))
-                 (application-id (md5 (concat ruby-version root))))
+                 (application-id (md5 (concat ruby-version root)))
+                 (full-application-id (md5 (concat ruby-version (expand-file-name root)))))
+
             (or
              (file-exists-p (format "%s/spring/%s.pid" path application-id))
              ;; 1.5.0+
-             (file-exists-p (format "%s/spring-%s/%s.pid" path (user-real-uid) application-id))))))))
+             (file-exists-p (format "%s/spring-%s/%s.pid" path (user-real-uid) application-id))
+             (file-exists-p (format "%s/spring-%s/%s.pid" path (user-real-uid) full-application-id))))))))
 
 (defun rspec2-p ()
   (or (string-match "rspec" rspec-spec-command)
