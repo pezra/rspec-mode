@@ -520,7 +520,10 @@ to navigate to the example or method corresponding to point."
     (let ((replace-regex (if (rspec-target-in-holder-dir-p a-file-name)
                              "^\\.\\./[^/]+/"
                            "^\\.\\./"))
-          (relative-file-name (file-relative-name a-file-name (rspec-spec-directory a-file-name))))
+          (relative-file-name ((if (string-match "controller" a-file-name)
+                                   (requestize-file-name a-file-name)
+                                file-relative-name a-file-name (rspec-spec-directory a-file-name)))))
+
       (rspec-specize-file-name (expand-file-name (replace-regexp-in-string replace-regex "" relative-file-name)
                                                  (rspec-spec-directory a-file-name))))))
 
