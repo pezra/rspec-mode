@@ -550,9 +550,22 @@ to navigate to the example or method corresponding to point."
 
 (defun rspec-specize-file-name (a-file-name)
   "Return A-FILE-NAME but converted in to a spec file name."
+  (if (string-match "controller" a-file-name)
+      (requestize-file-name a-file-name)
   (concat
    (file-name-directory a-file-name)
-   (replace-regexp-in-string "\\(\\.\\(rb\\|rake\\)\\)?$" "_spec.rb" (file-name-nondirectory a-file-name))))
+   (replace-regexp-in-string "\\(\\.\\(rb\\|rake\\)\\)?$" "_spec.rb" (file-name-nondirectory a-file-name))
+  )))
+
+(defun requestize-file-name (a-file-name)
+  "Return A-FILE-NAME converted to a request spec file name"
+  (setq request-spec-path (concat
+                          (replace-regexp-in-string "app/controllers" "spec/requests"
+                                                    (file-name-directory a-file-name))))
+       (concat
+       request-spec-path
+       (replace-regexp-in-string "\\(controller\\.\\(rb\\|rake\\)\\)?$" "request_spec.rb" (file-name-nondirectory a-file-name)))
+  )
 
 (defun rspec-targetize-file-name (a-file-name extension)
   "Return A-FILE-NAME but converted into a non-spec file name with EXTENSION."
