@@ -521,7 +521,7 @@ to navigate to the example or method corresponding to point."
                              "^\\.\\./[^/]+/"
                            "^\\.\\./"))
           (relative-file-name (if (string-match "controller" a-file-name)
-                                   (requestize-file-name a-file-name)
+                                  (convert-controller-to-request-name a-file-name)
                                 file-relative-name a-file-name (rspec-spec-directory a-file-name))))
 
       (rspec-specize-file-name (expand-file-name (replace-regexp-in-string replace-regex "" relative-file-name)
@@ -568,6 +568,16 @@ to navigate to the example or method corresponding to point."
        (concat
        request-spec-path
        (replace-regexp-in-string "\\(controller\\.\\(rb\\|rake\\)\\)?$" "request_spec.rb" (file-name-nondirectory a-file-name)))
+  )
+
+(defun convert-controller-to-request-name (a-file-name)
+  "Return A-FILE-NAME converted to a request spec file name"
+  (setq request-spec-path (concat
+                           (replace-regexp-in-string "app/controllers" "spec/requests"
+                                                     (file-name-directory a-file-name))))
+  (concat
+   request-spec-path
+   (replace-regexp-in-string "controller" "request" (file-name-nondirectory a-file-name)))
   )
 
 (defun rspec-targetize-file-name (a-file-name extension)
