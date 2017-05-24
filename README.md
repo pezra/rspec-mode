@@ -21,17 +21,6 @@ Provided you have `yasnippet` installed, you can load the snippets:
 (This isn't done automatically to avoid conflicts with snippets you
 may already have set up.)
 
-### RVM
-
-If you use RVM, you may have to set `rspec-use-rvm` to true to make
-`rspec-mode` function properly:
-
-```emacs
-(setq rspec-use-rvm t)
-```
-
-Or set it using Emacs' customization system.
-
 ## Usage
 
 If `rspec-mode` is installed properly, it will be started
@@ -89,6 +78,17 @@ your init file:
 ```
 
 When you've hit the breakpoint, hit `C-x C-q` to enable `inf-ruby`.
+
+### RVM
+
+If you use RVM, you may have to set `rspec-use-rvm` to true to make
+`rspec-mode` function properly:
+
+```emacs
+(setq rspec-use-rvm t)
+```
+
+Or set it using Emacs' customization system.
 
 ### ZSH and RVM
 
