@@ -79,6 +79,17 @@ your init file:
 
 When you've hit the breakpoint, hit `C-x C-q` to enable `inf-ruby`.
 
+### RVM
+
+If you use RVM, you may have to set `rspec-use-rvm` to true to make
+`rspec-mode` function properly:
+
+```emacs
+(setq rspec-use-rvm t)
+```
+
+Or set it using Emacs' customization system.
+
 ### ZSH and RVM
 
 If you use `ZSH` and `RVM`, you may encounter problems running the
