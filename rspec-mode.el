@@ -51,7 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
-;; 1.17 - Set :safe on defcustom string variables for .dir-local.el use
+;; 1.17 - Set :safe on rspec-docker-command for .dir-local.el use
 ;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
 ;; 1.15 - Add option to run spec commands in a Docker container
 ;;        through "docker exec".
@@ -136,13 +136,11 @@
 (defcustom rspec-rake-command "rake"
   "The command for rake."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-spec-command "rspec"
   "The command for spec."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-use-rvm nil
@@ -158,25 +156,23 @@
 (defcustom rspec-docker-command "docker-compose run"
   "Docker command to run."
   :type 'string
-  :safe 'stringp
+  :safe '(lambda (symbol value)
+           (member value '("docker-compose run" "docker-compose exec")))
   :group 'rspec-mode)
 
 (defcustom rspec-docker-container "rspec-container-name"
   "Name of the docker container to run rspec in."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-docker-cwd "/app/"
   "Working directory when running inside Docker.  Use trailing slash."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-use-bundler-when-possible t
@@ -213,13 +209,11 @@ Not used when running specs using Zeus or Spring."
 (defcustom rspec-key-command-prefix  (kbd "C-c ,")
   "The prefix for all rspec related key commands."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-command-options "--format documentation"
   "Default options used with rspec-command."
   :type 'string
-  :safe 'stringp
   :group 'rspec-mode)
 
 (defcustom rspec-snippets-fg-syntax nil
