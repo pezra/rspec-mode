@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.17 - Support for running multiple rspec processes at once
 ;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
 ;; 1.15 - Add option to run spec commands in a Docker container
 ;;        through "docker exec".
@@ -832,11 +833,15 @@ or a cons (FILE . LINE), to run one example."
 (defvar rspec-compilation-error-regexp-alist
   (mapcar 'car rspec-compilation-error-regexp-alist-alist))
 
+(defvar rspec-compilation-buffer-name-function 'rspec-compilation-buffer-name)
+
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
+  (add-hook 'compilation-start-hook 'rspec-increment-process-count nil t)
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
-  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
+  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
+  (add-hook 'compilation-finish-functions 'rspec-decrement-process-count nil t))
 
 (defun rspec-store-failures (&rest ignore)
   "Store the file and line number of the failed examples from this run."
@@ -908,6 +913,19 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
   (if (rspec--include-fg-syntax-methods-p)
       method
     (concat "FactoryGirl." method)))
+
+(defvar rspec-process-count 0)
+
+(defun rspec-compilation-buffer-name (&rest ignore)
+  (if (= rspec-process-count 0)
+      "*rspec-compilation*"
+    (format "*rspec-compilation* <%d>" rspec-process-count)))
+
+(defun rspec-increment-process-count (&rest ignore)
+  (setq rspec-process-count (1+ rspec-process-count)))
+
+(defun rspec-decrement-process-count (&rest ignore)
+  (setq rspec-process-count (1- rspec-process-count)))
 
 ;;;###autoload
 (defun rspec-enable-appropriate-mode ()
