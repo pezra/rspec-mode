@@ -29,10 +29,3 @@
     (should-not (rspec--test-compilation-match-p example 'error))
     (should-not (rspec--test-compilation-match-p example 'info))
     (should (rspec--test-compilation-match-p example 'warning))))
-
-(ert-deftest rspec--test-compilation-buffer-name ()
-  "compilation buffer name is named with `rspec-running-process-count'"
-  (let ((rspec-running-process-count 0))
-    (should (equal (rspec-compilation-buffer-name) "*rspec-compilation*")))
-  (let ((rspec-running-process-count 1))
-    (should (equal (rspec-compilation-buffer-name) "*rspec-compilation* <1>"))))

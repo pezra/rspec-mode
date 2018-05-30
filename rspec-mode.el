@@ -835,11 +835,9 @@ or a cons (FILE . LINE), to run one example."
 
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
-  (add-hook 'compilation-start-hook 'rspec-increment-process-count nil t)
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
-  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
-  (add-hook 'compilation-finish-functions 'rspec-decrement-process-count nil t))
+  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
 
 (defun rspec-store-failures (&rest ignore)
   "Store the file and line number of the failed examples from this run."
@@ -912,12 +910,12 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
       method
     (concat "FactoryGirl." method)))
 
-(defvar rspec-running-process-count 0)
-
-(defun rspec-compilation-buffer-name ()
-  (if (= rspec-running-process-count 0)
-      "*rspec-compilation*"
-    (format "*rspec-compilation* <%d>" rspec-running-process-count)))
+(defun rspec-compilation-buffer-name (&optional n)
+  (let* ((name (concat "*rspec-compilation*" (and n (format " <%d>" n))))
+         (process (get-buffer-process name)))
+    (if (process-live-p process)
+        (rspec-compilation-buffer-name (1+ (or n 0)))
+      name)))
 
 (defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
   (let ((mode-command (nth 1 args)))
@@ -929,12 +927,6 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
 
 ;;;###autoload
 (advice-add 'compilation-buffer-name :around 'rspec-compilation-buffer-name-wrapper)
-
-(defun rspec-increment-process-count (&rest ignore)
-  (setq rspec-running-process-count (1+ rspec-running-process-count)))
-
-(defun rspec-decrement-process-count (&rest ignore)
-  (setq rspec-running-process-count (1- rspec-running-process-count)))
 
 ;;;###autoload
 (defun rspec-enable-appropriate-mode ()
