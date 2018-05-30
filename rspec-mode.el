@@ -833,8 +833,6 @@ or a cons (FILE . LINE), to run one example."
 (defvar rspec-compilation-error-regexp-alist
   (mapcar 'car rspec-compilation-error-regexp-alist-alist))
 
-(defvar rspec-compilation-buffer-name-function 'rspec-compilation-buffer-name)
-
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
   (add-hook 'compilation-start-hook 'rspec-increment-process-count nil t)
@@ -916,10 +914,21 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
 
 (defvar rspec-running-process-count 0)
 
-(defun rspec-compilation-buffer-name (&rest ignore)
+(defun rspec-compilation-buffer-name ()
   (if (= rspec-running-process-count 0)
       "*rspec-compilation*"
     (format "*rspec-compilation* <%d>" rspec-running-process-count)))
+
+(defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
+  (let ((mode-command (nth 1 args)))
+    (case mode-command
+      (rspec-compilation-mode
+       (rspec-compilation-buffer-name))
+      (t
+       (apply orig-fn args)))))
+
+;;;###autoload
+(advice-add 'compilation-buffer-name :around 'rspec-compilation-buffer-name-wrapper)
 
 (defun rspec-increment-process-count (&rest ignore)
   (setq rspec-running-process-count (1+ rspec-running-process-count)))
