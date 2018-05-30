@@ -914,18 +914,18 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
       method
     (concat "FactoryGirl." method)))
 
-(defvar rspec-process-count 0)
+(defvar rspec-running-process-count 0)
 
 (defun rspec-compilation-buffer-name (&rest ignore)
-  (if (= rspec-process-count 0)
+  (if (= rspec-running-process-count 0)
       "*rspec-compilation*"
-    (format "*rspec-compilation* <%d>" rspec-process-count)))
+    (format "*rspec-compilation* <%d>" rspec-running-process-count)))
 
 (defun rspec-increment-process-count (&rest ignore)
-  (setq rspec-process-count (1+ rspec-process-count)))
+  (setq rspec-running-process-count (1+ rspec-running-process-count)))
 
 (defun rspec-decrement-process-count (&rest ignore)
-  (setq rspec-process-count (1- rspec-process-count)))
+  (setq rspec-running-process-count (1- rspec-running-process-count)))
 
 ;;;###autoload
 (defun rspec-enable-appropriate-mode ()
