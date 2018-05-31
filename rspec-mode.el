@@ -910,18 +910,61 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
       method
     (concat "FactoryGirl." method)))
 
-(defun rspec-compilation-buffer-name (&optional n)
-  (let* ((name (concat "*rspec-compilation*" (and n (format " <%d>" n))))
-         (process (get-buffer-process name)))
-    (if (process-live-p process)
-        (rspec-compilation-buffer-name (1+ (or n 0)))
-      name)))
+(defun rspec-parse-runner-target (target)
+  "Parses the `rspec-runner-target' string"
+  (when (string= "SPEC=\'" (subseq target 0 6))
+    ;; Removes SPEC=' prefix and ' suffix
+    (setq target (subseq target 6 (1- (length target)))))
+  (mapcar (lambda (s) (split-string s ":"))
+          (split-string target " ")))
+
+(defun rspec-remove-spec-directory-path (path)
+  "Removes 'spec/' from the head of `path'"
+  (if (string= "spec/" (subseq path 0 5))
+      (subseq path 5)
+    path))
+
+(defun rspec-compilation-buffer-name-suffix-candidates ()
+  "Lists the rspec compilation buffer name suffix (<...>) candidates"
+  (let* ((runner-target (car rspec-last-arguments))
+         (spec-filepath (caar (rspec-parse-runner-target runner-target)))
+         (spec-filename (and (rspec-spec-file-p spec-filepath)
+                             (file-name-sans-extension
+                              (file-name-nondirectory spec-filepath))))
+         (project-root-path (ignore-errors (rspec-project-root spec-filepath)))
+         (project-name (and project-root-path (file-name-nondirectory
+                                               (directory-file-name project-root-path))))
+         candidates)
+    ;; ex. foo_spec
+    (when spec-filename
+      (push (file-name-sans-extension spec-filename) candidates))
+    ;; ex. the_great_project
+    (when project-name
+      (push project-name candidates))
+    (when (and spec-filename project-name)
+      ;; ex. the_great_project/foo_spec
+      (push (concat project-name "/" spec-filename) candidates)
+      ;; ex. the_great_project/models/foo_spec
+      (push (concat project-name "/" (file-name-sans-extension
+                                      (rspec-remove-spec-directory-path
+                                       (rspec-compress-spec-file spec-filepath))))
+            candidates))
+    (nreverse candidates)))
+
+(defun rspec-compilation-buffer-name ()
+  "Determines the buffer name of the current rspec compilation"
+  (dolist (suffix (rspec-compilation-buffer-name-suffix-candidates))
+    (let* ((buffer-name-candidate (format "*rspec-compilation* <%s>" suffix))
+           (process (get-buffer-process buffer-name-candidate)))
+      (unless (process-live-p process)
+        (return buffer-name-candidate)))))
 
 (defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
   (let ((mode-command (nth 1 args)))
     (case mode-command
       (rspec-compilation-mode
-       (rspec-compilation-buffer-name))
+       (or (rspec-compilation-buffer-name)
+           (apply orig-fn args)))
       (t
        (apply orig-fn args)))))
 
