@@ -440,7 +440,7 @@ in long-running test suites."
 (defun rspec-dired-verify-single ()
   "Run marked specs or spec at point (works with directories too)."
   (interactive)
-  (rspec-compile (rspec-runner-target (dired-get-marked-files))
+  (rspec-compile (dired-get-marked-files)
                  (rspec-core-options)))
 
 (defun rspec-verify-all ()
@@ -732,15 +732,15 @@ file if it exists, or sensible defaults otherwise."
   "Processes TARGET to pass it to the runner.
 TARGET can be a file, a directory, a list of such,
 or a cons (FILE . LINE), to run one example."
-  (let ((use-rake (rspec-rake-p)))
+  (let ((use-rake (rspec-compile-target-use-rake target))
+        (specs (rspec-compile-target-specs target)))
     (concat (when use-rake "SPEC=\'")
-            (if (listp target)
-                (if (listp (cdr target))
-                    (mapconcat #'rspec--shell-quote-local target " ")
-                  (concat (rspec--shell-quote-local (car target))
-                          ":"
-                          (cdr target)))
-              (rspec--shell-quote-local target))
+            (mapconcat (lambda (s)
+                         (concat (rspec--shell-quote-local (car s))
+                                 (and (cdr s)
+                                      (concat ":" (cdr s)))))
+                       specs
+                       " ")
             (when use-rake "\'"))))
 
 ;;;###autoload
@@ -751,19 +751,18 @@ or a cons (FILE . LINE), to run one example."
 
 (defun rspec-run (&optional opts)
   "Run spec with the specified options OPTS."
-  (rspec-compile (rspec-runner-target
-                  (rspec-spec-directory (rspec-project-root)))
+  (rspec-compile (rspec-spec-directory (rspec-project-root))
                  opts))
 
 (defun rspec-run-single-file (spec-file &rest opts)
   "Run spec on SPEC-FILE with the specified options OPTS."
-  (rspec-compile (rspec-runner-target spec-file) opts))
+  (rspec-compile spec-file opts))
 
 (defun rspec-run-multiple-files (spec-files &rest opts)
   "Run spec on a list of SPEC-FILES with the specified options OPTS."
   (if (null spec-files)
       (message "No spec files found!")
-    (rspec-compile (rspec-runner-target spec-files) opts)))
+    (rspec-compile spec-files opts)))
 
 (defvar rspec-last-failed-specs nil
   "The file and line number of the specs that failed during the last run.")
@@ -792,19 +791,42 @@ or a cons (FILE . LINE), to run one example."
 
 (defun rspec-compile (target &optional opts)
   "Run a compile for TARGET with the specified options OPTS."
-  (setq rspec-last-directory default-directory
-        rspec-last-arguments (list target opts))
+  (let ((compile-target (rspec-make-rspec-compile-target target)))
+    (setq rspec-last-directory default-directory
+          rspec-last-arguments (list compile-target opts))
 
-  (if rspec-use-rvm
-      (rvm-activate-corresponding-ruby))
+    (if rspec-use-rvm
+        (rvm-activate-corresponding-ruby))
 
-  (if rspec-use-chruby
-      (chruby-use-corresponding))
+    (if rspec-use-chruby
+        (chruby-use-corresponding))
 
-  (let ((default-directory (or (rspec-project-root) default-directory)))
-    (compile
-     (rspec-compile-command target opts)
-     'rspec-compilation-mode)))
+    (let ((default-directory (or (rspec-project-root) default-directory)))
+      (setf (rspec-compile-target-directory compile-target) default-directory)
+      (compile
+       (rspec-compile-command compile-target opts)
+       'rspec-compilation-mode))))
+
+(cl-defstruct rspec-compile-target
+  use-rake specs directory)
+
+(defun rspec-make-rspec-compile-target (target)
+  "Processes TARGET to pass it to the runner.
+TARGET can be a file, a directory, a list of such,
+or a cons (FILE . LINE), to run one example."
+  (if (rspec-compile-target-p target)
+      target
+    (make-rspec-compile-target
+     :use-rake (rspec-rake-p)
+     :specs (let ((entries (cond ((and (listp target) (listp (cdr target)))
+                                  (mapcar (lambda (f) (list f)) target))
+                                 ((listp target)
+                                  (list target))
+                                 (t
+                                  (list (list target))))))
+              (mapcar (lambda (e)
+                        (cons (expand-file-name (car e)) (cdr e)))
+                      entries)))))
 
 (defun rspec-compile-command (target &optional opts)
   "Composes RSpec command line for the compile function"
@@ -812,7 +834,7 @@ or a cons (FILE . LINE), to run one example."
     (rspec--docker-wrapper
     (mapconcat 'identity `(,(rspec-runner)
                             ,(rspec-runner-options opts)
-                            ,target) " "))))
+                            ,(rspec-runner-target target)) " "))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
@@ -870,14 +892,17 @@ or a cons (FILE . LINE), to run one example."
         (insert-text-button url 'type 'help-url 'help-args (list url))
         (insert ".\n")))))
 
+(defun rspec-project-root-directory-p (directory)
+  (or (file-exists-p (expand-file-name "Rakefile" directory))
+      (file-exists-p (expand-file-name "Gemfile" directory))
+      (file-exists-p (expand-file-name "Berksfile" directory))))
+
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
   (let ((directory (file-name-as-directory (or directory default-directory))))
     (cond ((rspec-root-directory-p directory)
            (error "Could not determine the project root."))
-          ((file-exists-p (expand-file-name "Rakefile" directory)) (expand-file-name directory))
-          ((file-exists-p (expand-file-name "Gemfile" directory)) (expand-file-name directory))
-          ((file-exists-p (expand-file-name "Berksfile" directory)) (expand-file-name directory))
+          ((rspec-project-root-directory-p directory) (expand-file-name directory))
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--include-fg-syntax-methods-p ()
@@ -918,44 +943,69 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
   (mapcar (lambda (s) (split-string s ":"))
           (split-string target " ")))
 
-(defun rspec-remove-spec-directory-path (path)
-  "Removes 'spec/' from the head of `path'"
-  (if (string= "spec/" (subseq path 0 5))
-      (subseq path 5)
-    path))
+(defun rspec-compile-target-first-spec-file (target)
+  (let ((file (caar (rspec-compile-target-specs target))))
+    (and (rspec-spec-file-p file) file)))
 
-(defun rspec-compilation-buffer-name-suffix-candidates ()
-  "Lists the rspec compilation buffer name suffix (<...>) candidates"
-  (let* ((runner-target (car rspec-last-arguments))
-         (spec-filepath (caar (rspec-parse-runner-target runner-target)))
-         (spec-filename (and (rspec-spec-file-p spec-filepath)
-                             (file-name-sans-extension
-                              (file-name-nondirectory spec-filepath))))
-         (project-root-path (ignore-errors (rspec-project-root spec-filepath)))
-         (project-name (and project-root-path (file-name-nondirectory
-                                               (directory-file-name project-root-path))))
-         candidates)
-    ;; ex. foo_spec
-    (when spec-filename
-      (push (file-name-sans-extension spec-filename) candidates))
-    ;; ex. the_great_project
-    (when project-name
-      (push project-name candidates))
-    (when (and spec-filename project-name)
-      ;; ex. the_great_project/foo_spec
-      (push (concat project-name "/" spec-filename) candidates)
-      ;; ex. the_great_project/models/foo_spec
-      (push (concat project-name "/" (file-name-sans-extension
-                                      (rspec-remove-spec-directory-path
-                                       (rspec-compress-spec-file spec-filepath))))
-            candidates))
-    (nreverse candidates)))
+(defun rspec-compile-target-first-spec-filename (target)
+  (let ((spec-filepath (caar (rspec-compile-target-specs target))))
+    (and (rspec-spec-file-p spec-filepath)
+         (file-name-sans-extension
+          (file-name-nondirectory spec-filepath)))))
+
+(defun rspec-compile-target-project-name (target)
+  (let ((directory (rspec-compile-target-directory target)))
+    (and (rspec-project-root-directory-p directory)
+         (file-name-nondirectory (directory-file-name directory)))))
+
+(defconst rspec-compilation-buffer-name-base "*rspec-compilation*")
+
+(defun rspec-compilation-buffer-name-with (suffix)
+  (format (concat rspec-compilation-buffer-name-base " <%s>") suffix))
+
+(defun rspec-compilation-buffer-name-with-spec-file-name (target)
+  (let ((spec-filename (rspec-compile-target-first-spec-filename target)))
+    (and spec-filename
+         (rspec-compilation-buffer-name-with (file-name-sans-extension spec-filename)))))
+
+(defun rspec-compilation-buffer-name-with-project-name (target)
+  (let ((project-name (rspec-compile-target-project-name target)))
+    (and project-name
+         (rspec-compilation-buffer-name-with project-name))))
+
+(defun rspec-compilation-buffer-name-with-spec-and-project-name (target)
+  (let ((spec-filename (rspec-compile-target-first-spec-filename target))
+        (project-name (rspec-compile-target-project-name target)))
+    (and spec-filename
+         project-name
+         (rspec-compilation-buffer-name-with
+          (concat project-name "/" (file-name-sans-extension spec-filename))))))
+
+(defun rspec-compilation-buffer-name-with-spec-and-project-path (target)
+  (let ((spec-filepath (caar (rspec-compile-target-specs target)))
+        (project-name (rspec-compile-target-project-name target)))
+    (and project-name
+         (rspec-compilation-buffer-name-with
+          (concat project-name "/" (file-name-sans-extension
+                                    (rspec-compress-spec-file spec-filepath)))))))
+
+(defun rspec-compilation-buffer-name-candidates ()
+  (let ((target (car rspec-last-arguments))
+        candidates)
+    (cl-flet ((choose (name)
+                      (when name
+                        (push name candidates))))
+      (choose rspec-compilation-buffer-name-base)
+      (choose (rspec-compilation-buffer-name-with-spec-file-name target))
+      (choose (rspec-compilation-buffer-name-with-project-name target))
+      (choose (rspec-compilation-buffer-name-with-spec-and-project-name target))
+      (choose (rspec-compilation-buffer-name-with-spec-and-project-path target))
+      (nreverse candidates))))
 
 (defun rspec-compilation-buffer-name ()
   "Determines the buffer name of the current rspec compilation"
-  (dolist (suffix (rspec-compilation-buffer-name-suffix-candidates))
-    (let* ((buffer-name-candidate (format "*rspec-compilation* <%s>" suffix))
-           (process (get-buffer-process buffer-name-candidate)))
+  (dolist (buffer-name-candidate (rspec-compilation-buffer-name-candidates))
+    (let ((process (get-buffer-process buffer-name-candidate)))
       (unless (process-live-p process)
         (return buffer-name-candidate)))))
 
