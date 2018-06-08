@@ -67,15 +67,13 @@ Keybinding | Description                                                    |
 
 See `rspec-mode.el` for further usage.
 
-### Before verification hook
+### Hooks
 
 Any functions in `rspec-before-verification-hook` will be executed
-before the verification - `rspec-verify` and variants.
-
-### After verification hook
+before the verification (`rspec-verify`) and variants.
 
 Any functions in `rspec-after-verification-hook` will be executed
-after the verification - `rspec-verify` and variants. The hook will be
+after the verification (`rspec-verify`) and variants. The hook will be
 executed whatever the outcome of the verification.
 
 ## Gotchas
