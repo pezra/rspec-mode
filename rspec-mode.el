@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.13
+;; Version: 1.16
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,9 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
+;; 1.15 - Add option to run spec commands in a Docker container
+;;        through "docker exec".
 ;; 1.14 - Add option to run spec commands in a Vagrant box through
 ;;        "vagrant ssh -c".
 ;; 1.13 - Add a variable to autosave current buffer where it makes sense
@@ -98,6 +101,7 @@
 (define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "4 e") 'rspec-find-spec-or-target-find-example-other-window)
 (define-key rspec-verifiable-mode-keymap (kbd "r") 'rspec-rerun)
+(define-key rspec-verifiable-mode-keymap (kbd "y") 'rspec-yank-last-command)
 (define-key rspec-verifiable-mode-keymap (kbd "m") 'rspec-verify-matching)
 (define-key rspec-verifiable-mode-keymap (kbd "c") 'rspec-verify-continue)
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
@@ -143,6 +147,28 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-chruby nil
+  "When t, use chruby. Requires chruby.el."
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-docker-command "docker-compose run"
+  "Docker command to run."
+  :type 'string
+  :group 'rspec-mode
+  :safe (lambda (value)
+          (member value '("docker-compose run" "docker-compose exec"))))
+
+(defcustom rspec-docker-container "rspec-container-name"
+  "Name of the docker container to run rspec in."
+  :type 'string
+  :group 'rspec-mode)
+
+(defcustom rspec-docker-cwd "/app/"
+  "Working directory when running inside Docker.  Use trailing slash."
+  :type 'string
+  :group 'rspec-mode)
+
 (defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
@@ -151,6 +177,11 @@
 (defcustom rspec-use-bundler-when-possible t
   "When t and Gemfile is present, run specs with 'bundle exec'.
 Not used when running specs using Zeus or Spring."
+  :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-use-docker-when-possible nil
+  "When t and Dockerfile is present, run specs inside Docker container using 'docker exec'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -609,6 +640,10 @@ file if it exists, or sensible defaults otherwise."
   (and rspec-use-bundler-when-possible
        (file-readable-p (concat (rspec-project-root) "Gemfile"))))
 
+(defun rspec-docker-p ()
+  (and rspec-use-docker-when-possible
+       (file-readable-p (concat (rspec-project-root) "Dockerfile"))))
+
 (defun rspec-vagrant-p ()
   (and rspec-use-vagrant-when-possible
        (file-readable-p (concat (rspec-project-root) "Vagrantfile"))))
@@ -657,13 +692,24 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec--shell-quote-local (file)
   (let ((remote (file-remote-p file))
+        (docker (rspec-docker-p))
         (vagrant (rspec-vagrant-p)))
     (shell-quote-argument
      (cond
       (remote (substring file (length remote)))
+      (docker (replace-regexp-in-string (regexp-quote (rspec-project-root))
+                                         rspec-docker-cwd file))
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
       (t  file)))))
+
+(defun rspec--docker-wrapper (command)
+  (if (rspec-docker-p)
+      (format "%s %s bash -c \"%s\""
+              rspec-docker-command
+              rspec-docker-container
+              command)
+    command))
 
 (defun rspec--vagrant-wrapper (command)
   (if (rspec-vagrant-p)
@@ -746,6 +792,14 @@ or a cons (FILE . LINE), to run one example."
     (let ((default-directory rspec-last-directory))
       (apply #'rspec-compile rspec-last-arguments))))
 
+(defun rspec-yank-last-command ()
+  "Yank the last RSpec command to the clipboard."
+  (interactive)
+  (if (not rspec-last-directory)
+      (error "No previous verification")
+    (let ((default-directory rspec-last-directory))
+      (kill-new (apply #'rspec-compile-command rspec-last-arguments)))))
+
 (defun rspec-compile (target &optional opts)
   "Run a compile for TARGET with the specified options OPTS."
   (setq rspec-last-directory default-directory
@@ -754,12 +808,21 @@ or a cons (FILE . LINE), to run one example."
   (if rspec-use-rvm
       (rvm-activate-corresponding-ruby))
 
+  (if rspec-use-chruby
+      (chruby-use-corresponding))
+
   (let ((default-directory (or (rspec-project-root) default-directory)))
-    (compile (rspec--vagrant-wrapper
-              (mapconcat 'identity `(,(rspec-runner)
-                                     ,(rspec-runner-options opts)
-                                     ,target) " "))
-             'rspec-compilation-mode)))
+    (compile
+     (rspec-compile-command target opts)
+     'rspec-compilation-mode)))
+
+(defun rspec-compile-command (target &optional opts)
+  "Composes RSpec command line for the compile function"
+  (rspec--vagrant-wrapper
+    (rspec--docker-wrapper
+    (mapconcat 'identity `(,(rspec-runner)
+                            ,(rspec-runner-options opts)
+                            ,target) " "))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
@@ -832,9 +895,9 @@ or a cons (FILE . LINE), to run one example."
   (let ((directory (file-name-as-directory (or directory default-directory))))
     (cond ((rspec-root-directory-p directory)
            (error "Could not determine the project root."))
-          ((file-exists-p (expand-file-name "Rakefile" directory)) directory)
-          ((file-exists-p (expand-file-name "Gemfile" directory)) directory)
-          ((file-exists-p (expand-file-name "Berksfile" directory)) directory)
+          ((file-exists-p (expand-file-name "Rakefile" directory)) (expand-file-name directory))
+          ((file-exists-p (expand-file-name "Gemfile" directory)) (expand-file-name directory))
+          ((file-exists-p (expand-file-name "Berksfile" directory)) (expand-file-name directory))
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--include-fg-syntax-methods-p ()

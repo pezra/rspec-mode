@@ -39,6 +39,7 @@ Keybinding  | Description                                                       
 `C-c , 4 t` | Find in the other window the spec or the target file                          |
 `C-c , 4 e` | As above, but try to navigate to the example or method corresponding to point |
 `C-c , r`   | Re-run the last verification process                                          |
+`C-c , y`   | Yank the last verification command to clipboard                               |
 `C-c , m`   | Run all specs related to the current buffer                                   |
 `C-c , c`   | Run the current spec and all after it                                         |
 `C-c , s`   | Verify the example or method defined at point                                 |
@@ -89,6 +90,17 @@ your init file:
 
 When you've hit the breakpoint, hit `C-x C-q` to enable `inf-ruby`.
 
+### RVM
+
+If you use RVM, you may have to set `rspec-use-rvm` to true to make
+`rspec-mode` function properly:
+
+```emacs
+(setq rspec-use-rvm t)
+```
+
+Or set it using Emacs' customization system.
+
 ### ZSH and RVM
 
 If you use `ZSH` and `RVM`, you may encounter problems running the
@@ -117,6 +129,23 @@ You can run specs inside a Vagrant box. You can enable it through the
 directory where your project is inside your box through the
 `rspec-vagrant-cwd` option. This will run specs through the `vagrant ssh -c 'cd
 <cwd>; <rspec command>'`.
+
+### Docker
+
+You can run specs inside a Docker container. This can be enabled through the
+`rspec-use-docker-when-possible` option. This enabled, rspec is executed
+through `docker-compose run`.
+The following customization options are available:
+
+Option                           | Default value         | Description                                  |
+---------------------------------|-----------------------|-----------------------                       |
+`rspec-use-docker-when-possible` | `nil`                 | Enable docker                                |
+`rspec-docker-command`           | `docker-compose run`  | Docker command to run                        |
+`rspec-docker-cwd`               | `/app/`               | Path rspec to run in inside of the container |
+`rspec-docker-container`         | `rspec-container-name`| Name of the container to run rspec into      |
+
+To define the options for different projects, have a look at [Per-Directory Local Variables](https://www.gnu.org/software/emacs/manual/html_node/emacs/Directory-Variables.html).
+
 
 ### Auto-scrolling
 
