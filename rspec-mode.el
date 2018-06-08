@@ -907,7 +907,6 @@ or a cons (FILE . LINE), to run one example."
         (insert-text-button url 'type 'help-url 'help-args (list url))
         (insert ".\n")))))
 
-
 (defun rspec-run-after-verification-hooks (&rest ignore)
   "Executes any functions in `rspec-after-verification-hook'"
   (run-hooks 'rspec-after-verification-hook))
@@ -920,7 +919,6 @@ or a cons (FILE . LINE), to run one example."
   (or (file-exists-p (expand-file-name "Rakefile" directory))
       (file-exists-p (expand-file-name "Gemfile" directory))
       (file-exists-p (expand-file-name "Berksfile" directory))))
-
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
