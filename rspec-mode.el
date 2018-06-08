@@ -51,6 +51,8 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.17 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
+;;        hooks
 ;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
 ;; 1.15 - Add option to run spec commands in a Docker container
 ;;        through "docker exec".
