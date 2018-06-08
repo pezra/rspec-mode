@@ -845,7 +845,7 @@ or a cons (FILE . LINE), to run one example."
 
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
-  (add-hook 'compilation-start-hook 'rspec-run-before-verification-hooks nil nil)
+  (add-hook 'compilation-start-hook 'rspec-run-before-verification-hooks nil t)
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
   (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
