@@ -773,6 +773,9 @@ or a cons (FILE . LINE), to run one example."
 (defvar rspec-last-arguments nil
   "Arguments passed to `rspec-compile' at the last invocation.")
 
+(cl-defstruct rspec-compile-target
+  use-rake specs directory)
+
 (defun rspec-rerun ()
   "Re-run the last RSpec invocation."
   (interactive)
@@ -806,9 +809,6 @@ or a cons (FILE . LINE), to run one example."
       (compile
        (rspec-compile-command compile-target opts)
        'rspec-compilation-mode))))
-
-(cl-defstruct rspec-compile-target
-  use-rake specs directory)
 
 (defun rspec-make-rspec-compile-target (target)
   "Processes TARGET to pass it to the runner.
@@ -1004,19 +1004,18 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
 
 (defun rspec-compilation-buffer-name ()
   "Determines the buffer name of the current rspec compilation"
-  (dolist (buffer-name-candidate (rspec-compilation-buffer-name-candidates))
-    (let ((process (get-buffer-process buffer-name-candidate)))
-      (unless (process-live-p process)
-        (return buffer-name-candidate)))))
+  (cl-find-if (lambda (buffer-name-candidate)
+                (let ((process (get-buffer-process buffer-name-candidate)))
+                  (not (process-live-p process))))
+              (rspec-compilation-buffer-name-candidates)))
 
 (defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
   (let ((mode-command (nth 1 args)))
-    (case mode-command
-      (rspec-compilation-mode
-       (or (rspec-compilation-buffer-name)
-           (apply orig-fn args)))
-      (t
-       (apply orig-fn args)))))
+    (cond ((eq mode-command 'rspec-compilation-mode)
+           (or (rspec-compilation-buffer-name)
+               (apply orig-fn args)))
+          (t
+           (apply orig-fn args)))))
 
 ;;;###autoload
 (advice-add 'compilation-buffer-name :around 'rspec-compilation-buffer-name-wrapper)
