@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.19 - Fix bugs about change of buffer naming
 ;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
 ;;        hooks
 ;; 1.17 - Support for running multiple rspec processes at once
@@ -786,6 +787,9 @@ or a cons (FILE . LINE), to run one example."
 (defvar rspec-last-arguments nil
   "Arguments passed to `rspec-compile' at the last invocation.")
 
+(cl-defstruct rspec-compile-target
+  use-rake specs directory)
+
 (defun rspec-rerun ()
   "Re-run the last RSpec invocation."
   (interactive)
@@ -814,14 +818,12 @@ or a cons (FILE . LINE), to run one example."
     (if rspec-use-chruby
         (chruby-use-corresponding))
 
-    (let ((default-directory (or (rspec-project-root) default-directory)))
+    (let ((default-directory (or (rspec-project-root) default-directory))
+          (compilation-buffer-name-function 'rspec-compilation-buffer-name))
       (setf (rspec-compile-target-directory compile-target) default-directory)
       (compile
        (rspec-compile-command compile-target opts)
        'rspec-compilation-mode))))
-
-(cl-defstruct rspec-compile-target
-  use-rake specs directory)
 
 (defun rspec-make-rspec-compile-target (target)
   "Processes TARGET to pass it to the runner.
@@ -1025,24 +1027,15 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
       (choose (rspec-compilation-buffer-name-with-spec-and-project-path target))
       (nreverse candidates))))
 
-(defun rspec-compilation-buffer-name ()
+(defun rspec-compilation-buffer-name (&rest ignore)
   "Determines the buffer name of the current rspec compilation"
-  (dolist (buffer-name-candidate (rspec-compilation-buffer-name-candidates))
-    (let ((process (get-buffer-process buffer-name-candidate)))
-      (unless (process-live-p process)
-        (return buffer-name-candidate)))))
-
-(defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
-  (let ((mode-command (nth 1 args)))
-    (case mode-command
-      (rspec-compilation-mode
-       (or (rspec-compilation-buffer-name)
-           (apply orig-fn args)))
-      (t
-       (apply orig-fn args)))))
-
-;;;###autoload
-(advice-add 'compilation-buffer-name :around 'rspec-compilation-buffer-name-wrapper)
+  (let* ((candidates (rspec-compilation-buffer-name-candidates))
+         (first-candidate (car candidates)))
+    (or (cl-find-if (lambda (buffer-name-candidate)
+                      (let ((process (get-buffer-process buffer-name-candidate)))
+                        (not (process-live-p process))))
+                    candidates)
+        first-candidate)))
 
 ;;;###autoload
 (defun rspec-enable-appropriate-mode ()
