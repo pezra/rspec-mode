@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.19 - Fix bugs about change of buffer naming
 ;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
 ;;        hooks
 ;; 1.17 - Support for running multiple rspec processes at once
