@@ -51,6 +51,8 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
+;;        hooks
 ;; 1.17 - Support for running multiple rspec processes at once
 ;; 1.16 - Add `rspec-yank-last-command' function (Sergiy Kukunin)
 ;; 1.15 - Add option to run spec commands in a Docker container
@@ -256,6 +258,17 @@ for spec files corresponding to files inside them."
 `rspec-verify', `rspec-verify-single', `rspec-verify-matching',
 `rspec-verify-continue' & `rspec-run-last-failed'."
   :type 'boolean
+  :group 'rspec-mode)
+
+(defcustom rspec-after-verification-hook nil
+  "Hooks run after `rspec-verify' and its variants.
+They execute after failures have been stored in `rspec-last-failed-specs'."
+  :type 'hook
+  :group 'rspec-mode)
+
+(defcustom rspec-before-verification-hook nil
+  "Hooks run before `rspec-verify' and its variants."
+  :type 'hook
   :group 'rspec-mode)
 
 ;;;###autoload
@@ -539,7 +552,7 @@ to navigate to the example or method corresponding to point."
   "Find the target for A-SPEC-FILE-NAME."
   (cl-loop for extension in (list "rb" "rake")
            for candidate = (rspec-targetize-file-name a-spec-file-name
-                                                       extension)
+                                                      extension)
            for filename = (cl-loop for dir in (cons "."
                                                     rspec-primary-source-dirs)
                                    for target = (replace-regexp-in-string
@@ -857,9 +870,11 @@ or a cons (FILE . LINE), to run one example."
 
 (define-compilation-mode rspec-compilation-mode "RSpec Compilation"
   "Compilation mode for RSpec output."
+  (add-hook 'compilation-start-hook 'rspec-run-before-verification-hooks nil t)
   (add-hook 'compilation-filter-hook 'rspec-colorize-compilation-buffer nil t)
   (add-hook 'compilation-finish-functions 'rspec-store-failures nil t)
-  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t))
+  (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
+  (add-hook 'compilation-finish-functions 'rspec-run-after-verification-hooks t t))
 
 (defun rspec-store-failures (&rest ignore)
   "Store the file and line number of the failed examples from this run."
@@ -891,6 +906,14 @@ or a cons (FILE . LINE), to run one example."
         (insert "See ")
         (insert-text-button url 'type 'help-url 'help-args (list url))
         (insert ".\n")))))
+
+(defun rspec-run-after-verification-hooks (&rest ignore)
+  "Executes any functions in `rspec-after-verification-hook'"
+  (run-hooks 'rspec-after-verification-hook))
+
+(defun rspec-run-before-verification-hooks (&rest ignore)
+  "Executes any functions in `rspec-before-verification-hook'"
+  (run-hooks 'rspec-before-verification-hook))
 
 (defun rspec-project-root-directory-p (directory)
   (or (file-exists-p (expand-file-name "Rakefile" directory))
