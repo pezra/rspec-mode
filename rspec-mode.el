@@ -1009,6 +1009,7 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
                   (not (process-live-p process))))
               (rspec-compilation-buffer-name-candidates)))
 
+;;;###autoload
 (defun rspec-compilation-buffer-name-wrapper (orig-fn &rest args)
   (let ((mode-command (nth 1 args)))
     (cond ((eq mode-command 'rspec-compilation-mode)
