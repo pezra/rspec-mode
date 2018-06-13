@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.19
+;; Version: 1.20
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.20 - Fix a regression of `rspec-run-last-failed'
 ;; 1.19 - Fix bugs about change of buffer naming
 ;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
 ;;        hooks
@@ -833,15 +834,12 @@ or a cons (FILE . LINE), to run one example."
       target
     (make-rspec-compile-target
      :use-rake (rspec-rake-p)
-     :specs (let ((entries (cond ((and (listp target) (listp (cdr target)))
-                                  (mapcar (lambda (f) (list f)) target))
-                                 ((listp target)
-                                  (list target))
-                                 (t
-                                  (list (list target))))))
-              (mapcar (lambda (e)
-                        (cons (expand-file-name (car e)) (cdr e)))
-                      entries)))))
+     :specs (cond ((and (listp target) (listp (cdr target)))
+                   (mapcar (lambda (f) (list f)) target))
+                  ((listp target)
+                   (list target))
+                  (t
+                   (list (list target)))))))
 
 (defun rspec-compile-command (target &optional opts)
   "Composes RSpec command line for the compile function"
