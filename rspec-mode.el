@@ -818,9 +818,9 @@ or a cons (FILE . LINE), to run one example."
     (if rspec-use-chruby
         (chruby-use-corresponding))
 
-    (let ((default-directory (or (rspec-project-root) default-directory))
+    (let ((target-directory (or (rspec-project-root) default-directory))
           (compilation-buffer-name-function 'rspec-compilation-buffer-name))
-      (setf (rspec-compile-target-directory compile-target) default-directory)
+      (setf (rspec-compile-target-directory compile-target) target-directory)
       (compile
        (rspec-compile-command compile-target opts)
        'rspec-compilation-mode))))
