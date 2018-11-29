@@ -273,6 +273,12 @@ They execute after failures have been stored in `rspec-last-failed-specs'."
   :type 'hook
   :group 'rspec-mode)
 
+(defcustom rspec-allow-multiple-compilation-buffers nil
+  "If t allows multiple RSpec to run in distinct compilation
+buffers concurrently"
+  :type 'boolean
+  :group 'rspec-mode)
+
 ;;;###autoload
 (define-minor-mode rspec-mode
   "Minor mode for RSpec files
@@ -820,7 +826,8 @@ or a cons (FILE . LINE), to run one example."
         (chruby-use-corresponding))
 
     (let ((default-directory (or (rspec-project-root) default-directory))
-          (compilation-buffer-name-function 'rspec-compilation-buffer-name))
+          (compilation-buffer-name-function (and rspec-allow-multiple-compilation-buffers
+                                                 'rspec-compilation-buffer-name)))
       (setf (rspec-compile-target-directory compile-target) default-directory)
       (compile
        (rspec-compile-command compile-target opts)

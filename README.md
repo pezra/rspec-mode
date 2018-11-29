@@ -150,6 +150,15 @@ To define the options for different projects, have a look at [Per-Directory Loca
 Set `compilation-scroll-output`. For example, `(setq compilation-scroll-output t)`
 will turn on auto scrolling.
 
+### Multiple Compilation Buffer Support
+
+RSpec Mode can support running multiple RSpec compilation buffers
+concurrently with the `rspec-allow-multiple-compilation-buffers`
+option. To turn this on:
+
+```elisp
+(setq rspec-allow-multiple-compilation-buffers t)
+```
 
 ## Contributing
 
