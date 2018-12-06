@@ -710,7 +710,7 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
-      (format "%s %s bash -c \"%s\""
+      (format "%s %s sh -c \"%s\""
               rspec-docker-command
               rspec-docker-container
               command)
