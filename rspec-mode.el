@@ -255,6 +255,13 @@ for spec files corresponding to files inside them."
   :safe 'listp
   :group 'rspec-mode)
 
+(defcustom rspec-unit-test-dir nil
+  "If non-nil, look for spec files in this directory instead of
+the default project root spec/ directory"
+  :type 'string
+  :group 'rspec-mode
+  )
+
 (defcustom rspec-autosave-buffer nil
   "If t save the current buffer when running
 `rspec-verify', `rspec-verify-single', `rspec-verify-matching',
@@ -546,7 +553,9 @@ to navigate to the example or method corresponding to point."
                            "^\\.\\./"))
           (relative-file-name (file-relative-name a-file-name (rspec-spec-directory a-file-name))))
       (rspec-specize-file-name (expand-file-name (replace-regexp-in-string replace-regex "" relative-file-name)
-                                                 (rspec-spec-directory a-file-name))))))
+                                                 (if rspec-unit-test-dir
+                                                     (concat (rspec-project-root) "/" rspec-unit-test-dir "/")
+                                                   (rspec-spec-directory a-file-name)))))))
 
 (defun rspec-target-in-holder-dir-p (a-file-name)
   (string-match (concat "^" (concat
@@ -564,7 +573,9 @@ to navigate to the example or method corresponding to point."
            for filename = (cl-loop for dir in (cons "."
                                                     rspec-primary-source-dirs)
                                    for target = (replace-regexp-in-string
-                                                 "/spec/"
+                                                 (if rspec-unit-test-dir
+                                                     rspec-unit-test-dir
+                                                   "/spec/")
                                                  (concat "/" dir "/")
                                                  candidate)
                                    if (file-exists-p target)
