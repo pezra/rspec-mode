@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.20
+;; Version: 1.21
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.21 - Allow spec directory to be customized (`rspec-unit-test-dir')
 ;; 1.20 - Fix a regression of `rspec-run-last-failed'
 ;; 1.19 - Fix bugs about change of buffer naming
 ;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'

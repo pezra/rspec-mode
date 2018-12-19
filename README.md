@@ -160,6 +160,19 @@ option. To turn this on:
 (setq rspec-allow-multiple-compilation-buffers t)
 ```
 
+### Setting a Custom Spec Directory
+
+If the spec directory layout doesn't follow usual conventions or is in an unusual
+location, you can set the location of the specs relative to your project root with:
+
+```elisp
+(setq rspec-unit-test-dir "relative_path/to_my_specs")
+```
+
+For example, project ruby files are in `lib/` but the specs are in `spec/unit_tests/lib`
+for some reason.  Set the `rspec-unit-test-dir` variable to "spec/unit_tests" and the
+rspec-mode toggling should work as expected.
+
 ## Contributing
 
 Love RSpec and Emacs? Great, help out by contributing. The easiest way
