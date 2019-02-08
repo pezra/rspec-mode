@@ -157,6 +157,11 @@
   :type 'boolean
   :group 'rspec-mode)
 
+(defcustom rspec-use-rbenv nil
+  "When t, use rbenv. Requires rbenv.el."
+  :type 'boolean
+  :group 'rspec-mode)
+
 (defcustom rspec-docker-command "docker-compose run"
   "Docker command to run."
   :type 'string
@@ -824,6 +829,9 @@ or a cons (FILE . LINE), to run one example."
 
     (if rspec-use-chruby
         (chruby-use-corresponding))
+       
+    (if rspec-use-rbenv
+        (rbenv-use-corresponding))
 
     (let ((default-directory (or (rspec-project-root) default-directory))
           (compilation-buffer-name-function (and rspec-allow-multiple-compilation-buffers
