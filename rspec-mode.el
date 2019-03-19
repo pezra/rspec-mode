@@ -866,8 +866,8 @@ or a cons (FILE . LINE), to run one example."
      (1 compilation-error-face))))
 
 (defvar rspec-compilation-error-regexp-alist-alist
-  '((rspec-capybara-html "screenshot: file://\\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
-    (rspec-capybara-screenshot "screenshot: file://\\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
+  '((rspec-capybara-html "HTML screenshot: \\([0-9A-Za-z@_./\:-]+\\.html\\)" 1 nil nil 0 1)
+    (rspec-capybara-screenshot "Image screenshot: \\([0-9A-Za-z@_./\:-]+\\.png\\)" 1 nil nil 0 1)
     (rspec "^ +# \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\):in" 1 2 nil 2 1)
     (rspec-pendings "^ +# \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 1 1)
     (rspec-summary "^rspec \\([0-9A-Za-z@_./:-]+\\.rb\\):\\([0-9]+\\)" 1 2 nil 2 1)))
