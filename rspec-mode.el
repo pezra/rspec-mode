@@ -174,6 +174,11 @@
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-docker-wrapper-fn 'rspec--docker-default-wrapper
+  "Function for wrapping a command for execution inside a dockerized environment. "
+  :type 'function
+  :group 'rspec-mode)
+
 (defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
@@ -714,12 +719,16 @@ file if it exists, or sensible defaults otherwise."
                                          rspec-vagrant-cwd file))
       (t  file)))))
 
+(defun rspec--docker-default-wrapper (rspec-docker-command rspec-docker-container command)
+  "Function for wrapping a command for execution inside a dockerized environment. "
+  (format "%s %s sh -c \"%s\"" rspec-docker-command rspec-docker-container command))
+
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
-      (format "%s %s sh -c \"%s\""
-              rspec-docker-command
-              rspec-docker-container
-              command)
+      (funcall rspec-docker-wrapper-fn
+               rspec-docker-command
+               rspec-docker-container
+               command)
     command))
 
 (defun rspec--vagrant-wrapper (command)
