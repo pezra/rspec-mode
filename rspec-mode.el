@@ -174,8 +174,7 @@
   :type 'string
   :group 'rspec-mode)
 
-(defcustom rspec-docker-wrapper-fn
-  (lambda (rspec-docker-command rspec-docker-container command) (format "%s %s sh -c \"%s\"" rspec-docker-command rspec-docker-container command))
+(defcustom rspec-docker-wrapper-fn 'rspec--docker-default-wrapper
   "Function for wrapping a command for execution inside a dockerized environment. "
   :type 'function
   :group 'rspec-mode)
@@ -719,6 +718,10 @@ file if it exists, or sensible defaults otherwise."
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
       (t  file)))))
+
+(defun rspec--docker-default-wrapper (rspec-docker-command rspec-docker-container command)
+  "Function for wrapping a command for execution inside a dockerized environment. "
+  (format "%s %s sh -c \"%s\"" rspec-docker-command rspec-docker-container command))
 
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
