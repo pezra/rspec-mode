@@ -902,9 +902,7 @@ or a cons (FILE . LINE), to run one example."
     (setq rspec-last-failed-specs (reverse failures))))
 
 (defun rspec-colorize-compilation-buffer ()
-  (toggle-read-only)
-  (ansi-color-apply-on-region compilation-filter-start (point))
-  (toggle-read-only))
+  (ansi-color-apply-on-region compilation-filter-start (point)))
 
 (defun rspec-handle-error (&rest ignore)
   (save-excursion
