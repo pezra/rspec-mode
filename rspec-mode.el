@@ -184,6 +184,11 @@
   :type 'string
   :group 'rspec-mode)
 
+(defcustom rspec-use-relative-path nil
+  "When t the file path will be relative."
+  :type 'boolean
+  :group 'rspec-mode)
+
 (defcustom rspec-use-bundler-when-possible t
   "When t and Gemfile is present, run specs with 'bundle exec'.
 Not used when running specs using Zeus or Spring."
@@ -717,6 +722,7 @@ file if it exists, or sensible defaults otherwise."
                                          rspec-docker-cwd file))
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
+      (rspec-use-relative-path (file-relative-name file (rspec-project-root)))
       (t  file)))))
 
 (defun rspec--docker-default-wrapper (rspec-docker-command rspec-docker-container command)
