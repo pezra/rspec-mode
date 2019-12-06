@@ -168,7 +168,8 @@
 (defcustom rspec-docker-container "rspec-container-name"
   "Name of the docker container to run rspec in."
   :type 'string
-  :group 'rspec-mode)
+  :group 'rspec-mode
+  :safe 'stringp)
 
 (defcustom rspec-docker-cwd "/app/"
   "Working directory when running inside Docker.  Use trailing slash."
