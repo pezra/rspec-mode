@@ -4,7 +4,7 @@
 ;; Author: Peter Williams, et al.
 ;; URL: http://github.com/pezra/rspec-mode
 ;; Created: 2011
-;; Version: 1.20
+;; Version: 1.21
 ;; Keywords: rspec ruby
 ;; Package-Requires: ((ruby-mode "1.0") (cl-lib "0.4"))
 
@@ -51,6 +51,7 @@
 ;;
 ;;; Change Log:
 ;;
+;; 1.21 - New option `rspec-docker-file-name'.
 ;; 1.20 - Fix a regression of `rspec-run-last-failed'
 ;; 1.19 - Fix bugs about change of buffer naming
 ;; 1.18 - Add `rspec-before-verification-hook' and `rspec-after-verification-hook'
@@ -179,6 +180,12 @@
   :type 'function
   :group 'rspec-mode)
 
+(defcustom rspec-docker-file-name "docker-compose.yml"
+  "File name to look for to determine whether to use Docker."
+  :type 'string
+  :group 'rspec-mode
+  :safe 'stringp)
+
 (defcustom rspec-vagrant-cwd "/vagrant/"
   "Working directory when running inside Vagrant. Use trailing slash."
   :type 'string
@@ -196,7 +203,8 @@ Not used when running specs using Zeus or Spring."
   :group 'rspec-mode)
 
 (defcustom rspec-use-docker-when-possible nil
-  "When t and Dockerfile is present, run specs inside Docker container using 'docker exec'."
+  "When t and a file `rspec-docker-file-name' exists, run specs inside Docker.
+The command that will be used is defined by `rspec-docker-command'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -663,7 +671,7 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec-docker-p ()
   (and rspec-use-docker-when-possible
-       (file-readable-p (concat (rspec-project-root) "Dockerfile"))))
+       (file-readable-p (concat (rspec-project-root) rspec-docker-file-name))))
 
 (defun rspec-vagrant-p ()
   (and rspec-use-vagrant-when-possible
