@@ -977,7 +977,7 @@ or a cons (FILE . LINE), to run one example."
 (defun rspec--autosave-buffer-maybe ()
   "Saves the current buffer if `rspec-autosave-buffer' is t and
 the buffer is a spec or a target file."
-  (when (and rspec-autosave-buffer (rspec-spec-or-target))
+  (when rspec-autosave-buffer
     (save-buffer)))
 
 (defun rspec-snippets-fg-method-call (method)
