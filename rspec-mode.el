@@ -135,9 +135,6 @@
                 (const :tag "Use 'rspec' command" nil))
   :group 'rspec-mode)
 
-(define-obsolete-variable-alias 'rspec-use-rake-flag
-  'rspec-use-rake-when-possible "1.7")
-
 (defcustom rspec-rake-command "rake"
   "The command for rake."
   :type 'string
