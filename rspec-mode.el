@@ -351,6 +351,7 @@ buffers concurrently"
 (defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
   (require 'yasnippet)
+  (defvar yas-snippet-dirs)
   (add-to-list 'yas-snippet-dirs rspec-snippets-dir t)
   (yas-load-directory rspec-snippets-dir))
 
@@ -437,6 +438,9 @@ buffers concurrently"
   (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
                             (rspec-core-options)))
 
+(defvar rspec-last-failed-specs nil
+  "The file and line number of the specs that failed during the last run.")
+
 (defun rspec-run-last-failed ()
   "Run just the specs that failed during the last invocation."
   (interactive)
@@ -468,6 +472,9 @@ in long-running test suites."
       (widen)
       (number-to-string (line-number-at-pos))))
    (rspec-core-options)))
+
+(declare-function dired-current-directory "dired")
+(declare-function dired-get-marked-files "dired")
 
 (defun rspec-dired-verify ()
   "Run all specs in the current directory."
@@ -806,9 +813,6 @@ or a cons (FILE . LINE), to run one example."
       (message "No spec files found!")
     (rspec-compile spec-files opts)))
 
-(defvar rspec-last-failed-specs nil
-  "The file and line number of the specs that failed during the last run.")
-
 (defvar rspec-last-directory nil
   "Directory the last spec process ran in.")
 
@@ -986,9 +990,9 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
 
 (defun rspec-parse-runner-target (target)
   "Parses the `rspec-runner-target' string"
-  (when (string= "SPEC=\'" (subseq target 0 6))
+  (when (string= "SPEC=\'" (cl-subseq target 0 6))
     ;; Removes SPEC=' prefix and ' suffix
-    (setq target (subseq target 6 (1- (length target)))))
+    (setq target (cl-subseq target 6 (1- (length target)))))
   (mapcar (lambda (s) (split-string s ":"))
           (split-string target " ")))
 
