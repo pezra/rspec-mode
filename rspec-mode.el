@@ -945,10 +945,14 @@ or a cons (FILE . LINE), to run one example."
   "Executes any functions in `rspec-before-verification-hook'"
   (run-hooks 'rspec-before-verification-hook))
 
+(defun file-exists-and-is-not-directory-p (file)
+  (and (file-exists-p file)
+       (not (file-directory-p file))))
+
 (defun rspec-project-root-directory-p (directory)
-  (or (file-exists-p (expand-file-name "Rakefile" directory))
-      (file-exists-p (expand-file-name "Gemfile" directory))
-      (file-exists-p (expand-file-name "Berksfile" directory))))
+  (or (file-exists-and-is-not-directory-p (expand-file-name "Rakefile" directory))
+      (file-exists-and-is-not-directory-p (expand-file-name "Gemfile" directory))
+      (file-exists-and-is-not-directory-p (expand-file-name "Berksfile" directory))))
 
 (defun rspec-project-root (&optional directory)
   "Finds the root directory of the project by walking the directory tree until it finds a rake file."
