@@ -852,7 +852,9 @@ or a cons (FILE . LINE), to run one example."
 
     (let ((default-directory (or (rspec-project-root) default-directory))
           (compilation-buffer-name-function (and rspec-allow-multiple-compilation-buffers
-                                                 'rspec-compilation-buffer-name)))
+                                                 'rspec-compilation-buffer-name))
+          (process-environment (cons "RUBY_DEBUG_NO_RELINE=true"
+                                     process-environment)))
       (setf (rspec-compile-target-directory compile-target) default-directory)
       (compile
        (rspec-compile-command compile-target opts)
