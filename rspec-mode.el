@@ -174,7 +174,7 @@
   :group 'rspec-mode)
 
 (defcustom rspec-docker-wrapper-fn 'rspec--docker-default-wrapper
-  "Function for wrapping a command for execution inside a dockerized environment. "
+  "Function for wrapping a command for execution inside a dockerized environment."
   :type 'function
   :group 'rspec-mode)
 
@@ -207,7 +207,8 @@ The command that will be used is defined by `rspec-docker-command'."
   :group 'rspec-mode)
 
 (defcustom rspec-use-vagrant-when-possible nil
-  "When t and Vagrant file is present, run specs inside Vagrant box using 'vagrant ssh -c'."
+  "When t and Vagrant file is present, run specs inside Vagrant box.
+Use shell command 'vagrant ssh -c'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -258,14 +259,14 @@ info, are considered errors."
   :group 'rspec-mode)
 
 (defcustom rspec-expose-dsl-globally nil
-  "Defines whether the RSpec DSL is assumed to be exposed
-  globally, and so prepend snippets at the top level with
-  'RSpec.'."
+  "Defines whether the RSpec DSL is assumed to be exposed globally.
+If t, prepend snippets at the top level with 'RSpec.'."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-primary-source-dirs '("app" "lib")
-  "List of directories whose names should be omitted when looking
+  "Suppression list when searching for spec files.
+List of directories whose names should be omitted when looking
 for spec files corresponding to files inside them."
   :type '(repeat string)
   :safe 'listp
@@ -432,7 +433,8 @@ buffers concurrently"
                          (rspec-core-options)))
 
 (defun rspec-verify-matching ()
-  "Run the specs related to the current buffer. This is more fuzzy that a simple verify."
+  "Run the specs related to the current buffer.
+This is more fuzzy that a simple verify."
   (interactive)
   (rspec--autosave-buffer-maybe)
   (rspec-run-multiple-files (rspec-all-related-spec-files (buffer-file-name))
@@ -838,6 +840,9 @@ or a cons (FILE . LINE), to run one example."
     (let ((default-directory rspec-last-directory))
       (kill-new (apply #'rspec-compile-command rspec-last-arguments)))))
 
+(declare-function rvm-activate-corresponding-ruby nil)
+(declare-function chruby-use-corresponding nil)
+
 (defun rspec-compile (target &optional opts)
   "Run a compile for TARGET with the specified options OPTS."
   (let ((compile-target (rspec-make-rspec-compile-target target)))
@@ -852,7 +857,9 @@ or a cons (FILE . LINE), to run one example."
 
     (let ((default-directory (or (rspec-project-root) default-directory))
           (compilation-buffer-name-function (and rspec-allow-multiple-compilation-buffers
-                                                 'rspec-compilation-buffer-name)))
+                                                 'rspec-compilation-buffer-name))
+          (process-environment (cons "RUBY_DEBUG_NO_RELINE=true"
+                                     process-environment)))
       (setf (rspec-compile-target-directory compile-target) default-directory)
       (compile
        (rspec-compile-command compile-target opts)
@@ -955,7 +962,8 @@ or a cons (FILE . LINE), to run one example."
       (file-exists-and-is-not-directory-p (expand-file-name "Berksfile" directory))))
 
 (defun rspec-project-root (&optional directory)
-  "Finds the root directory of the project by walking the directory tree until it finds a rake file."
+  "Find the root directory of the project.
+Walk the directory tree until it finds a rake file."
   (let ((directory (file-name-as-directory (or directory default-directory))))
     (cond ((rspec-root-directory-p directory)
            (error "Could not determine the project root."))
@@ -963,7 +971,9 @@ or a cons (FILE . LINE), to run one example."
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--include-fg-syntax-methods-p ()
-  "Check whether FactoryGirl::Syntax::Methods is included in rails_helper or spec_helper."
+  "Check if FactoryGirl is available.
+Check whether FactoryGirl::Syntax::Methods is included
+in rails_helper or spec_helper."
   (cl-case rspec-snippets-fg-syntax
     (full nil)
     (concise t)
