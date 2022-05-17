@@ -953,9 +953,9 @@ or a cons (FILE . LINE), to run one example."
   (run-hooks 'rspec-before-verification-hook))
 
 (defun rspec-project-root-directory-p (directory)
-  (or (file-exists-p (expand-file-name "Rakefile" directory))
-      (file-exists-p (expand-file-name "Gemfile" directory))
-      (file-exists-p (expand-file-name "Berksfile" directory))))
+  (or (file-regular-p (expand-file-name "Rakefile" directory))
+      (file-regular-p (expand-file-name "Gemfile" directory))
+      (file-regular-p (expand-file-name "Berksfile" directory))))
 
 (defun rspec-project-root (&optional directory)
   "Find the root directory of the project.
