@@ -1,5 +1,6 @@
 # -*- mode: snippet -*-
 # name: describe Class, "modifier" do ... end
+# expand-env: ((top-level (rspec-top-level-desc-p)) (global-dsl rspec-expose-dsl-globally))
 # --
 `(and top-level (not global-dsl) "RSpec.")`describe ${1:`(rspec-class-from-file-name)`}, "${2:modifier}" do
   $0
