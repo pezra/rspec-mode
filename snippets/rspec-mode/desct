@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: describe Class, type: type do ... end
+# expand-env: ((top-level (rspec-top-level-desc-p)) (global-dsl rspec-expose-dsl-globally))
+# --
+`(and top-level (not global-dsl) "RSpec.")`describe ${1:`(rspec-class-from-file-name)`}, type: :${2:`(rspec-type-from-file-name)`} do
+  $0
+end

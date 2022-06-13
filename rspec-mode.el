@@ -366,6 +366,15 @@ buffers concurrently"
       (setq class (replace-regexp-in-string (car rule) (cdr rule) class t t)))
     class))
 
+(defun rspec-type-from-file-name ()
+  "Guess the type of the spec is for."
+  (let* ((name (file-relative-name (buffer-file-name)
+                                   (rspec-spec-directory (buffer-file-name))))
+         (rules `(("/.*" . "") ("s$" . ""))))
+    (dolist (rule rules)
+      (setq name (replace-regexp-in-string (car rule) (cdr rule) name)))
+    name))
+
 (defun rspec-top-level-desc-p ()
   "Return t if point is on the first \"describe\" block opener."
   (save-excursion
