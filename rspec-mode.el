@@ -247,6 +247,13 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
           (const nil))
   :group 'rspec-mode)
 
+(defcustom rspec-factory-gem 'factory-girl
+  "Defines whether to use the FactoryGirl or FactoryBot module in snippets."
+  :type '(choice
+          (const factory-girl)
+          (const factory-bot))
+  :group 'rspec-mode)
+
 (defcustom rspec-compilation-skip-threshold 2
   "Compilation motion commands skip less important messages.
 The value can be either 2 -- skip anything less than error, 1 --
@@ -976,7 +983,9 @@ Walk the directory tree until it finds a rake file."
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
 (defun rspec--factory-girl-module-name ()
-  "FactoryGirl")
+  (if (eq rspec-factory-gem 'factory-bot)
+      "FactoryBot"
+    "FactoryGirl"))
 
 (defun rspec--include-fg-syntax-methods-p ()
   "Check if FactoryGirl is available.
