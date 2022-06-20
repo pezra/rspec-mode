@@ -247,6 +247,13 @@ there's an `include FactoryGirl::Syntax::Methods' statement in spec_helper."
           (const nil))
   :group 'rspec-mode)
 
+(defcustom rspec-factory-gem 'factory-girl
+  "Defines whether to use the FactoryGirl or FactoryBot module in snippets."
+  :type '(choice
+          (const factory-girl)
+          (const factory-bot))
+  :group 'rspec-mode)
+
 (defcustom rspec-compilation-skip-threshold 2
   "Compilation motion commands skip less important messages.
 The value can be either 2 -- skip anything less than error, 1 --
@@ -975,6 +982,11 @@ Walk the directory tree until it finds a rake file."
           ((rspec-project-root-directory-p directory) (expand-file-name directory))
           (t (rspec-project-root (file-name-directory (directory-file-name directory)))))))
 
+(defun rspec--factory-girl-module-name ()
+  (if (eq rspec-factory-gem 'factory-bot)
+      "FactoryBot"
+    "FactoryGirl"))
+
 (defun rspec--include-fg-syntax-methods-p ()
   "Check if FactoryGirl is available.
 Check whether FactoryGirl::Syntax::Methods is included
@@ -990,7 +1002,7 @@ in rails_helper or spec_helper."
             (with-temp-buffer
               (insert-file-contents expanded-path)
               (ruby-mode)
-              (when (re-search-forward "include +FactoryGirl::Syntax::Methods" nil t)
+              (when (re-search-forward (concat "include +" (rspec--factory-girl-module-name) "::Syntax::Methods") nil t)
                 (not (nth 4 (syntax-ppss))))))))
       '("spec/rails_helper.rb" "spec/spec_helper.rb")))))
 
@@ -1005,7 +1017,7 @@ the buffer is a spec or a target file."
 Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
   (if (rspec--include-fg-syntax-methods-p)
       method
-    (concat "FactoryGirl." method)))
+    (concat (rspec--factory-girl-module-name) "." method)))
 
 (defun rspec-parse-runner-target (target)
   "Parses the `rspec-runner-target' string"
