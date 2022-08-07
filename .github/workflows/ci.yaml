@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  test:
+    name: Emacs ${{ matrix.emacs_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        emacs_version:
+          - '25.1'
+          - '26.1'
+          - '27.1'
+          - '28.1'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: purcell/setup-emacs@v3.0
+        with:
+          version: ${{ matrix.emacs_version }}
+
+      - run: make test
