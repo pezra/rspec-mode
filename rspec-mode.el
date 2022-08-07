@@ -1,4 +1,4 @@
-;;; rspec-mode.el --- Enhance ruby-mode for RSpec
+;;; rspec-mode.el --- Enhance ruby-mode for RSpec -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2008-2015 Peter Williams <http://barelyenough.org> and others
 ;; Author: Peter Williams, et al.
@@ -759,9 +759,9 @@ file if it exists, or sensible defaults otherwise."
       (rspec-use-relative-path (file-relative-name file (rspec-project-root)))
       (t  file)))))
 
-(defun rspec--docker-default-wrapper (rspec-docker-command rspec-docker-container command)
+(defun rspec--docker-default-wrapper (docker-command docker-container command)
   "Function for wrapping a command for execution inside a dockerized environment. "
-  (format "%s %s sh -c \"%s\"" rspec-docker-command rspec-docker-container command))
+  (format "%s %s sh -c \"%s\"" docker-command docker-container command))
 
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
@@ -934,7 +934,7 @@ or a cons (FILE . LINE), to run one example."
   (add-hook 'compilation-finish-functions 'rspec-handle-error nil t)
   (add-hook 'compilation-finish-functions 'rspec-run-after-verification-hooks t t))
 
-(defun rspec-store-failures (&rest ignore)
+(defun rspec-store-failures (&rest _)
   "Store the file and line number of the failed examples from this run."
   (let (failures)
     (save-excursion
@@ -946,7 +946,7 @@ or a cons (FILE . LINE), to run one example."
 (defun rspec-colorize-compilation-buffer ()
   (ansi-color-apply-on-region compilation-filter-start (point)))
 
-(defun rspec-handle-error (&rest ignore)
+(defun rspec-handle-error (&rest _)
   (save-excursion
     (goto-char (point-max))
     (when (save-excursion
@@ -963,11 +963,11 @@ or a cons (FILE . LINE), to run one example."
         (insert-text-button url 'type 'help-url 'help-args (list url))
         (insert ".\n")))))
 
-(defun rspec-run-after-verification-hooks (&rest ignore)
+(defun rspec-run-after-verification-hooks (&rest _)
   "Executes any functions in `rspec-after-verification-hook'"
   (run-hooks 'rspec-after-verification-hook))
 
-(defun rspec-run-before-verification-hooks (&rest ignore)
+(defun rspec-run-before-verification-hooks (&rest _)
   "Executes any functions in `rspec-before-verification-hook'"
   (run-hooks 'rspec-before-verification-hook))
 
@@ -1089,7 +1089,7 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
       (choose (rspec-compilation-buffer-name-with-spec-and-project-path target))
       (nreverse candidates))))
 
-(defun rspec-compilation-buffer-name (&rest ignore)
+(defun rspec-compilation-buffer-name (&rest _)
   "Determines the buffer name of the current rspec compilation"
   (let* ((candidates (rspec-compilation-buffer-name-candidates))
          (first-candidate (car candidates)))
