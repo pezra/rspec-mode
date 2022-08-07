@@ -97,7 +97,9 @@
 (require 'compile)
 (require 'cl-lib)
 
+(defvar rspec-verifiable-mode-keymap)
 (define-prefix-command 'rspec-verifiable-mode-keymap)
+(defvar rspec-mode-keymap)
 (define-prefix-command 'rspec-mode-keymap)
 
 (define-key rspec-verifiable-mode-keymap (kbd "v") 'rspec-verify)
@@ -118,6 +120,7 @@
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
 (define-key rspec-mode-keymap (kbd "d") 'rspec-toggle-example-pendingness)
 
+(defvar rspec-dired-mode-keymap)
 (define-prefix-command 'rspec-dired-mode-keymap)
 (define-key rspec-dired-mode-keymap (kbd "v") 'rspec-dired-verify)
 (define-key rspec-dired-mode-keymap (kbd "s") 'rspec-dired-verify-single)
