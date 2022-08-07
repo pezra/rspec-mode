@@ -1,4 +1,7 @@
 # Emacs RSpec Mode
+
+[![CI](https://github.com/pezra/rspec-mode/workflows/CI/badge.svg)](https://github.com/pezra/rspec-mode/actions/workflows/ci.yaml)
+
 RSpec mode provides some convenience functions for dealing with RSpec.
 
 ## Installation
