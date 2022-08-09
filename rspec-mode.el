@@ -306,7 +306,8 @@ buffers concurrently"
   :type 'boolean
   :group 'rspec-mode)
 
-(declare-function yas-activate-extra-mode "yasnippet")
+(declare-function yas-activate-extra-mode "yasnippet" (mode))
+(declare-function yas-deactivate-extra-mode "yasnippet" (mode))
 (declare-function yas-load-directory "yasnippet" (top-level-dir &optional use-jit interactive))
 
 ;;;###autoload
@@ -318,12 +319,12 @@ buffers concurrently"
   (if rspec-mode
       (progn
         (rspec-set-imenu-generic-expression)
-        ;; Yasnippet 0.8.1+
-        (yas-activate-extra-mode 'rspec-mode))
+        (when (fboundp 'yas-activate-extra-mode)
+          (yas-activate-extra-mode 'rspec-mode)))
     (setq imenu-create-index-function 'ruby-imenu-create-index)
     (setq imenu-generic-expression nil)
-    (when (boundp 'yas-extra-modes)
-      (setq yas-extra-modes (delq 'rspec-mode yas-extra-modes)))))
+    (when (fboundp 'yas-deactivate-extra-mode)
+      (yas-deactivate-extra-mode 'rspec-mode))))
 
 ;;;###autoload
 (define-minor-mode rspec-verifiable-mode
