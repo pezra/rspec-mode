@@ -316,6 +316,7 @@ buffers concurrently"
       (progn
         (rspec-set-imenu-generic-expression)
         (when (boundp 'yas-extra-modes)
+          (declare-function yas--load-pending-jits ())
           (if (fboundp 'yas-activate-extra-mode)
               ;; Yasnippet 0.8.1+
               (yas-activate-extra-mode 'rspec-mode)
@@ -362,6 +363,7 @@ buffers concurrently"
 (defun rspec-install-snippets ()
   "Add `rspec-snippets-dir' to `yas-snippet-dirs' and load snippets from it."
   (require 'yasnippet)
+  (declare-function yas-load-directory (top-level-dir &optional use-jit interactive))
   (defvar yas-snippet-dirs)
   (add-to-list 'yas-snippet-dirs rspec-snippets-dir t)
   (yas-load-directory rspec-snippets-dir))
