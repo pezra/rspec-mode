@@ -84,7 +84,7 @@
 ;; 0.7 - follow RoR conventions for file in lib directory (Tim Harper)
 ;; 0.6 - support for arbitrary spec and rake commands (David Yeu)
 ;; 0.5 - minor changes from Tim Harper
-;; 0.4 - ansi colorization of compliation buffers (teaforthecat)
+;; 0.4 - ansi colorization of compilation buffers (teaforthecat)
 ;; 0.3 - Dave Nolan implements respect for spec.opts config and
 ;;       custom option to use 'rake spec' task or 'spec' command
 ;; 0.2 - Tim Harper implemented support for imenu to generate a basic
