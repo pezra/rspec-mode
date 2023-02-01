@@ -1107,7 +1107,7 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
 
 ;; Hook up all Ruby buffers.
 ;;;###autoload
-(dolist (hook '(ruby-mode-hook enh-ruby-mode-hook))
+(dolist (hook '(ruby-mode-hook ruby-ts-mode-hook enh-ruby-mode-hook))
   (add-hook hook 'rspec-enable-appropriate-mode))
 
 ;; Add verify related spec keybinding to rails minor mode buffers
