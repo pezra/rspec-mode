@@ -127,21 +127,6 @@
 (define-key rspec-dired-mode-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-dired-mode-keymap (kbd "r") 'rspec-rerun)
 
-(defvar rspec--docker-commands
-  '("docker exec"
-    "docker run"
-    "docker-compose exec"
-    "docker-compose run"
-    "nerdctl compose exec"
-    "nerdctl compose run"
-    "nerdctl exec"
-    "nerdctl run"
-    "podman exec"
-    "podman run"
-    "podman-compose exec"
-    "podman-compose run")
-  "List of acceptable docker commands to use.")
-
 (defgroup rspec-mode nil
   "RSpec minor mode."
   :group 'languages)
@@ -178,7 +163,7 @@
   :type 'string
   :group 'rspec-mode
   :safe (lambda (value)
-          (member value rspec--docker-commands)))
+          (member value '("docker-compose run" "docker-compose exec" "docker run" "docker exec"))))
 
 (defcustom rspec-docker-container "rspec-container-name"
   "Name of the docker container to run rspec in."
@@ -776,7 +761,24 @@ file if it exists, or sensible defaults otherwise."
 
 (defun rspec--docker-default-wrapper (docker-command docker-container command)
   "Function for wrapping a command for execution inside a dockerized environment. "
-  (format "%s %s sh -c \"%s\"" docker-command docker-container command))
+    (if-let ((docker-cwd . ((rspec--docker-find-cwd))))
+        (format "cd %s; %s %s sh -c \"%s\""
+                docker-cwd
+                docker-command
+                docker-container
+                command)
+      (format "%s %s sh -c \"%s\""
+                docker-command
+                docker-container
+                command)
+    ))
+
+(defun rspec--docker-find-cwd ()
+  (when (and
+         rspec-docker-file-name
+         (file-exists-p rspec-docker-file-name))
+    (file-name-directory
+     (expand-file-name rspec-docker-file-name))))
 
 (defun rspec--docker-wrapper (command)
   (if (rspec-docker-p)
