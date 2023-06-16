@@ -163,7 +163,22 @@
   :type 'string
   :group 'rspec-mode
   :safe (lambda (value)
-          (member value '("docker-compose run" "docker-compose exec" "docker run" "docker exec"))))
+          (member value rspec--docker-commands)))
+
+(defvar rspec--docker-commands
+  '("docker exec"
+    "docker run"
+    "docker-compose exec"
+    "docker-compose run"
+    "nerdctl compose exec"
+    "nerdctl compose run"
+    "nerdctl exec"
+    "nerdctl run"
+    "podman exec"
+    "podman run"
+    "podman-compose exec"
+    "podman-compose run")
+  "List of acceptable docker commands to use.")
 
 (defcustom rspec-docker-container "rspec-container-name"
   "Name of the docker container to run rspec in."
