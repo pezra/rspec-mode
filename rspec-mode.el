@@ -766,12 +766,12 @@ file if it exists, or sensible defaults otherwise."
         (vagrant (rspec-vagrant-p)))
     (shell-quote-argument
      (cond
+      (rspec-use-relative-path (file-relative-name file (rspec-project-root)))
       (remote (substring file (length remote)))
       (docker (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-docker-cwd file))
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
-      (rspec-use-relative-path (file-relative-name file (rspec-project-root)))
       (t  file)))))
 
 (defun rspec--docker-default-wrapper (docker-command docker-container command)
