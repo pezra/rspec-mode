@@ -226,17 +226,17 @@ The command that will be used is defined by `rspec-docker-command'."
 
 (defcustom rspec-use-vagrant-when-possible nil
   "When t and Vagrant file is present, run specs inside Vagrant box.
-Use shell command 'vagrant ssh -c'."
+Use shell command `vagrant ssh -c'."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-zeus-when-possible t
-  "When t and .zeus.sock is present, run specs with 'zeus'."
+  "When t and .zeus.sock is present, run specs with `zeus'."
   :type 'boolean
   :group 'rspec-mode)
 
 (defcustom rspec-use-spring-when-possible t
-  "When t and spring.pid is present, run specs with 'spring'."
+  "When t and spring.pid is present, run specs with `spring'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -285,7 +285,7 @@ info, are considered errors."
 
 (defcustom rspec-expose-dsl-globally nil
   "Defines whether the RSpec DSL is assumed to be exposed globally.
-If t, prepend snippets at the top level with 'RSpec.'."
+If t, prepend snippets at the top level with `RSpec.'."
   :type 'boolean
   :group 'rspec-mode)
 
@@ -524,7 +524,7 @@ in long-running test suites."
                  (rspec-core-options)))
 
 (defun rspec-verify-all ()
-  "Run the 'spec' rake task for the project of the current file."
+  "Run the `spec' rake task for the project of the current file."
   (interactive)
   (rspec-run (rspec-core-options)))
 
