@@ -158,13 +158,6 @@
   :type 'boolean
   :group 'rspec-mode)
 
-(defcustom rspec-docker-command "docker-compose run"
-  "Docker command to run."
-  :type 'string
-  :group 'rspec-mode
-  :safe (lambda (value)
-          (member value rspec--docker-commands)))
-
 (defvar rspec--docker-commands
   '("docker exec"
     "docker run"
@@ -179,6 +172,13 @@
     "podman-compose exec"
     "podman-compose run")
   "List of acceptable docker commands to use.")
+
+(defcustom rspec-docker-command "docker-compose run"
+  "Docker command to run."
+  :type 'string
+  :group 'rspec-mode
+  :safe (lambda (value)
+          (member value rspec--docker-commands)))
 
 (defcustom rspec-docker-container "rspec-container-name"
   "Name of the docker container to run rspec in."
