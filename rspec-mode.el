@@ -213,7 +213,7 @@
   :group 'rspec-mode)
 
 (defcustom rspec-use-bundler-when-possible t
-  "When t and Gemfile is present, run specs with 'bundle exec'.
+  "When t and Gemfile is present, run specs with `bundle exec'.
 Not used when running specs using Zeus or Spring."
   :type 'boolean
   :group 'rspec-mode)
