@@ -140,7 +140,7 @@
   "When non-nil and Rakefile is present, run specs via rake spec task."
   :tag "RSpec runner command"
   :type '(radio (const :tag "Use 'rake spec' task" t)
-          (const :tag "Use 'rspec' command" nil))
+                (const :tag "Use 'rspec' command" nil))
   :group 'rspec-mode)
 
 (defcustom rspec-rake-command "rake"
@@ -284,8 +284,8 @@ skip anything less than warning or 0 -- don't skip any messages.
 Note that all messages not positively identified as warning or
 info, are considered errors."
   :type '(choice (const :tag "Skip warnings and info" 2)
-          (const :tag "Skip info" 1)
-          (const :tag "No skip" 0))
+                 (const :tag "Skip info" 1)
+                 (const :tag "No skip" 0))
   :group 'rspec-mode)
 
 (defcustom rspec-expose-dsl-globally nil
@@ -583,19 +583,19 @@ the method at point."
 (defun rspec--toggle-spec-and-target-find-method (toggle-function)
   (cl-labels
       ((get-spec-name ()
-         (save-excursion
-           (end-of-line)
-           (or
-            (re-search-backward "\\(?:describe\\|context\\)\s*(?[\s\n]*['\"][#\\.]\\([a-zA-Z_?!]*\\)['\"].*[\n\s)]* ?do" nil t)
-            (error "No method spec before point"))
-           (match-string 1)))
+                      (save-excursion
+                        (end-of-line)
+                        (or
+                         (re-search-backward "\\(?:describe\\|context\\)\s*(?[\s\n]*['\"][#\\.]\\([a-zA-Z_?!]*\\)['\"].*[\n\s)]* ?do" nil t)
+                         (error "No method spec before point"))
+                        (match-string 1)))
        (get-method-name ()
-         (save-excursion
-           (end-of-line)
-           (or
-            (re-search-backward "def \\(?:self\\)?\\(.?[a-zA-Z_?!]+\\)" nil t)
-            (error "No method definition before point"))
-           (match-string 1))))
+                        (save-excursion
+                          (end-of-line)
+                          (or
+                           (re-search-backward "def \\(?:self\\)?\\(.?[a-zA-Z_?!]+\\)" nil t)
+                           (error "No method definition before point"))
+                          (match-string 1))))
     (let* ((spec-p (rspec-buffer-is-spec-p))
            (target-regexp (if spec-p
                               (format "def \\(self\\)?\\.?%s" (regexp-quote (get-spec-name)))
