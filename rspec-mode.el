@@ -104,6 +104,8 @@
 
 (define-key rspec-verifiable-mode-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-verifiable-mode-keymap (kbd "a") 'rspec-verify-all)
+(define-key rspec-verifiable-mode-keymap (kbd "g") 'rspec-verify-tagged)
+(define-key rspec-verifiable-mode-keymap (kbd "G") 'rspec-verify-all-tagged)
 (define-key rspec-verifiable-mode-keymap (kbd "t") 'rspec-toggle-spec-and-target)
 (define-key rspec-verifiable-mode-keymap (kbd "e") 'rspec-toggle-spec-and-target-find-example)
 (define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
@@ -125,6 +127,9 @@
 (define-key rspec-dired-mode-keymap (kbd "v") 'rspec-dired-verify)
 (define-key rspec-dired-mode-keymap (kbd "s") 'rspec-dired-verify-single)
 (define-key rspec-dired-mode-keymap (kbd "a") 'rspec-verify-all)
+(define-key rspec-dired-mode-keymap (kbd "g") 'rspec-dired-verify-tagged)
+(define-key rspec-dired-mode-keymap (kbd "i") 'rspec-dired-verify-single-tagged)
+(define-key rspec-dired-mode-keymap (kbd "G") 'rspec-verify-all-tagged)
 (define-key rspec-dired-mode-keymap (kbd "r") 'rspec-rerun)
 
 (defgroup rspec-mode nil
@@ -526,11 +531,27 @@ in long-running test suites."
   (interactive)
   (rspec-run-single-file (dired-current-directory) (rspec-core-options)))
 
+(defun rspec-dired-verify-tagged (tags)
+  "Run the specs tagged with TAGS."
+  (interactive "sTags (separated by space): ")
+  (let ((tags-list (split-string tags)))
+    (rspec-run-single-file (dired-current-directory)
+                           (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " ") " "
+                                   (rspec-core-options)))))
+
 (defun rspec-dired-verify-single ()
   "Run marked specs or spec at point (works with directories too)."
   (interactive)
   (rspec-compile (dired-get-marked-files)
                  (rspec-core-options)))
+
+(defun rspec-dired-verify-single-tagged (tags)
+  "Run the specs tagged with TAGS."
+  (interactive "sTags (separated by space): ")
+  (let ((tags-list (split-string tags)))
+    (rspec-compile (dired-get-marked-files)
+                   (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " ") " "
+                           (rspec-core-options)))))
 
 (defun rspec-verify-all ()
   "Run the `spec' rake task for the project of the current file."
