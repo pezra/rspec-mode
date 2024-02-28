@@ -805,7 +805,7 @@ file if it exists, or sensible defaults otherwise."
       (rspec-use-relative-path (file-relative-name file (rspec-project-root)))
       (remote (substring file (length remote)))
       (docker (replace-regexp-in-string (regexp-quote (rspec-project-root))
-                                        rspec-docker-cwd file))
+                                         rspec-docker-cwd file))
       (vagrant (replace-regexp-in-string (regexp-quote (rspec-project-root))
                                          rspec-vagrant-cwd file))
       (t  file)))))
@@ -953,10 +953,10 @@ or a cons (FILE . LINE), to run one example."
 (defun rspec-compile-command (target &optional opts)
   "Composes RSpec command line for the compile function"
   (rspec--vagrant-wrapper
-   (rspec--docker-wrapper
+    (rspec--docker-wrapper
     (mapconcat 'identity `(,(rspec-runner)
-                           ,(rspec-runner-options opts)
-                           ,(rspec-runner-target target)) " "))))
+                            ,(rspec-runner-options opts)
+                            ,(rspec-runner-target target)) " "))))
 
 (defvar rspec-compilation-mode-font-lock-keywords
   '((compilation--ensure-parse)
@@ -1131,8 +1131,8 @@ Looks at FactoryGirl::Syntax::Methods usage in spec_helper."
   (let ((target (car rspec-last-arguments))
         candidates)
     (cl-flet ((choose (name)
-                (when name
-                  (push name candidates))))
+                      (when name
+                        (push name candidates))))
       (choose rspec-compilation-buffer-name-base)
       (choose (rspec-compilation-buffer-name-with-spec-file-name target))
       (choose (rspec-compilation-buffer-name-with-project-name target))
