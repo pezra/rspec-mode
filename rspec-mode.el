@@ -101,11 +101,11 @@
 (define-prefix-command 'rspec-verifiable-mode-keymap)
 (defvar rspec-mode-keymap)
 (define-prefix-command 'rspec-mode-keymap)
+(defvar rspec-verifiable-tags-mode-keymap)
+(define-prefix-command 'rspec-verifiable-tags-mode-keymap)
 
 (define-key rspec-verifiable-mode-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-verifiable-mode-keymap (kbd "a") 'rspec-verify-all)
-(define-key rspec-verifiable-mode-keymap (kbd "g") 'rspec-verify-tagged)
-(define-key rspec-verifiable-mode-keymap (kbd "G") 'rspec-verify-all-tagged)
 (define-key rspec-verifiable-mode-keymap (kbd "t") 'rspec-toggle-spec-and-target)
 (define-key rspec-verifiable-mode-keymap (kbd "e") 'rspec-toggle-spec-and-target-find-example)
 (define-key rspec-verifiable-mode-keymap (kbd "4 t") 'rspec-find-spec-or-target-other-window)
@@ -117,6 +117,10 @@
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
 (define-key rspec-verifiable-mode-keymap (kbd "f") 'rspec-run-last-failed)
 
+(define-key rspec-verifiable-mode-keymap (kbd "g") rspec-verifiable-tags-mode-keymap)
+(define-key rspec-verifiable-tags-mode-keymap (kbd "v") 'rspec-verify-tags)
+(define-key rspec-verifiable-tags-mode-keymap (kbd "a") 'rspec-verify-tags-all)
+
 (set-keymap-parent rspec-mode-keymap rspec-verifiable-mode-keymap)
 
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
@@ -124,13 +128,18 @@
 
 (defvar rspec-dired-mode-keymap)
 (define-prefix-command 'rspec-dired-mode-keymap)
+(defvar rspec-dired-tags-mode-keymap)
+(define-prefix-command 'rspec-dired-tags-mode-keymap)
+
 (define-key rspec-dired-mode-keymap (kbd "v") 'rspec-dired-verify)
 (define-key rspec-dired-mode-keymap (kbd "s") 'rspec-dired-verify-single)
 (define-key rspec-dired-mode-keymap (kbd "a") 'rspec-verify-all)
-(define-key rspec-dired-mode-keymap (kbd "g") 'rspec-dired-verify-tagged)
-(define-key rspec-dired-mode-keymap (kbd "i") 'rspec-dired-verify-single-tagged)
-(define-key rspec-dired-mode-keymap (kbd "G") 'rspec-verify-all-tagged)
 (define-key rspec-dired-mode-keymap (kbd "r") 'rspec-rerun)
+
+(define-key rspec-dired-mode-keymap (kbd "g") rspec-dired-tags-mode-keymap)
+(define-key rspec-dired-tags-mode-keymap (kbd "v") 'rspec-dired-verify-tags)
+(define-key rspec-dired-tags-mode-keymap (kbd "a") 'rspec-verify-tags-all)
+(define-key rspec-dired-tags-mode-keymap (kbd "s") 'rspec-dired-verify-tags-single)
 
 (defgroup rspec-mode nil
   "RSpec minor mode."
@@ -471,11 +480,24 @@ buffers concurrently"
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
                          (rspec-core-options)))
 
-(defun rspec-verify-tagged (tags)
-  "Run the specs tagged with TAGS."
-  (interactive "sTags (separated by space): ")
+(defvar rspec-tags-history nil
+  "History of tags used in rspec-verify-tags-* functions.")
+
+(defun rspec-add-tags-to-history (tags)
+  "Add TAGS to rspec-tags-history and optionally save to savehist."
+  (dolist (tag tags)
+    (add-to-history 'rspec-tags-history tag))
+  (when (and (featurep 'savehist) savehist-mode)
+    (unless (member 'rspec-tags-history savehist-additional-variables)
+      (add-to-list 'savehist-additional-variables 'rspec-tags-history))))
+
+(defun rspec-verify-tags ()
+  "Run the specified spec, or the spec file for the current buffer, filtered by one or multiple tags."
+  (interactive)
   (rspec--autosave-buffer-maybe)
-  (let ((tags-list (split-string tags)))
+  (let* ((tags-string (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history))
+         (tags-list (if (stringp tags-string) (split-string tags-string ",\\s-*") tags-string)))
+    (rspec-add-tags-to-history tags-list)
     (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
                            (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " "))
                            (rspec-core-options))))
@@ -527,14 +549,16 @@ in long-running test suites."
 (declare-function dired-get-marked-files "dired")
 
 (defun rspec-dired-verify ()
-  "Run all specs in the current directory."
+  "Run all specs in the current directory, filtered by one or multiple tags."
   (interactive)
   (rspec-run-single-file (dired-current-directory) (rspec-core-options)))
 
-(defun rspec-dired-verify-tagged (tags)
-  "Run the specs tagged with TAGS."
-  (interactive "sTags (separated by space): ")
-  (let ((tags-list (split-string tags)))
+(defun rspec-dired-verify-tags ()
+  "Run all specs in the current directory, filtered by one or multiple tags."
+  (interactive)
+  (let* ((tags-string (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history))
+         (tags-list (if (stringp tags-string) (split-string tags-string ",\\s-*") tags-string)))
+    (rspec-add-tags-to-history tags-list)
     (rspec-run-single-file (dired-current-directory)
                            (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " ") " "
                                    (rspec-core-options)))))
@@ -545,10 +569,12 @@ in long-running test suites."
   (rspec-compile (dired-get-marked-files)
                  (rspec-core-options)))
 
-(defun rspec-dired-verify-single-tagged (tags)
-  "Run the specs tagged with TAGS."
-  (interactive "sTags (separated by space): ")
-  (let ((tags-list (split-string tags)))
+(defun rspec-dired-verify-tags-single ()
+  "Run marked specs or spec at point, filtered by one or multiple tags (works with directories too)."
+  (interactive)
+  (let* ((tags-string (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history))
+         (tags-list (if (stringp tags-string) (split-string tags-string ",\\s-*") tags-string)))
+    (rspec-add-tags-to-history tags-list)
     (rspec-compile (dired-get-marked-files)
                    (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " ") " "
                            (rspec-core-options)))))
@@ -558,10 +584,12 @@ in long-running test suites."
   (interactive)
   (rspec-run (rspec-core-options)))
 
-(defun rspec-verify-all-tagged (tags)
-  "Run the specs tagged with TAGS."
-  (interactive "sTags (separated by space): ")
-  (let ((tags-list (split-string tags)))
+(defun rspec-verify-tags-all ()
+  "Run the `spec' rake task for the project of the current file, filtered by one or multiple tags."
+  (interactive)
+  (let* ((tags-string (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history))
+         (tags-list (if (stringp tags-string) (split-string tags-string ",\\s-*") tags-string)))
+    (rspec-add-tags-to-history tags-list)
     (rspec-run (concat (rspec-core-options) (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags-list " ")))))
 
 (defun rspec-toggle-spec-and-target ()
