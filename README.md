@@ -33,20 +33,22 @@ automatically when `ruby-mode` is started.
 
 These keybindings are available in any Ruby source file:
 
-Keybinding  | Description                                                                   |
-------------|-------------------------------------------------------------------------------|
-`C-c , v`   | Verify the spec file associated with the current buffer                       |
-`C-c , a`   | Run spec for entire project                                                   |
-`C-c , t`   | Toggle back and forth between a spec and its target                           |
-`C-c , e`   | Toggle back and forth between a method and its examples in the spec file      |
-`C-c , 4 t` | Find in the other window the spec or the target file                          |
-`C-c , 4 e` | As above, but try to navigate to the example or method corresponding to point |
-`C-c , r`   | Re-run the last verification process                                          |
-`C-c , y`   | Yank the last verification command to clipboard                               |
-`C-c , m`   | Run all specs related to the current buffer                                   |
-`C-c , c`   | Run the current spec and all after it                                         |
-`C-c , s`   | Verify the example or method defined at point                                 |
-`C-c , f`   | Re-run just the failed examples from the last run                             |
+| Keybinding     | Description                                                                               |
+| -------------- | ----------------------------------------------------------------------------------------- |
+| `C-c , v`      | Verify the spec file associated with the current buffer                                   |
+| `C-c , a`      | Run spec for entire project                                                               |
+| `C-c , t`      | Toggle back and forth between a spec and its target                                       |
+| `C-c , e`      | Toggle back and forth between a method and its examples in the spec file                  |
+| `C-c , 4 t`    | Find in the other window the spec or the target file                                      |
+| `C-c , 4 e`    | As above, but try to navigate to the example or method corresponding to point             |
+| `C-c , r`      | Re-run the last verification process                                                      |
+| `C-c , y`      | Yank the last verification command to clipboard                                           |
+| `C-c , m`      | Run all specs related to the current buffer                                               |
+| `C-c , c`      | Run the current spec and all after it                                                     |
+| `C-c , s`      | Verify the example or method defined at point                                             |
+| `C-c , f`      | Re-run just the failed examples from the last run                                         |
+| `C-c , g v`    | Verify the spec file associated with the current buffer, filtered by one or multiple tags |
+| `C-c , g a`    | Run spec for entire project, filtered by one or multiple tags                             |
 
 ### RSpec mode
 
@@ -61,12 +63,15 @@ Keybinding | Description                                    |
 
 These keybindings are available in Dired buffers:
 
-Keybinding | Description                                                    |
------------|----------------------------------------------------------------|
-`C-c , v`  | Run all specs in the current directory                         |
-`C-c , s`  | Run marked specs or spec at point (works with directories too) |
-`C-c , a`  | Run the 'spec' rake task for the project of the current file   |
-`C-c , r`  | Re-run the last RSpec invocation                               |
+Keybinding   | Description                                                                                      |
+-------------|--------------------------------------------------------------------------------------------------|
+`C-c , v`    | Run all specs in the current directory                                                           |
+`C-c , s`    | Run marked specs or spec at point (works with directories too)                                   |
+`C-c , a`    | Run the 'spec' rake task for the project of the current file                                     |
+`C-c , r`    | Re-run the last RSpec invocation                                                                 |
+`C-c , g v`  | Run all specs in the current directory, filtered by one or multiple tags                         |
+`C-c , g s`  | Run marked specs or spec at point, filtered by one or multiple tags (works with directories too) |
+`C-c , g a`  | Run the 'spec' rake task for the project of the current file, filtered by one or multiple tags   |
 
 See `rspec-mode.el` for further usage.
 
