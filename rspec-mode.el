@@ -101,6 +101,8 @@
 (define-prefix-command 'rspec-verifiable-mode-keymap)
 (defvar rspec-mode-keymap)
 (define-prefix-command 'rspec-mode-keymap)
+(defvar rspec-verifiable-tags-mode-keymap)
+(define-prefix-command 'rspec-verifiable-tags-mode-keymap)
 
 (define-key rspec-verifiable-mode-keymap (kbd "v") 'rspec-verify)
 (define-key rspec-verifiable-mode-keymap (kbd "a") 'rspec-verify-all)
@@ -115,6 +117,10 @@
 (define-key rspec-verifiable-mode-keymap (kbd "s") 'rspec-verify-method)
 (define-key rspec-verifiable-mode-keymap (kbd "f") 'rspec-run-last-failed)
 
+(define-key rspec-verifiable-mode-keymap (kbd "g") rspec-verifiable-tags-mode-keymap)
+(define-key rspec-verifiable-tags-mode-keymap (kbd "v") 'rspec-verify-tags)
+(define-key rspec-verifiable-tags-mode-keymap (kbd "a") 'rspec-verify-tags-all)
+
 (set-keymap-parent rspec-mode-keymap rspec-verifiable-mode-keymap)
 
 (define-key rspec-mode-keymap (kbd "s") 'rspec-verify-single)
@@ -122,10 +128,18 @@
 
 (defvar rspec-dired-mode-keymap)
 (define-prefix-command 'rspec-dired-mode-keymap)
+(defvar rspec-dired-tags-mode-keymap)
+(define-prefix-command 'rspec-dired-tags-mode-keymap)
+
 (define-key rspec-dired-mode-keymap (kbd "v") 'rspec-dired-verify)
 (define-key rspec-dired-mode-keymap (kbd "s") 'rspec-dired-verify-single)
 (define-key rspec-dired-mode-keymap (kbd "a") 'rspec-verify-all)
 (define-key rspec-dired-mode-keymap (kbd "r") 'rspec-rerun)
+
+(define-key rspec-dired-mode-keymap (kbd "g") rspec-dired-tags-mode-keymap)
+(define-key rspec-dired-tags-mode-keymap (kbd "v") 'rspec-dired-verify-tags)
+(define-key rspec-dired-tags-mode-keymap (kbd "a") 'rspec-verify-tags-all)
+(define-key rspec-dired-tags-mode-keymap (kbd "s") 'rspec-dired-verify-tags-single)
 
 (defgroup rspec-mode nil
   "RSpec minor mode."
@@ -466,6 +480,19 @@ buffers concurrently"
   (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
                          (rspec-core-options)))
 
+(defvar rspec-tags-history nil
+  "History of tags used in rspec-verify-tags functions.")
+
+(defun rspec-verify-tags ()
+  "Run current spec file, filtered by one or multiple tags."
+  (interactive)
+  (rspec--autosave-buffer-maybe)
+  (let* ((tags (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history nil nil nil 'rspec-tags-history)))
+    (rspec-run-single-file (rspec-spec-file-for (buffer-file-name))
+                           (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags " ")
+                                   " "
+                                   (rspec-core-options)))))
+
 (defun rspec-verify-matching ()
   "Run the specs related to the current buffer.
 This is more fuzzy that a simple verify."
@@ -517,16 +544,43 @@ in long-running test suites."
   (interactive)
   (rspec-run-single-file (dired-current-directory) (rspec-core-options)))
 
+(defun rspec-dired-verify-tags ()
+  "Run all specs in the current directory, filtered by one or multiple tags."
+  (interactive)
+  (let* ((tags (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history nil nil nil 'rspec-tags-history))
+         (rspec-command-options (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags " ")
+                                        " "
+                                        (rspec-core-options))))
+    (rspec-dired-verify)))
+
 (defun rspec-dired-verify-single ()
   "Run marked specs or spec at point (works with directories too)."
   (interactive)
   (rspec-compile (dired-get-marked-files)
                  (rspec-core-options)))
 
+(defun rspec-dired-verify-tags-single ()
+  "Run marked specs/spec at point, filtered by one or multiple tags."
+  (interactive)
+  (let* ((tags (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history nil nil nil 'rspec-tags-history))
+         (rspec-command-options (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags " ")
+                                        " "
+                                        (rspec-core-options))))
+    (rspec-dired-verify-single)))
+
 (defun rspec-verify-all ()
   "Run the `spec' rake task for the project of the current file."
   (interactive)
   (rspec-run (rspec-core-options)))
+
+(defun rspec-verify-tags-all ()
+  "Run project specs, filtered by one or multiple tags."
+  (interactive)
+  (let* ((tags (completing-read-multiple "Select tags (separated by comma): " rspec-tags-history nil nil nil 'rspec-tags-history))
+         (rspec-command-options (concat (mapconcat #'(lambda (tag) (format " --tag %s" tag)) tags " ")
+                                        " "
+                                        (rspec-core-options))))
+    (rspec-verify-all)))
 
 (defun rspec-toggle-spec-and-target ()
   "Switch to the spec or the target file for the current buffer.
